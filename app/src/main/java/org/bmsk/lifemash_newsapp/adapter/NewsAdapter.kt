@@ -5,16 +5,21 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import org.bmsk.lifemash_newsapp.data.model.NewsItem
+import com.bumptech.glide.Glide
+import org.bmsk.lifemash_newsapp.data.model.NewsModel
 import org.bmsk.lifemash_newsapp.databinding.ItemNewsBinding
 
-class NewsAdapter : ListAdapter<NewsItem, NewsAdapter.ViewHolder>(diffUtil) {
+class NewsAdapter : ListAdapter<NewsModel, NewsAdapter.ViewHolder>(diffUtil) {
 
     inner class ViewHolder(private val binding: ItemNewsBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: NewsItem) {
+        fun bind(item: NewsModel) {
             binding.titleTextView.text = item.title
+
+            Glide.with(binding.thumbnailImageView)
+                .load(item.imageUrl)
+                .into(binding.thumbnailImageView)
         }
     }
 
@@ -33,12 +38,12 @@ class NewsAdapter : ListAdapter<NewsItem, NewsAdapter.ViewHolder>(diffUtil) {
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<NewsItem>() {
-            override fun areItemsTheSame(oldItem: NewsItem, newItem: NewsItem): Boolean {
+        val diffUtil = object : DiffUtil.ItemCallback<NewsModel>() {
+            override fun areItemsTheSame(oldItem: NewsModel, newItem: NewsModel): Boolean {
                 return oldItem === newItem
             }
 
-            override fun areContentsTheSame(oldItem: NewsItem, newItem: NewsItem): Boolean {
+            override fun areContentsTheSame(oldItem: NewsModel, newItem: NewsModel): Boolean {
                 return oldItem == newItem
             }
         }
