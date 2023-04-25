@@ -69,3 +69,21 @@ RSS 형식의 데이터 방식은 XML 형식으로 데이터를 내려주기 때
 두개가 있지만 Simple XML은 Depecated되었고 JAXB는 Android를 지원하지 않는다...
 
 그렇기 때문에 차선책으로 Tikxml을 사용하고 가급적이면 XML 데이터 포맷 대신 Json 형식을 사용하는 것이 좋을 것이다.
+
+
+## RSS 데이터
+
+Google News에서 (ex: news.google.com/rss/...) rss 키워드를 붙여주면 다음과 같은 XML 데이터를 볼 수 있다.
+(다른 웹 사이트도 가능하다!)
+
+![](.README_images/googlenews_rss.png)
+
+![](.README_images/googlenews_1.png)
+
+- 그러나 rss를 확인해보면 사진 데이터가 보이지 않기 때문에 해당 뉴스 게시물의 링크로 들어가 *메타 데이터*를 확인하기로 한다.
+
+![](.README_images/googlenews_meta.png)
+
+- meta `og:image`와  `og:title`이 보이는 것을 확인할 수 있다. 이것을 활용하도록 한다.
+
+** 메타데이터는 데이터에 대한 데이터로, 다른 데이터의 구조, 의미, 특성, 위치 등을 설명하는 정보이다.
