@@ -70,6 +70,9 @@ RSS 형식의 데이터 방식은 XML 형식으로 데이터를 내려주기 때
 
 그렇기 때문에 차선책으로 Tikxml을 사용하고 가급적이면 XML 데이터 포맷 대신 Json 형식을 사용하는 것이 좋을 것이다.
 
+### 사용법
+
+https://github.com/Tickaroo/tikxml/blob/master/docs/AnnotatingModelClasses.md
 
 ## RSS 데이터
 
