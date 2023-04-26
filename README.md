@@ -1,6 +1,9 @@
 # LifeMash-NewsApp
 
 Retrofit, MaterialDesign(CardView, Chip), Jsoup, Glide, Lottie
+![](gif/use_ex.gif)
+
+![](gif/use_lottie.gif)
 
 ## Material Design
 
@@ -30,7 +33,9 @@ Retrofit, MaterialDesign(CardView, Chip), Jsoup, Glide, Lottie
 ## Jsoup
 
 Jsoup는 자바 라이브러리로, 웹 페이지를 크롤링하고 HTML 문서를 파싱하는 데 사용된다.
-- HTML 데이터를 직접 크롤링하기보다는 서버 통신을 통한 JSON 형식의 데이터를 받는게 더 일반적이므로 자주 사용할 라이브러리는 아니다.(일반적인 앱 서비스에서 자주 사용되는 것은 아니다)
+
+- HTML 데이터를 직접 크롤링하기보다는 서버 통신을 통한 JSON 형식의 데이터를 받는게 더 일반적이므로 자주 사용할 라이브러리는 아니다.(일반적인 앱 서비스에서 자주 사용되는
+  것은 아니다)
 
 ### 주요 기능
 
@@ -64,9 +69,10 @@ RSS 형식의 데이터 방식은 XML 형식으로 데이터를 내려주기 때
 마지막 릴리즈가 2018년 11월, 마지막 커밋이 2020년 7월로 오래되었기에 사용을 권장하지는 않는다.
 
 그러나 Retrofit에서 support하는 XML Parser는
+
 - Simple XML
 - JAXB
-두개가 있지만 Simple XML은 Depecated되었고 JAXB는 Android를 지원하지 않는다...
+  두개가 있지만 Simple XML은 Depecated되었고 JAXB는 Android를 지원하지 않는다...
 
 그렇기 때문에 차선책으로 Tikxml을 사용하고 가급적이면 XML 데이터 포맷 대신 Json 형식을 사용하는 것이 좋을 것이다.
 
@@ -94,8 +100,6 @@ Google News에서 (ex: news.google.com/rss/...) rss 키워드를 붙여주면 �
 ## TextInputLayout
 
 - https://m3.material.io/components/text-fields/overview
-
-
 
 # 2023.04.26 Update
 
