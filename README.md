@@ -1,6 +1,7 @@
 # LifeMash-NewsApp
 
-Retrofit, MaterialDesign(CardView, Chip), Jsoup, Glide, Lottie
+- Retrofit, MaterialDesign(CardView, Chip), Jsoup, Glide, Lottie
+
 ![](gif/use_ex.gif)
 
 ![](gif/use_lottie.gif)
