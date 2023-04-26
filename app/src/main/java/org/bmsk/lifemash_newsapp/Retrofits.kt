@@ -7,7 +7,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
 object Retrofits {
-    val sbsRetrofit = Retrofit.Builder()
+    val sbsRetrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL_SBS)
         .addConverterFactory(
             TikXmlConverterFactory.create(
@@ -23,7 +23,7 @@ object Retrofits {
         }.build())
         .build()
 
-    val googleRetrofit = Retrofit.Builder()
+    val googleRetrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL_GOOGLE)
         .addConverterFactory(
             TikXmlConverterFactory.create(

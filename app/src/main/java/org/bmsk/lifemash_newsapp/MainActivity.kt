@@ -1,6 +1,7 @@
 package org.bmsk.lifemash_newsapp
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -34,7 +35,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter { url ->
+            startActivity(
+                Intent(this, WebViewActivity::class.java).apply {
+                    putExtra("url", url)
+                }
+            )
+        }
 
         binding.newsRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -100,7 +107,8 @@ class MainActivity : AppCompatActivity() {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v.windowToken, 0)
 
-                googleNewsService.search(binding.searchTextInputEditText.text.toString()).submitList()
+                googleNewsService.search(binding.searchTextInputEditText.text.toString())
+                    .submitList()
 
                 return@setOnEditorActionListener true
             }
