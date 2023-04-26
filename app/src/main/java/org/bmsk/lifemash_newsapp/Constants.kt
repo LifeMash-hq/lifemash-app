@@ -14,3 +14,5 @@ const val SECTION_ENTERTAINMENT_BROADCAST = "14"
 // Google
 const val BASE_URL_GOOGLE = "https://news.google.com/"
 
+// putExtraKey
+const val PUT_EXTRA_KEY_URL = "url"

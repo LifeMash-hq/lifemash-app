@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
     <HorizontalScrollView
         android:id="@+id/chipGroupScrollView"
@@ -107,4 +107,16 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
         tools:listitem="@layout/item_news" />
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/notFoundAnimationView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textInputLayout"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/search_not_found" />
 </androidx.constraintlayout.widget.ConstraintLayout>
