@@ -1,15 +1,17 @@
 package org.bmsk.lifemash_newsapp
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tickaroo.tikxml.TikXml
-import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import org.bmsk.lifemash_newsapp.Retrofits.googleRetrofit
+import org.bmsk.lifemash_newsapp.Retrofits.sbsRetrofit
 import org.bmsk.lifemash_newsapp.adapter.NewsAdapter
-import org.bmsk.lifemash_newsapp.data.NewsService
+import org.bmsk.lifemash_newsapp.data.GoogleNewsService
+import org.bmsk.lifemash_newsapp.data.SbsNewsService
 import org.bmsk.lifemash_newsapp.data.model.NewsRss
 import org.bmsk.lifemash_newsapp.data.model.transform
 import org.bmsk.lifemash_newsapp.databinding.ActivityMainBinding
@@ -17,30 +19,15 @@ import org.jsoup.Jsoup
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
+import retrofit2.create
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var newsAdapter: NewsAdapter
 
-    private val retrofit =
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(
-                TikXmlConverterFactory.create(
-                    TikXml.Builder()
-                        .exceptionOnUnreadXml(false)    // 필요한 데이터만 골라서 매핑할 것이기 때문에 이 속성을 추가
-                        .build()
-                )
-            )
-            .client(OkHttpClient.Builder().apply {
-                addInterceptor(HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                })
-            }.build())
-            .build()
-    private val newsService = retrofit.create(NewsService::class.java)
+    private val sbsNewsService = sbsRetrofit.create(SbsNewsService::class.java)
+    private val googleNewsService = googleRetrofit.create(GoogleNewsService::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,53 +45,70 @@ class MainActivity : AppCompatActivity() {
             binding.chipGroup.clearCheck()
             binding.economyChip.isChecked = true
 
-            newsService.getNews(SECTION_ECONOMICS).submitList()
+            sbsNewsService.getNews(SECTION_ECONOMICS).submitList()
         }
 
         binding.politicsChip.setOnClickListener {
             binding.chipGroup.clearCheck()
             binding.politicsChip.isChecked = true
 
-            newsService.getNews(SECTION_POLITICS).submitList()
+            sbsNewsService.getNews(SECTION_POLITICS).submitList()
         }
 
         binding.socialChip.setOnClickListener {
             binding.chipGroup.clearCheck()
             binding.socialChip.isChecked = true
 
-            newsService.getNews(SECTION_SOCIAL).submitList()
+            sbsNewsService.getNews(SECTION_SOCIAL).submitList()
         }
 
         binding.lifeCultureChip.setOnClickListener {
             binding.chipGroup.clearCheck()
             binding.lifeCultureChip.isChecked = true
 
-            newsService.getNews(SECTION_LIFE_CULTURE).submitList()
+            sbsNewsService.getNews(SECTION_LIFE_CULTURE).submitList()
         }
 
         binding.internationalGlobalChip.setOnClickListener {
             binding.chipGroup.clearCheck()
             binding.internationalGlobalChip.isChecked = true
 
-            newsService.getNews(SECTION_INTERNATIONAL_GLOBAL).submitList()
+            sbsNewsService.getNews(SECTION_INTERNATIONAL_GLOBAL).submitList()
         }
 
         binding.entertainmentBroadcastChip.setOnClickListener {
             binding.chipGroup.clearCheck()
             binding.entertainmentBroadcastChip.isChecked = true
 
-            newsService.getNews(SECTION_ENTERTAINMENT_BROADCAST).submitList()
+            sbsNewsService.getNews(SECTION_ENTERTAINMENT_BROADCAST).submitList()
         }
 
         binding.sportChip.setOnClickListener {
             binding.chipGroup.clearCheck()
             binding.sportChip.isChecked = true
 
-            newsService.getNews(SECTION_SPORT).submitList()
+            sbsNewsService.getNews(SECTION_SPORT).submitList()
+        }
+
+        // v: View, actionId: 어떤 액션,
+        binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                binding.chipGroup.clearCheck()
+
+                binding.searchTextInputEditText.clearFocus()
+
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(v.windowToken, 0)
+
+                googleNewsService.search(binding.searchTextInputEditText.text.toString()).submitList()
+
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
         }
 
         binding.economyChip.isChecked = true
-        newsService.getNews().submitList()
+        sbsNewsService.getNews().submitList()
     }
 
     private fun Call<NewsRss>.submitList() {

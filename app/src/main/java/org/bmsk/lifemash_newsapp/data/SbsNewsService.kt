@@ -5,7 +5,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface NewsService {
+interface SbsNewsService {
     @GET("news/SectionRssFeed.do")
     fun getNews(
         @Query("sectionId")
