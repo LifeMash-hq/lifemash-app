@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">LifeMash_NewsApp</string>
+    <string name="politics">정치</string>
+    <string name="social">사회</string>
+    <string name="feed">피드</string>
+    <string name="economy">경제</string>
+    <string name="it">IT</string>
+    <string name="sport">스포츠</string>
+    <string name="life_culture">생활/문화</string>
+    <string name="international_global">국제/글로벌</string>
+    <string name="entertainment_broadcast">연예/방송</string>
 </resources>
