@@ -12,21 +12,30 @@ import org.bmsk.lifemash_newsapp.databinding.ActivityWebViewBinding
 class WebViewActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWebViewBinding
 
-    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityWebViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val url = intent.getStringExtra(PUT_EXTRA_KEY_URL)
-        binding.newsWebView.webViewClient = WebViewClient()
-        binding.newsWebView.settings.javaScriptEnabled = true
-
-        if(url.isNullOrEmpty()) {
-            Toast.makeText(this, R.string.invalid_url, Toast.LENGTH_SHORT).show()
-            finish()
+        if (url.isNullOrEmpty()) {
+            showToastAndFinish()
         } else {
-            binding.newsWebView.loadUrl(url)
+            setupWebView(url)
         }
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun setupWebView(url: String) {
+        binding.newsWebView.apply {
+            webViewClient = WebViewClient()
+            settings.javaScriptEnabled = true
+            loadUrl(url)
+        }
+    }
+
+    private fun showToastAndFinish() {
+        Toast.makeText(this, R.string.invalid_url, Toast.LENGTH_SHORT).show()
+        finish()
     }
 }

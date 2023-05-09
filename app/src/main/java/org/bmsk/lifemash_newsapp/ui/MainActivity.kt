@@ -2,16 +2,13 @@ package org.bmsk.lifemash_newsapp.ui
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.bmsk.lifemash_newsapp.PUT_EXTRA_KEY_URL
-import org.bmsk.lifemash_newsapp.data.Retrofits.googleRetrofit
-import org.bmsk.lifemash_newsapp.data.Retrofits.sbsRetrofit
 import org.bmsk.lifemash_newsapp.SECTION_ECONOMICS
 import org.bmsk.lifemash_newsapp.SECTION_ENTERTAINMENT_BROADCAST
 import org.bmsk.lifemash_newsapp.SECTION_INTERNATIONAL_GLOBAL
@@ -20,16 +17,17 @@ import org.bmsk.lifemash_newsapp.SECTION_POLITICS
 import org.bmsk.lifemash_newsapp.SECTION_SOCIAL
 import org.bmsk.lifemash_newsapp.SECTION_SPORT
 import org.bmsk.lifemash_newsapp.adapter.NewsAdapter
-import org.bmsk.lifemash_newsapp.data.service.GoogleNewsService
-import org.bmsk.lifemash_newsapp.data.service.SbsNewsService
+import org.bmsk.lifemash_newsapp.data.Retrofits.googleRetrofit
+import org.bmsk.lifemash_newsapp.data.Retrofits.sbsRetrofit
 import org.bmsk.lifemash_newsapp.data.model.NewsRss
 import org.bmsk.lifemash_newsapp.data.model.transform
+import org.bmsk.lifemash_newsapp.data.service.GoogleNewsService
+import org.bmsk.lifemash_newsapp.data.service.SbsNewsService
 import org.bmsk.lifemash_newsapp.databinding.ActivityMainBinding
 import org.jsoup.Jsoup
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -56,75 +54,52 @@ class MainActivity : AppCompatActivity() {
             adapter = newsAdapter
         }
 
-        binding.economyChip.setOnClickListener {
-            binding.chipGroup.clearCheck()
-            binding.economyChip.isChecked = true
+        setupChipListeners()
 
-            sbsNewsService.getNews(SECTION_ECONOMICS).submitList()
-        }
-
-        binding.politicsChip.setOnClickListener {
-            binding.chipGroup.clearCheck()
-            binding.politicsChip.isChecked = true
-
-            sbsNewsService.getNews(SECTION_POLITICS).submitList()
-        }
-
-        binding.socialChip.setOnClickListener {
-            binding.chipGroup.clearCheck()
-            binding.socialChip.isChecked = true
-
-            sbsNewsService.getNews(SECTION_SOCIAL).submitList()
-        }
-
-        binding.lifeCultureChip.setOnClickListener {
-            binding.chipGroup.clearCheck()
-            binding.lifeCultureChip.isChecked = true
-
-            sbsNewsService.getNews(SECTION_LIFE_CULTURE).submitList()
-        }
-
-        binding.internationalGlobalChip.setOnClickListener {
-            binding.chipGroup.clearCheck()
-            binding.internationalGlobalChip.isChecked = true
-
-            sbsNewsService.getNews(SECTION_INTERNATIONAL_GLOBAL).submitList()
-        }
-
-        binding.entertainmentBroadcastChip.setOnClickListener {
-            binding.chipGroup.clearCheck()
-            binding.entertainmentBroadcastChip.isChecked = true
-
-            sbsNewsService.getNews(SECTION_ENTERTAINMENT_BROADCAST).submitList()
-        }
-
-        binding.sportChip.setOnClickListener {
-            binding.chipGroup.clearCheck()
-            binding.sportChip.isChecked = true
-
-            sbsNewsService.getNews(SECTION_SPORT).submitList()
-        }
-
-        // v: View, actionId: 어떤 액션,
         binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                binding.chipGroup.clearCheck()
-
-                binding.searchTextInputEditText.clearFocus()
-
-                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(v.windowToken, 0)
-
-                googleNewsService.search(binding.searchTextInputEditText.text.toString())
-                    .submitList()
-
-                return@setOnEditorActionListener true
-            }
-            return@setOnEditorActionListener false
+            handleEditorAction(v, actionId)
         }
 
         binding.economyChip.isChecked = true
         sbsNewsService.getNews().submitList()
+    }
+
+    private fun setupChipListeners() {
+        val chipSectionMap = mapOf(
+            binding.economyChip to SECTION_ECONOMICS,
+            binding.politicsChip to SECTION_POLITICS,
+            binding.socialChip to SECTION_SOCIAL,
+            binding.lifeCultureChip to SECTION_LIFE_CULTURE,
+            binding.internationalGlobalChip to SECTION_INTERNATIONAL_GLOBAL,
+            binding.entertainmentBroadcastChip to SECTION_ENTERTAINMENT_BROADCAST,
+            binding.sportChip to SECTION_SPORT
+        )
+
+        for ((chip, section) in chipSectionMap) {
+            chip.setOnClickListener {
+                binding.chipGroup.clearCheck()
+                chip.isChecked = true
+
+                sbsNewsService.getNews(section).submitList()
+            }
+        }
+    }
+
+    private fun handleEditorAction(v: android.view.View, actionId: Int): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            binding.chipGroup.clearCheck()
+
+            binding.searchTextInputEditText.clearFocus()
+
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(v.windowToken, 0)
+
+            googleNewsService.search(binding.searchTextInputEditText.text.toString())
+                .submitList()
+
+            return true
+        }
+        return false
     }
 
     private fun Call<NewsRss>.submitList() {
