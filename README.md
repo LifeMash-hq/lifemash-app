@@ -2,9 +2,7 @@
 
 - Retrofit, MaterialDesign(CardView, Chip), Jsoup, Glide, Lottie
 
-![](gif/use_ex.gif)
-
-![](gif/use_lottie.gif)
+![](gif/use_ex.gif) ![](gif/use_lottie.gif)
 
 ## Material Design
 
