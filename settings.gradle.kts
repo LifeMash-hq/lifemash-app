@@ -13,4 +13,6 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "LifeMash_NewsApp"
-include ':app'
+include(":app")
+include(":core:chatgpt")
+include(":core:model")
