@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id(libs.plugins.hilt.plugin.get().pluginId)
 }
 
 android {
@@ -69,6 +70,9 @@ dependencies {
 
     // lottie
     implementation("com.airbnb.android:lottie:6.0.1")
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
