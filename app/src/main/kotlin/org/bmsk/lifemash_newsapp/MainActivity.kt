@@ -1,4 +1,4 @@
-package org.bmsk.lifemash_newsapp.ui
+package org.bmsk.lifemash_newsapp
 
 import android.content.Context
 import android.content.Intent
@@ -8,14 +8,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import org.bmsk.lifemash_newsapp.PUT_EXTRA_KEY_URL
-import org.bmsk.lifemash_newsapp.SECTION_ECONOMICS
-import org.bmsk.lifemash_newsapp.SECTION_ENTERTAINMENT_BROADCAST
-import org.bmsk.lifemash_newsapp.SECTION_INTERNATIONAL_GLOBAL
-import org.bmsk.lifemash_newsapp.SECTION_LIFE_CULTURE
-import org.bmsk.lifemash_newsapp.SECTION_POLITICS
-import org.bmsk.lifemash_newsapp.SECTION_SOCIAL
-import org.bmsk.lifemash_newsapp.SECTION_SPORT
 import org.bmsk.lifemash_newsapp.adapter.NewsAdapter
 import org.bmsk.lifemash_newsapp.data.Retrofits.googleRetrofit
 import org.bmsk.lifemash_newsapp.data.Retrofits.sbsRetrofit
@@ -24,6 +16,7 @@ import org.bmsk.lifemash_newsapp.data.model.transform
 import org.bmsk.lifemash_newsapp.data.service.GoogleNewsService
 import org.bmsk.lifemash_newsapp.data.service.SbsNewsService
 import org.bmsk.lifemash_newsapp.databinding.ActivityMainBinding
+import org.bmsk.lifemash_newsapp.ui.WebViewActivity
 import org.jsoup.Jsoup
 import retrofit2.Call
 import retrofit2.Callback
