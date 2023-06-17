@@ -1,4 +1,4 @@
-package org.bmsk.lifemash_newsapp.data.model
+package org.bmsk.model
 
 data class NewsModel(
     val title: String,
