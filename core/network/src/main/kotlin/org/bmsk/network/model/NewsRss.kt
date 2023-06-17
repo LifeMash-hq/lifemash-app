@@ -1,4 +1,4 @@
-package org.bmsk.lifemash_newsapp.data.model
+package org.bmsk.network.model
 
 import com.tickaroo.tikxml.annotation.Element
 import com.tickaroo.tikxml.annotation.PropertyElement
@@ -14,7 +14,6 @@ data class NewsRss(
 data class RssChannel(
     @PropertyElement(name = "title")
     val title: String,
-
     @Element(name = "item")
     val items: List<NewsItem>? = null
 )

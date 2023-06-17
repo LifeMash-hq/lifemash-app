@@ -1,6 +1,9 @@
-package org.bmsk.lifemash_newsapp.data.model
+package org.bmsk.data
 
-fun List<NewsItem>.transform(): List<NewsModel> {
+import org.bmsk.model.NewsModel
+import org.bmsk.network.model.NewsItem
+
+fun List<NewsItem>.asDomain(): List<NewsModel> {
     return this.map {
         NewsModel(
             title = it.title ?: "",

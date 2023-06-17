@@ -3,27 +3,17 @@ import org.bmsk.buildsrc.Configuration
 plugins {
     id(libs.plugins.android.library.get().pluginId)
     id(libs.plugins.kotlin.android.get().pluginId)
+    id(libs.plugins.hilt.plugin.get().pluginId)
+    id(libs.plugins.kotlin.kapt.get().pluginId)
+    id(libs.plugins.ksp.get().pluginId) version libs.versions.ksp.get()
 }
 
 android {
-    namespace = Configuration.namespace
+    namespace = "org.bmsk.network"
     compileSdk = Configuration.compileSdk
 
     defaultConfig {
         minSdk = Configuration.minSdk
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -34,7 +24,20 @@ android {
     }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_7
-    targetCompatibility = JavaVersion.VERSION_1_7
+dependencies {
+    implementation(project(":core:model"))
+
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.moshi)
+
+    kapt(libs.tikxml.processor)
+    implementation(libs.tikxml.core)
+    implementation(libs.tikxml.annotation)
+    implementation(libs.tikxml.retrofit)
 }
