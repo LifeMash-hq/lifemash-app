@@ -1,6 +1,13 @@
 # LifeMash-NewsApp
 
-- Retrofit, MaterialDesign(CardView, Chip), Jsoup, Glide, Lottie
+- Retrofit, OkHttp, MaterialDesign(CardView, Chip)
+- Jsoup, Glide
+- Lottie
+- Core Module
+- Hilt
+- Kotlin DSL
+- Jetpack Navigation
+- WebView
 
 ![](gif/use_ex.gif) ![](gif/use_lottie.gif)
 
