@@ -5,34 +5,38 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import org.bmsk.lifemash_newsapp.adapter.NewsAdapter
-import org.bmsk.lifemash_newsapp.data.Retrofits.googleRetrofit
-import org.bmsk.lifemash_newsapp.data.Retrofits.sbsRetrofit
-import org.bmsk.lifemash_newsapp.data.model.NewsRss
-import org.bmsk.lifemash_newsapp.data.model.transform
-import org.bmsk.lifemash_newsapp.data.service.GoogleNewsService
-import org.bmsk.lifemash_newsapp.data.service.SbsNewsService
 import org.bmsk.lifemash_newsapp.databinding.ActivityMainBinding
 import org.bmsk.lifemash_newsapp.ui.WebViewActivity
+import org.bmsk.model.section.SbsSection.SECTION_ECONOMICS
+import org.bmsk.model.section.SbsSection.SECTION_ENTERTAINMENT_BROADCAST
+import org.bmsk.model.section.SbsSection.SECTION_INTERNATIONAL_GLOBAL
+import org.bmsk.model.section.SbsSection.SECTION_LIFE_CULTURE
+import org.bmsk.model.section.SbsSection.SECTION_POLITICS
+import org.bmsk.model.section.SbsSection.SECTION_SOCIAL
+import org.bmsk.model.section.SbsSection.SECTION_SPORT
+import org.bmsk.network.model.NewsRss
 import org.jsoup.Jsoup
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var newsAdapter: NewsAdapter
-
-    private val sbsNewsService = sbsRetrofit.create(SbsNewsService::class.java)
-    private val googleNewsService = googleRetrofit.create(GoogleNewsService::class.java)
-
+    private val viewModel: MainActivityViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = ActivityMainBinding.inflate(layoutInflater).apply {
+            setContentView(root)
+            lifecycleOwner = this@MainActivity
+        }
 
         newsAdapter = NewsAdapter { url ->
             startActivity(
