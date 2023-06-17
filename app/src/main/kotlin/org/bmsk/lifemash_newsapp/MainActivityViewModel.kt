@@ -1,4 +1,8 @@
 package org.bmsk.lifemash_newsapp
 
-class MainActivityViewModel {
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+
+@HiltViewModel
+class MainActivityViewModel: ViewModel() {
 }
