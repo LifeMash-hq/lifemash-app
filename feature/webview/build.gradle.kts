@@ -1,6 +1,6 @@
 import org.bmsk.buildsrc.Configuration
 
-plugins {
+plugins{
     id(libs.plugins.android.library.get().pluginId)
     id(libs.plugins.kotlin.android.get().pluginId)
     id(libs.plugins.kotlin.kapt.get().pluginId)
@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = Configuration.namespace
+    namespace = "org.bmsk.webview"
     compileSdk = Configuration.compileSdk
 
     defaultConfig {
@@ -34,6 +34,9 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        dataBinding = true
+    }
 }
 
 dependencies {
@@ -44,4 +47,5 @@ dependencies {
 
     // di
     kapt(libs.hilt.compiler)
-    implementation(libs.hilt.android)}
+    implementation(libs.hilt.android)
+}
