@@ -1,4 +1,4 @@
-package org.bmsk.webview.ui
+package org.bmsk.topic
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

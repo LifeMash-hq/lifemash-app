@@ -1,3 +1,5 @@
+import org.bmsk.buildsrc.Configuration
+
 plugins {
     id(libs.plugins.android.library.get().pluginId)
     id(libs.plugins.kotlin.android.get().pluginId)
@@ -5,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "org.bmsk.network"
-    compileSdk = org.bmsk.buildsrc.Configuration.compileSdk
+    namespace = "org.bmsk.data"
+    compileSdk = Configuration.compileSdk
 
     defaultConfig {
-        minSdk = org.bmsk.buildsrc.Configuration.minSdk
+        minSdk = Configuration.minSdk
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -30,4 +32,10 @@ dependencies {
     // di
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.android)
+
+    // retrofit
+    implementation(libs.retrofit)
+
+    // jsoup
+    implementation(libs.jsoup)
 }

@@ -1,4 +1,4 @@
-package org.bmsk.webview.ui
+package org.bmsk.topic
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -9,17 +9,18 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.webview.R
-import org.bmsk.webview.databinding.FragmentWebViewBinding
+import org.bmsk.lifemash_newsapp.R
+import org.bmsk.lifemash_newsapp.databinding.FragmentWebViewBinding
 
 @AndroidEntryPoint
-class WebViewFragment(
-    private val url: String
-): Fragment() {
+class WebViewFragment: Fragment() {
     private var _binding: FragmentWebViewBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WebViewViewModel by viewModels()
+    private val args: WebViewFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,7 +35,7 @@ class WebViewFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupWebView(url)
+        setupWebView(args.url)
     }
 
     override fun onDestroyView() {
@@ -46,7 +47,6 @@ class WebViewFragment(
     private fun setupWebView(url: String) {
         if(url.isEmpty()) {
             Toast.makeText(requireContext(), R.string.invalid_url, Toast.LENGTH_SHORT).show()
-            // TODO 뒤로 가기
         }
         binding.newsWebView.apply {
             webViewClient = WebViewClient()
