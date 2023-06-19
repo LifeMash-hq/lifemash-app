@@ -44,7 +44,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:network"))
+    implementation(project(":core:data"))
     implementation(project(":core:model"))
     implementation(project(":feature:topic"))
 
@@ -52,13 +52,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.activity)
-
-    // TikXML
-    // 가장 최신 버전이 이슈가 많아서 8.13 버전을 사용함
-    kapt(libs.tikxml.processor)
-    implementation(libs.tikxml.core)
-    implementation(libs.tikxml.annotation)
-    implementation(libs.tikxml.retrofit)
 
     // glide
     implementation(libs.glide)

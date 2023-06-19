@@ -12,8 +12,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.bmsk.lifemash_newsapp.databinding.FragmentTopicBinding
 import org.bmsk.model.section.SbsSection
 import org.bmsk.topic.adapter.NewsAdapter
@@ -83,20 +88,9 @@ class TopicFragment : Fragment() {
                     newsAdapter.submitList(newsList)
                     binding.notFoundAnimationView.isVisible = newsList.isEmpty()
 
-//                    newsList.forEachIndexed { index, news ->
-//                        withContext(Dispatchers.IO) {
-//                            val jsoup = Jsoup.connect(news.link).get()
-//                            val elements = jsoup.select("meta[property^=og:]")
-//                            val ogImageNode = elements.find { node ->
-//                                node.attr("property") == "og:image"
-//                            }
-//                            news.imageUrl = ogImageNode?.attr("content")
-//
-//                            withContext(Dispatchers.Main) {
-//                                newsAdapter.notifyItemChanged(index)
-//                            }
-//                        }
-//                    }
+                    viewModel.fetchOpenGraphImage().collect {
+                        newsAdapter.notifyItemChanged(it)
+                    }
                 }
             }
         }
