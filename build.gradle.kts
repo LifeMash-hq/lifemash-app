@@ -2,6 +2,7 @@
 buildscript {
     dependencies {
         classpath(libs.androidx.navigation.sageargs)
+        classpath("com.android.tools.build:gradle:8.0.2")
     }
 }
 

@@ -15,13 +15,17 @@ import javax.inject.Singleton
 object ServiceModule {
     @Provides
     @Singleton
-    fun providesGoogleNewsService(@GoogleRetrofit retrofit: Retrofit): GoogleNewsService {
+    fun providesGoogleNewsService(
+        @GoogleRetrofit retrofit: Retrofit
+    ): GoogleNewsService {
         return retrofit.create(GoogleNewsService::class.java)
     }
 
     @Provides
     @Singleton
-    fun providesSbsNewsService(@SbsRetrofit retrofit: Retrofit): SbsNewsService {
+    fun providesSbsNewsService(
+        @SbsRetrofit retrofit: Retrofit
+    ): SbsNewsService {
         return retrofit.create(SbsNewsService::class.java)
     }
 }

@@ -1,4 +1,4 @@
-package org.bmsk.lifemash_newsapp.adapter
+package org.bmsk.topic.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

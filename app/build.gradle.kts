@@ -13,7 +13,6 @@ android {
     compileSdk = Configuration.compileSdk
 
     defaultConfig {
-        applicationId = Configuration.applicationId
         minSdk = Configuration.minSdk
         targetSdk = Configuration.targetSdk
         versionCode = Configuration.versionCode
@@ -45,8 +44,9 @@ android {
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":core:network")))
-    implementation(project(mapOf("path" to ":core:model")))
+    implementation(project(":core:network"))
+    implementation(project(":core:model"))
+    implementation(project(":feature:topic"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
@@ -59,12 +59,10 @@ dependencies {
     implementation(libs.tikxml.core)
     implementation(libs.tikxml.annotation)
     implementation(libs.tikxml.retrofit)
-    // jsoup
-    implementation(libs.jsoup)
+
     // glide
     implementation(libs.glide)
-    // lottie
-    implementation(libs.lottie)
+
     // di
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.android)
