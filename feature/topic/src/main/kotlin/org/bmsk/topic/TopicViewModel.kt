@@ -9,6 +9,8 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.bmsk.data.repository.NewsRepository
@@ -28,24 +30,26 @@ class TopicViewModel @Inject constructor(
         getNews(SbsSection.SECTION_ECONOMICS)
     }
 
-    fun getNews(section: String) {
+    fun getNews(
+        section: String
+    ) {
         viewModelScope.launch {
             val list = newsRepository.getSbsNews(section).first()
-            _newsStateFlow.value = list.map { news ->
-                async { fetchOpenGraphImage(news) }
-            }.awaitAll()
+            _newsStateFlow.value = list
         }
     }
 
-    private suspend fun fetchOpenGraphImage(news: NewsModel): NewsModel =
-        withContext(Dispatchers.IO) {
+    suspend fun fetchOpenGraphImage() = flow<Int> {
+        val newsList = _newsStateFlow.value
+        newsList.forEachIndexed { index, news ->
             val jsoup = Jsoup.connect(news.link).get()
             val elements = jsoup.select("meta[property^=og:]")
             val ogImageNode = elements.find { node ->
                 node.attr("property") == "og:image"
             }
-            news.apply {
-                imageUrl = ogImageNode?.attr("content")
-            }
+            news.imageUrl = ogImageNode?.attr("content")
+
+            emit(index)
         }
+    }.flowOn(Dispatchers.IO)
 }
