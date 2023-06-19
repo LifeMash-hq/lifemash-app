@@ -5,6 +5,7 @@ plugins {
     id(libs.plugins.kotlin.android.get().pluginId)
     id(libs.plugins.kotlin.kapt.get().pluginId)
     id(libs.plugins.hilt.plugin.get().pluginId)
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -34,14 +35,30 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        dataBinding = true
+    }
 }
 
 dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.constraintLayout)
-
+    implementation(libs.material)
+    // jsoup
+    implementation(libs.jsoup)
     // di
     kapt(libs.hilt.compiler)
-    implementation(libs.hilt.android)}
+    implementation(libs.hilt.android)
+    // lottie
+    implementation(libs.lottie)
+    // glide
+    implementation(libs.glide)
+    // navigation
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+}

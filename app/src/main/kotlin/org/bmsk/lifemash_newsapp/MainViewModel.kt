@@ -2,7 +2,8 @@ package org.bmsk.lifemash_newsapp
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 @HiltViewModel
-class MainActivityViewModel: ViewModel() {
+class MainViewModel @Inject constructor(): ViewModel() {
 }
