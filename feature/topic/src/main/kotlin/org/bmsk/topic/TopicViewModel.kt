@@ -42,7 +42,9 @@ class TopicViewModel @Inject constructor(
     suspend fun fetchOpenGraphImage() = flow<Int> {
         val newsList = _newsStateFlow.value
         newsList.forEachIndexed { index, news ->
-            val jsoup = Jsoup.connect(news.link).get()
+            val jsoup = Jsoup.connect(news.link)
+                .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                .get()
             val elements = jsoup.select("meta[property^=og:]")
             val ogImageNode = elements.find { node ->
                 node.attr("property") == "og:image"

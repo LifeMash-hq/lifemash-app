@@ -2,6 +2,7 @@ package org.bmsk.topic
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +27,7 @@ class WebViewFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentWebViewBinding.inflate(inflater).apply {
+        _binding = FragmentWebViewBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = this@WebViewFragment.viewLifecycleOwner
         }
         return binding.root

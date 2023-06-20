@@ -14,7 +14,6 @@ import kotlin.system.exitProcess
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModels()
 
     private var backPressedTime = 0L
     private val exitAppWhenBackButtonPressedTwiceCallback =

@@ -44,10 +44,13 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:data"))
 
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.constraintLayout)
+    implementation(libs.androidx.databinding)
+
     implementation(libs.material)
     // jsoup
     implementation(libs.jsoup)
