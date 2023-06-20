@@ -1,18 +1,15 @@
-package org.bmsk.topic
+package org.bmsk.topic.ui.topic
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.bmsk.data.repository.NewsRepository
 import org.bmsk.model.NewsModel
 import org.bmsk.model.section.SbsSection
@@ -27,14 +24,21 @@ class TopicViewModel @Inject constructor(
     val newsStateFlow = _newsStateFlow.asStateFlow()
 
     init {
-        getNews(SbsSection.SECTION_ECONOMICS)
+        fetchNews(SbsSection.ECONOMICS)
     }
 
-    fun getNews(
-        section: String
+    fun fetchNews(
+        section: SbsSection
     ) {
         viewModelScope.launch {
             val list = newsRepository.getSbsNews(section).first()
+            _newsStateFlow.value = list
+        }
+    }
+
+    fun fetchNewsSearchResults(query: String) {
+        viewModelScope.launch {
+            val list = newsRepository.getGoogleNews(query).first()
             _newsStateFlow.value = list
         }
     }

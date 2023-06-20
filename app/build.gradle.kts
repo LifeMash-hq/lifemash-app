@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = Configuration.namespace
+    namespace = "org.bmsk.lifemash_newsapp"
     compileSdk = Configuration.compileSdk
 
     defaultConfig {
@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintLayout)
     implementation(libs.androidx.databinding)
+    implementation(libs.androidx.appcompat)
 
     // glide
     implementation(libs.glide)
