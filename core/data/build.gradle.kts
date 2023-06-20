@@ -38,4 +38,8 @@ dependencies {
 
     // jsoup
     implementation(libs.jsoup)
+
+    // test
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito)
 }

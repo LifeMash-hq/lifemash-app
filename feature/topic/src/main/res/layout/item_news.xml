@@ -6,6 +6,9 @@
 
     <data>
 
+        <variable
+            name="item"
+            type="org.bmsk.model.NewsModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -17,13 +20,15 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            tools:background="@color/white">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/thumbnailImageView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:scaleType="centerCrop"
+                app:imageUrl="@{item.imageUrl}"
                 app:layout_constraintDimensionRatio="2:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -35,14 +40,31 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:padding="15dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="12dp"
+                android:text="@{item.title}"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/thumbnailImageView"
-                tools:text="기사 제목" />
+                tools:text="How About Android Developer YiBeomSeok? - [ORG.BMSK news]" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/dateTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="@{item.pubDate}"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/titleTextView"
+                tools:text="2023-06-20 11:57:43" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>

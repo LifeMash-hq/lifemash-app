@@ -8,6 +8,7 @@ fun List<NewsItem>.asDomain(): List<NewsModel> {
         NewsModel(
             title = it.title ?: "",
             link = it.link ?: "",
+            pubDate = it.pubDate?.let { date -> DateParser.parseDate(date) }?: "",
             imageUrl = null
         )
     }
