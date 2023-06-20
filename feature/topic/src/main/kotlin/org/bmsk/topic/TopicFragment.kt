@@ -1,9 +1,13 @@
 package org.bmsk.topic
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,13 +16,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.bmsk.lifemash_newsapp.databinding.FragmentTopicBinding
 import org.bmsk.model.section.SbsSection
 import org.bmsk.topic.adapter.NewsAdapter
@@ -53,6 +52,21 @@ class TopicFragment : Fragment() {
         binding.newsRecyclerView.adapter = newsAdapter
         setupChipListeners()
         observeNewsList()
+
+        binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
+            if(actionId == EditorInfo.IME_ACTION_SEARCH) {
+                binding.chipGroup.clearCheck()
+
+                binding.searchTextInputEditText.clearFocus()
+                val imm = getSystemService(requireContext(), InputMethodManager::class.java)
+                imm?.hideSoftInputFromWindow(v.windowToken, 0)
+
+                viewModel.getNews(binding.searchTextInputEditText.text.toString())
+
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
     }
 
     override fun onDestroyView() {

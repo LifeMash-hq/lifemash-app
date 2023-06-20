@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintLayout)
+    implementation(libs.androidx.databinding)
 
     // glide
     implementation(libs.glide)
