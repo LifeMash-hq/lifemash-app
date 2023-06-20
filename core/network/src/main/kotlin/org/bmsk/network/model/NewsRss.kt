@@ -24,4 +24,6 @@ data class NewsItem(
     val title: String? = null,
     @PropertyElement(name = "link")
     val link: String? = null,
+    @PropertyElement(name = "pubDate")
+    val pubDate: String? = null,
 )

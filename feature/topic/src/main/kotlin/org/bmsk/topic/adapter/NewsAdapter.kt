@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import org.bmsk.model.NewsModel
 import org.bmsk.topic.databinding.ItemNewsBinding
 
@@ -17,14 +16,10 @@ class NewsAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: NewsModel) {
-            binding.titleTextView.text = item.title
+            binding.item = item
             binding.root.setOnClickListener {
                 onClick(item.link)
             }
-
-            Glide.with(binding.thumbnailImageView)
-                .load(item.imageUrl)
-                .into(binding.thumbnailImageView)
         }
     }
 
