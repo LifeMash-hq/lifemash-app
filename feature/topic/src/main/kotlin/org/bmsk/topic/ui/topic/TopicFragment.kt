@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -62,7 +63,7 @@ class TopicFragment : Fragment() {
         _binding = null
     }
 
-    fun fetchNews(view: View) {
+    fun onChipClicked(view: View) {
         if (view is Chip) {
             binding.chipGroup.clearCheck()
             view.isChecked = true
@@ -72,28 +73,51 @@ class TopicFragment : Fragment() {
     }
 
     private fun setupBinding() {
-        binding.fragment = this
+        with(binding) {
+            fragment = this@TopicFragment
+            binding.motionLayout.setTransition(R.id.hide, R.id.expand)
+        }
     }
 
     private fun setupRecyclerView() {
         binding.newsRecyclerView.adapter = newsAdapter
+        binding.newsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            var isScrollingUp = false
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0) {
+                    // Scrolling Up
+                    if (!isScrollingUp) {
+                        isScrollingUp = true
+                        binding.motionLayout.transitionToStart()
+                    }
+                } else {
+                    // Scrolling down
+                    if (isScrollingUp) {
+                        isScrollingUp = false
+                        binding.motionLayout.transitionToEnd()
+                    }
+                }
+            }
+        })
     }
 
     private fun setupSearchTextInputEditText() {
         binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 binding.chipGroup.clearCheck()
-
                 binding.searchTextInputEditText.clearFocus()
-                val imm = getSystemService(requireContext(), InputMethodManager::class.java)
-                imm?.hideSoftInputFromWindow(v.windowToken, 0)
-
+                hideKeyboard(v)
                 viewModel.fetchNewsSearchResults(binding.searchTextInputEditText.text.toString())
-
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
         }
+    }
+
+    private fun hideKeyboard(view: View) {
+        val imm = getSystemService(requireContext(), InputMethodManager::class.java)
+        imm?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun observeNewsList() {
