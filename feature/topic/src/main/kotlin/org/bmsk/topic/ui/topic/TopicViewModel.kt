@@ -30,20 +30,14 @@ class TopicViewModel @Inject constructor(
     fun fetchNews(
         section: SbsSection
     ) {
-        viewModelScope.launch {
-            val list = newsRepository.getSbsNews(section).first()
-            _newsStateFlow.value = list
-        }
+        fetchNews { newsRepository.getSbsNews(section).first() }
     }
 
     fun fetchNewsSearchResults(query: String) {
-        viewModelScope.launch {
-            val list = newsRepository.getGoogleNews(query).first()
-            _newsStateFlow.value = list
-        }
+        fetchNews { newsRepository.getGoogleNews(query).first() }
     }
 
-    suspend fun fetchOpenGraphImage() = flow<Int> {
+    suspend fun fetchOpenGraphImage() = flow {
         val newsList = _newsStateFlow.value
         newsList.forEachIndexed { index, news ->
             val jsoup = Jsoup.connect(news.link)
@@ -58,4 +52,11 @@ class TopicViewModel @Inject constructor(
             emit(index)
         }
     }.flowOn(Dispatchers.IO)
+
+    private fun fetchNews(fetcher: suspend () -> List<NewsModel>) {
+        viewModelScope.launch {
+            val list = fetcher()
+            _newsStateFlow.value = list
+        }
+    }
 }

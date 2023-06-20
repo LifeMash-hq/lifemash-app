@@ -30,9 +30,7 @@ class TopicFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: TopicViewModel by viewModels()
     private val newsAdapter = NewsAdapter { url ->
-        findNavController().navigate(
-            TopicFragmentDirections.actionTopicFragmentToWebViewFragment(url)
-        )
+        navigateToWebFragment(url)
     }
 
     override fun onCreateView(
@@ -53,25 +51,10 @@ class TopicFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.fragment = this
-        binding.newsRecyclerView.adapter = newsAdapter
+        setupBinding()
+        setupRecyclerView()
+        setupSearchTextInputEditText()
         observeNewsList()
-
-        binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                binding.chipGroup.clearCheck()
-
-                binding.searchTextInputEditText.clearFocus()
-                val imm = getSystemService(requireContext(), InputMethodManager::class.java)
-                imm?.hideSoftInputFromWindow(v.windowToken, 0)
-
-                viewModel.fetchNewsSearchResults(binding.searchTextInputEditText.text.toString())
-
-                return@setOnEditorActionListener true
-            }
-            return@setOnEditorActionListener false
-        }
     }
 
     override fun onDestroyView() {
@@ -88,6 +71,31 @@ class TopicFragment : Fragment() {
         }
     }
 
+    private fun setupBinding() {
+        binding.fragment = this
+    }
+
+    private fun setupRecyclerView() {
+        binding.newsRecyclerView.adapter = newsAdapter
+    }
+
+    private fun setupSearchTextInputEditText() {
+        binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                binding.chipGroup.clearCheck()
+
+                binding.searchTextInputEditText.clearFocus()
+                val imm = getSystemService(requireContext(), InputMethodManager::class.java)
+                imm?.hideSoftInputFromWindow(v.windowToken, 0)
+
+                viewModel.fetchNewsSearchResults(binding.searchTextInputEditText.text.toString())
+
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
+    }
+
     private fun observeNewsList() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -101,5 +109,10 @@ class TopicFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun navigateToWebFragment(url: String) {
+        val action = TopicFragmentDirections.actionTopicFragmentToWebViewFragment(url)
+        findNavController().navigate(action)
     }
 }
