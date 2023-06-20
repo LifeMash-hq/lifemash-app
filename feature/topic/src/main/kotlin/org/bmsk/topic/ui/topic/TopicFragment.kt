@@ -1,6 +1,5 @@
-package org.bmsk.topic
+package org.bmsk.topic.ui.topic
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,18 +8,20 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.isVisible
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash_newsapp.databinding.FragmentTopicBinding
-import org.bmsk.model.section.SbsSection
+import org.bmsk.topic.R
 import org.bmsk.topic.adapter.NewsAdapter
+import org.bmsk.topic.databinding.FragmentTopicBinding
 
 @AndroidEntryPoint
 class TopicFragment : Fragment() {
@@ -30,8 +31,7 @@ class TopicFragment : Fragment() {
     private val viewModel: TopicViewModel by viewModels()
     private val newsAdapter = NewsAdapter { url ->
         findNavController().navigate(
-            TopicFragmentDirections
-                .actionTopicFragmentToWebViewFragment(url)
+            TopicFragmentDirections.actionTopicFragmentToWebViewFragment(url)
         )
     }
 
@@ -40,7 +40,12 @@ class TopicFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTopicBinding.inflate(inflater).apply {
+        _binding = DataBindingUtil.inflate<FragmentTopicBinding>(
+            inflater,
+            R.layout.fragment_topic,
+            container,
+            false
+        ).apply {
             lifecycleOwner = this@TopicFragment.viewLifecycleOwner
         }
         return binding.root
@@ -49,19 +54,19 @@ class TopicFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.fragment = this
         binding.newsRecyclerView.adapter = newsAdapter
-        setupChipListeners()
         observeNewsList()
 
-        binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
-            if(actionId == EditorInfo.IME_ACTION_SEARCH) {
+        binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 binding.chipGroup.clearCheck()
 
                 binding.searchTextInputEditText.clearFocus()
                 val imm = getSystemService(requireContext(), InputMethodManager::class.java)
                 imm?.hideSoftInputFromWindow(v.windowToken, 0)
 
-                viewModel.getNews(binding.searchTextInputEditText.text.toString())
+                viewModel.fetchNewsSearchResults(binding.searchTextInputEditText.text.toString())
 
                 return@setOnEditorActionListener true
             }
@@ -74,24 +79,12 @@ class TopicFragment : Fragment() {
         _binding = null
     }
 
-    private fun setupChipListeners() {
-        val chipSectionMap = mapOf(
-            binding.economyChip to SbsSection.SECTION_ECONOMICS,
-            binding.politicsChip to SbsSection.SECTION_POLITICS,
-            binding.socialChip to SbsSection.SECTION_SOCIAL,
-            binding.lifeCultureChip to SbsSection.SECTION_LIFE_CULTURE,
-            binding.internationalGlobalChip to SbsSection.SECTION_INTERNATIONAL_GLOBAL,
-            binding.entertainmentBroadcastChip to SbsSection.SECTION_ENTERTAINMENT_BROADCAST,
-            binding.sportChip to SbsSection.SECTION_SPORT
-        )
-
-        for ((chip, section) in chipSectionMap) {
-            chip.setOnClickListener {
-                binding.chipGroup.clearCheck()
-                chip.isChecked = true
-
-                viewModel.getNews(section)
-            }
+    fun fetchNews(view: View) {
+        if (view is Chip) {
+            binding.chipGroup.clearCheck()
+            view.isChecked = true
+            val section = ChipSection.getSectionByChipId(view.id)
+            viewModel.fetchNews(section)
         }
     }
 

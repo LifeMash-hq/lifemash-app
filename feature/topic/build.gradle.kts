@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = Configuration.namespace
+    namespace = "org.bmsk.topic"
     compileSdk = Configuration.compileSdk
 
     defaultConfig {

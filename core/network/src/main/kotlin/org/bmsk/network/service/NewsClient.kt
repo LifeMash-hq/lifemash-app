@@ -10,11 +10,11 @@ class NewsClient @Inject constructor(
     private val sbsNewsService: SbsNewsService,
 ){
     suspend fun getSbsNews(
-        sectionId: String = SbsSection.SECTION_ECONOMICS,
+        section: SbsSection = SbsSection.ECONOMICS,
         plink: String = "RSSREADER"
     ): Response<NewsRss> {
         return sbsNewsService.getNews(
-            sectionId = sectionId,
+            sectionId = section.id,
             plink = plink
         )
     }

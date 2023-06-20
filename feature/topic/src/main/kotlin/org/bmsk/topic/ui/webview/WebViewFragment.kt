@@ -1,8 +1,7 @@
-package org.bmsk.topic
+package org.bmsk.topic.ui.webview
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.lifemash_newsapp.R
-import org.bmsk.lifemash_newsapp.databinding.FragmentWebViewBinding
+import org.bmsk.topic.R
+import org.bmsk.topic.databinding.FragmentWebViewBinding
 
 @AndroidEntryPoint
 class WebViewFragment: Fragment() {

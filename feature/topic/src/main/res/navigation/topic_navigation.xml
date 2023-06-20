@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/topicFragment"
-        android:name="org.bmsk.topic.TopicFragment"
+        android:name="org.bmsk.topic.ui.topic.TopicFragment"
         android:label="TopicFragment"
         tools:layout="@layout/fragment_topic">
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/webViewFragment"
-        android:name="org.bmsk.topic.WebViewFragment"
+        android:name="org.bmsk.topic.ui.webview.WebViewFragment"
         android:label="WebViewFragment"
         tools:layout="@layout/fragment_web_view" >
         <argument

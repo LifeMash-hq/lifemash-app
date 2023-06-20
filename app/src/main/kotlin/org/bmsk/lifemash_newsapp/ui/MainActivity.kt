@@ -1,13 +1,13 @@
-package org.bmsk.lifemash_newsapp
+package org.bmsk.lifemash_newsapp.ui
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
+import org.bmsk.lifemash_newsapp.R
 import org.bmsk.lifemash_newsapp.databinding.ActivityMainBinding
 import kotlin.system.exitProcess
 

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import org.bmsk.model.NewsModel
-import org.bmsk.lifemash_newsapp.databinding.ItemNewsBinding
+import org.bmsk.topic.databinding.ItemNewsBinding
 
 class NewsAdapter(
     private val onClick: (String) -> Unit

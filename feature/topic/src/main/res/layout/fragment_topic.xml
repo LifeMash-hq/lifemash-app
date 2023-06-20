@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="fragment"
+            type="org.bmsk.topic.ui.topic.TopicFragment" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,6 +36,7 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="@{(view) -> fragment.fetchNews(view)}"
                     android:text="@string/economy" />
 
                 <com.google.android.material.chip.Chip
@@ -40,6 +44,7 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="@{(view) -> fragment.fetchNews(view)}"
                     android:text="@string/politics" />
 
                 <com.google.android.material.chip.Chip
@@ -47,6 +52,7 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="@{(view) -> fragment.fetchNews(view)}"
                     android:text="@string/social" />
 
                 <com.google.android.material.chip.Chip
@@ -54,6 +60,7 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="@{(view) -> fragment.fetchNews(view)}"
                     android:text="@string/life_culture" />
 
                 <com.google.android.material.chip.Chip
@@ -61,6 +68,7 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="@{(view) -> fragment.fetchNews(view)}"
                     android:text="@string/international_global" />
 
                 <com.google.android.material.chip.Chip
@@ -68,6 +76,7 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="@{(view) -> fragment.fetchNews(view)}"
                     android:text="@string/entertainment_broadcast" />
 
                 <com.google.android.material.chip.Chip
@@ -75,6 +84,7 @@
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="@{(view) -> fragment.fetchNews(view)}"
                     android:text="@string/sport" />
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>

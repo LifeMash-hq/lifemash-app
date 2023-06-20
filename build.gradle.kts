@@ -10,7 +10,6 @@ plugins {
     id (libs.plugins.android.application.get().pluginId) version libs.versions.agp apply false
     id (libs.plugins.android.library.get().pluginId) version libs.versions.agp apply false
     id (libs.plugins.kotlin.android.get().pluginId) version libs.versions.kotlin apply false
-    id (libs.plugins.kotlin.kapt.get().pluginId) version libs.versions.kotlin apply false
     id (libs.plugins.kotlin.jvm.get().pluginId) version libs.versions.kotlin apply false
     id (libs.plugins.hilt.android.get().pluginId) version libs.versions.hilt apply false
 }
