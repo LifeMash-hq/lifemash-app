@@ -2,6 +2,7 @@ package org.bmsk.topic.ui.topic
 
 import org.bmsk.model.section.SbsSection
 import org.bmsk.topic.R
+
 enum class ChipSection(val chipId: Int, val section: SbsSection) {
     ECONOMY(R.id.economyChip, SbsSection.ECONOMICS),
     POLITICS(R.id.politicsChip, SbsSection.POLITICS),
