@@ -9,7 +9,7 @@
 - Jetpack Navigation
 - WebView
 
-![](gif/use_ex.gif) ![](gif/use_lottie.gif)
+<img src="gif/use_ex.gif" height="600"> <img src="gif/use_lottie.gif" height="600">"
 
 ## Material Design
 
