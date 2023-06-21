@@ -37,6 +37,10 @@ class TopicViewModel @Inject constructor(
         fetchNews { newsRepository.getGoogleNews(query).first() }
     }
 
+    fun bookmark(newsItem: NewsModel) {
+
+    }
+
     suspend fun fetchOpenGraphImage() = flow {
         val newsList = _newsStateFlow.value
         newsList.forEachIndexed { index, news ->
