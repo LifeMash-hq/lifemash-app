@@ -9,16 +9,22 @@ import org.bmsk.model.NewsModel
 import org.bmsk.topic.databinding.ItemNewsBinding
 
 class NewsAdapter(
-    private val onClick: (String) -> Unit
+    private val onClickItem: (String) -> Unit,
+    private val onClickOption: (NewsModel) -> Unit,
 ) : ListAdapter<NewsModel, NewsAdapter.ViewHolder>(diffUtil) {
 
     inner class ViewHolder(private val binding: ItemNewsBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: NewsModel) {
-            binding.item = item
-            binding.root.setOnClickListener {
-                onClick(item.link)
+            with(binding) {
+                this.item = item
+                root.setOnClickListener {
+                    onClickItem(item.link)
+                }
+                moreOptionButton.setOnClickListener {
+                    onClickOption(item)
+                }
             }
         }
     }

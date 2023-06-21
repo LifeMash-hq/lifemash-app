@@ -31,8 +31,7 @@
             android:id="@+id/motionLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layoutDescription="@xml/fragment_topic_scene"
-            tools:background="@color/white">
+            app:layoutDescription="@xml/fragment_topic_scene">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/newsRecyclerView"
@@ -61,31 +60,34 @@
 
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/chipGroup"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        style="@style/Widget.Material3.ChipGroup"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minHeight="48dp"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp">
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/economyChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            style="@style/Widget.Material3.Chip.Suggestion"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{(view) -> fragment.onChipClicked(view)}"
-                            android:text="@string/economy" />
+                            android:text="@string/economy"
+                            tools:checked="true" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/politicsChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            style="@style/Widget.Material3.Chip.Suggestion"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{(view) -> fragment.onChipClicked(view)}"
-                            android:text="@string/politics" />
+                            android:text="@string/politics"
+                            tools:checked="false" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/socialChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            style="@style/Widget.Material3.Chip.Suggestion"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{(view) -> fragment.onChipClicked(view)}"
@@ -93,7 +95,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/lifeCultureChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            style="@style/Widget.Material3.Chip.Suggestion"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{(view) -> fragment.onChipClicked(view)}"
@@ -101,7 +103,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/internationalGlobalChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            style="@style/Widget.Material3.Chip.Suggestion"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{(view) -> fragment.onChipClicked(view)}"
@@ -109,7 +111,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/entertainmentBroadcastChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            style="@style/Widget.Material3.Chip.Suggestion"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{(view) -> fragment.onChipClicked(view)}"
@@ -117,7 +119,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/sportChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            style="@style/Widget.Material3.Chip.Suggestion"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{(view) -> fragment.onChipClicked(view)}"
@@ -148,7 +150,54 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bottomOptionLayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@drawable/rectangle_top_r25"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="parent"
+                tools:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/shareButton"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_baseline_share_24"
+                    android:drawablePadding="8dp"
+                    android:drawableTint="@color/white"
+                    android:gravity="start"
+                    android:padding="16dp"
+                    android:text="@string/share"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/bookmarkButton"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:drawableTint="@color/white"
+                    android:gravity="start"
+                    android:padding="16dp"
+                    android:text="@string/bookmark"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    app:drawableStartCompat="@drawable/ic_baseline_bookmark_border_24"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/shareButton" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.motion.widget.MotionLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>

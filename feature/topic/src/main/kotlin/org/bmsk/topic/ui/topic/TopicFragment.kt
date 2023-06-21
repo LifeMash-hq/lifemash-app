@@ -1,6 +1,7 @@
 package org.bmsk.topic.ui.topic
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.bmsk.model.NewsModel
 import org.bmsk.topic.R
 import org.bmsk.topic.adapter.NewsAdapter
 import org.bmsk.topic.databinding.FragmentTopicBinding
@@ -30,9 +32,10 @@ class TopicFragment : Fragment() {
     private var _binding: FragmentTopicBinding? = null
     private val binding get() = _binding!!
     private val viewModel: TopicViewModel by viewModels()
-    private val newsAdapter = NewsAdapter { url ->
-        navigateToWebFragment(url)
-    }
+    private val newsAdapter = NewsAdapter(
+        ::navigateToWebFragment,
+        ::expandBottomOption
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,8 +57,10 @@ class TopicFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBinding()
         setupRecyclerView()
-        setupSearchTextInputEditText()
         observeNewsList()
+        setupSearchTextInputEditText()
+        setupMotionLayoutTransitions()
+        setupClickListeners()
     }
 
     override fun onDestroyView() {
@@ -75,31 +80,51 @@ class TopicFragment : Fragment() {
     private fun setupBinding() {
         with(binding) {
             fragment = this@TopicFragment
-            binding.motionLayout.setTransition(R.id.hide, R.id.expand)
         }
+    }
+
+    private fun setupMotionLayoutTransitions() {
+        binding.motionLayout.apply {
+            setTransition(R.id.hide, R.id.expand)
+            setTransition(R.id.optionHide, R.id.optionExpand)
+        }
+    }
+
+    private fun setupClickListeners() {
+        binding.root.setOnClickListener {
+            if (binding.motionLayout.currentState == R.id.optionExpand) {
+                binding.motionLayout.transitionToState(R.id.optionHide)
+            }
+        }
+
+        binding.bottomOptionLayout.setOnClickListener { }
     }
 
     private fun setupRecyclerView() {
         binding.newsRecyclerView.adapter = newsAdapter
-        binding.newsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            var isScrollingUp = false
+        binding.newsRecyclerView.addOnScrollListener(createScrollListener())
+    }
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0) {
-                    // Scrolling Up
-                    if (!isScrollingUp) {
-                        isScrollingUp = true
-                        binding.motionLayout.transitionToStart()
-                    }
-                } else {
-                    // Scrolling down
-                    if (isScrollingUp) {
-                        isScrollingUp = false
-                        binding.motionLayout.transitionToEnd()
-                    }
+    private fun createScrollListener() = object : RecyclerView.OnScrollListener() {
+        var isScrollingUp = false
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            if (binding.motionLayout.currentState == R.id.optionExpand) {
+                binding.motionLayout.transitionToState(R.id.optionHide)
+            }
+
+            if (dy > 0) {
+                if (!isScrollingUp) {
+                    isScrollingUp = true
+                    binding.motionLayout.transitionToState(R.id.expand)
+                }
+            } else {
+                if (isScrollingUp) {
+                    isScrollingUp = false
+                    binding.motionLayout.transitionToState(R.id.hide)
                 }
             }
-        })
+        }
     }
 
     private fun setupSearchTextInputEditText() {
@@ -118,6 +143,14 @@ class TopicFragment : Fragment() {
     private fun hideKeyboard(view: View) {
         val imm = getSystemService(requireContext(), InputMethodManager::class.java)
         imm?.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    private fun expandBottomOption(newsItem: NewsModel) {
+        binding.motionLayout.transitionToState(R.id.optionExpand)
+        binding.bookmarkButton.setOnClickListener {
+            Log.e("TopicFragment", "bookmarkButton")
+            viewModel.bookmark(newsItem)
+        }
     }
 
     private fun observeNewsList() {
