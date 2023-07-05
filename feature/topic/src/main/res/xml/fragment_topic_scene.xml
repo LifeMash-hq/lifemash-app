@@ -3,12 +3,14 @@
     xmlns:motion="http://schemas.android.com/apk/res-auto">
 
     <Transition
+        android:id="@+id/bottomLayoutExpandToHideTransition"
         motion:constraintSetStart="@+id/expand"
         motion:constraintSetEnd="@+id/hide"
-        motion:duration="150"
+        motion:duration="300"
         motion:motionInterpolator="linear">
 
         <OnSwipe
+            motion:dragDirection="dragUp"
             motion:touchAnchorId="@id/newsRecyclerView"
             motion:touchRegionId="@id/newsRecyclerView" />
     </Transition>

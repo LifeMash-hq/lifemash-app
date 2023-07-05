@@ -90,10 +90,14 @@ class TopicFragment : Fragment() {
         }
     }
 
+    private fun transitionToState(stateId: Int) {
+        binding.motionLayout.transitionToState(stateId)
+    }
+
     private fun setupClickListeners() {
         binding.root.setOnClickListener {
             if (binding.motionLayout.currentState == R.id.optionExpand) {
-                binding.motionLayout.transitionToState(R.id.optionHide)
+                transitionToState(R.id.optionHide)
             }
         }
 
@@ -110,19 +114,16 @@ class TopicFragment : Fragment() {
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (binding.motionLayout.currentState == R.id.optionExpand) {
-                binding.motionLayout.transitionToState(R.id.optionHide)
+                transitionToState(R.id.optionHide)
+                binding.motionLayout.setTransition(R.id.hide, R.id.expand)
             }
 
-            if (dy > 0) {
-                if (!isScrollingUp) {
-                    isScrollingUp = true
-                    binding.motionLayout.transitionToState(R.id.expand)
-                }
-            } else {
-                if (isScrollingUp) {
-                    isScrollingUp = false
-                    binding.motionLayout.transitionToState(R.id.hide)
-                }
+            if (dy > 0 && !isScrollingUp) {
+                isScrollingUp = true
+                transitionToState(R.id.hide)
+            } else if (dy <= 0 && isScrollingUp) {
+                isScrollingUp = false
+                transitionToState(R.id.expand)
             }
         }
     }
@@ -130,14 +131,18 @@ class TopicFragment : Fragment() {
     private fun setupSearchTextInputEditText() {
         binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                binding.chipGroup.clearCheck()
-                binding.searchTextInputEditText.clearFocus()
-                hideKeyboard(v)
-                viewModel.fetchNewsSearchResults(binding.searchTextInputEditText.text.toString())
+                processSearchAction(v)
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
         }
+    }
+
+    private fun processSearchAction(v: View) {
+        binding.chipGroup.clearCheck()
+        binding.searchTextInputEditText.clearFocus()
+        hideKeyboard(v)
+        viewModel.fetchNewsSearchResults(binding.searchTextInputEditText.text.toString())
     }
 
     private fun hideKeyboard(view: View) {
@@ -146,7 +151,7 @@ class TopicFragment : Fragment() {
     }
 
     private fun expandBottomOption(newsItem: NewsModel) {
-        binding.motionLayout.transitionToState(R.id.optionExpand)
+        transitionToState(R.id.optionExpand)
         binding.bookmarkButton.setOnClickListener {
             Log.e("TopicFragment", "bookmarkButton")
             viewModel.bookmark(newsItem)
