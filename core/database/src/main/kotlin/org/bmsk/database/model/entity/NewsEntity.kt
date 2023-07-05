@@ -7,7 +7,7 @@ import java.util.Date
 
 @Entity("News")
 data class NewsEntity(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo
     val title: String,
     @ColumnInfo

@@ -36,8 +36,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:interactor"))
-
     implementation(libs.androidx.core.ktx)
 
     implementation(libs.coroutines)
@@ -52,7 +50,8 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.test.junit)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.kotlin.test.junit)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.mockito)
 }
