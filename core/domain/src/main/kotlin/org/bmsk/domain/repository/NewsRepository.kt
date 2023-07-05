@@ -1,4 +1,4 @@
-package org.bmsk.data.repository
+package org.bmsk.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import org.bmsk.model.NewsModel

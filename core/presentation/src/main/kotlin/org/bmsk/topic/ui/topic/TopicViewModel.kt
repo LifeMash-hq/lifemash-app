@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import org.bmsk.data.repository.NewsRepository
+import org.bmsk.domain.repository.NewsRepository
+import org.bmsk.domain.usecase.NewsUseCase
 import org.bmsk.model.NewsModel
 import org.bmsk.model.section.SbsSection
 import org.jsoup.Jsoup
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TopicViewModel @Inject constructor(
-    private val newsRepository: NewsRepository
+    private val newsUseCase: NewsUseCase
 ) : ViewModel() {
     private val _newsStateFlow = MutableStateFlow<List<NewsModel>>(emptyList())
     val newsStateFlow = _newsStateFlow.asStateFlow()
@@ -30,11 +31,11 @@ class TopicViewModel @Inject constructor(
     fun fetchNews(
         section: SbsSection
     ) {
-        fetchNews { newsRepository.getSbsNews(section).first() }
+        fetchNews { newsUseCase.getSbsNews(section).first() }
     }
 
     fun fetchNewsSearchResults(query: String) {
-        fetchNews { newsRepository.getGoogleNews(query).first() }
+        fetchNews { newsUseCase.getGoogleNews(query).first() }
     }
 
     fun bookmark(newsItem: NewsModel) {

@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.bmsk.data.asDomain
+import org.bmsk.domain.repository.NewsRepository
 import org.bmsk.model.NewsModel
 import org.bmsk.model.section.SbsSection
 import org.bmsk.network.service.NewsClient
