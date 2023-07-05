@@ -1,4 +1,4 @@
-package org.bmsk.lifemash_newsapp.ui
+package org.bmsk.topic.ui
 
 import android.os.Bundle
 import android.widget.Toast
@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.lifemash_newsapp.R
-import org.bmsk.lifemash_newsapp.databinding.ActivityMainBinding
+import org.bmsk.topic.R
+import org.bmsk.topic.databinding.ActivityMainBinding
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint

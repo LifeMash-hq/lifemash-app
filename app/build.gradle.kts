@@ -47,7 +47,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:model"))
     implementation(project(":core:common-ui"))
-    implementation(project(":feature:topic"))
+    implementation(project(":core:presentation"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)

@@ -1,15 +1,3 @@
 <resources>
     <string name="app_name">LifeMash</string>
-    <string name="politics">정치</string>
-    <string name="social">사회</string>
-    <string name="feed">피드</string>
-    <string name="economy">경제</string>
-    <string name="it">IT</string>
-    <string name="sport">스포츠</string>
-    <string name="life_culture">생활/문화</string>
-    <string name="international_global">국제/글로벌</string>
-    <string name="entertainment_broadcast">연예/방송</string>
-    <string name="invalid_url">잘못된 URL 입니다.</string>
-    <string name="search_news">뉴스 검색</string>
-    <string name="guide_double_tab_exit">한 번 더 누르면 종료됩니다.</string>
 </resources>
