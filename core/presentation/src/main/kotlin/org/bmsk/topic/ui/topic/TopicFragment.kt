@@ -159,15 +159,13 @@ class TopicFragment : Fragment() {
     }
 
     private fun observeNewsList() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.newsStateFlow.collectLatest { newsList ->
-                    newsAdapter.submitList(newsList)
-                    binding.notFoundAnimationView.isVisible = newsList.isEmpty()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.newsStateFlow.collectLatest { newsList ->
+                newsAdapter.submitList(newsList)
+                binding.notFoundAnimationView.isVisible = newsList.isEmpty()
 
-                    viewModel.fetchOpenGraphImage().collect {
-                        newsAdapter.notifyItemChanged(it)
-                    }
+                viewModel.fetchOpenGraphImage().collect {
+                    newsAdapter.notifyItemChanged(it)
                 }
             }
         }
