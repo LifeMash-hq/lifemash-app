@@ -72,7 +72,7 @@ class TopicViewModel @Inject constructor(
                     news.imageUrl = imageUrl
                     _newsImageLoadingFlow.emit(index)
                 } catch (e: Exception) {
-                    // 이미지 로딩 실패 처리
+                    _errorFlow.emit(e)
                 }
             }
         }

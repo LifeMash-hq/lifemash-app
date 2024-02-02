@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.constraintLayout)
     implementation(libs.androidx.databinding)
+    implementation(libs.androidx.lifecycle)
 
     implementation(libs.material)
     // jsoup

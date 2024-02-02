@@ -9,7 +9,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.isVisible
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -30,23 +29,15 @@ class TopicFragment : Fragment() {
     private var _binding: FragmentTopicBinding? = null
     private val binding get() = _binding!!
     private val viewModel: TopicViewModel by viewModels()
-    private val newsAdapter = NewsAdapter(
-        ::navigateToWebFragment,
-        ::expandBottomOption,
-    )
+    private val newsAdapter = NewsAdapter(::navigateToWebFragment, ::expandBottomOption)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = DataBindingUtil.inflate<FragmentTopicBinding>(
-            inflater,
-            R.layout.fragment_topic,
-            container,
-            false,
-        ).apply {
-            lifecycleOwner = this@TopicFragment.viewLifecycleOwner
+        _binding = FragmentTopicBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
         }
         return binding.root
     }
@@ -55,7 +46,7 @@ class TopicFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBinding()
         setupRecyclerView()
-        observeNewsList()
+        observeViewModel()
         setupSearchTextInputEditText()
         setupMotionLayoutTransitions()
         setupClickListeners()
@@ -156,15 +147,17 @@ class TopicFragment : Fragment() {
         }
     }
 
-    private fun observeNewsList() {
+    private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            with(viewModel) {
-                newsStateFlow.collectLatest { newsList ->
+            launch {
+                viewModel.newsStateFlow.collect { newsList ->
                     newsAdapter.submitList(newsList)
                     binding.notFoundAnimationView.isVisible = newsList.isEmpty()
-                    newsImageLoadingFlow.collect {
-                        newsAdapter.notifyItemChanged(it)
-                    }
+                }
+            }
+            launch {
+                viewModel.newsImageLoadingFlow.collect { index ->
+                    newsAdapter.notifyItemChanged(index)
                 }
             }
         }
