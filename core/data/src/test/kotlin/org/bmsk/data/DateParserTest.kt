@@ -4,7 +4,6 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mock
 
-
 class DateParserTest {
     @Mock
     val dateParser = DateParser
@@ -14,7 +13,7 @@ class DateParserTest {
     fun testDateFormat() {
         // 서버로부터 받은 GMT 시간 문자열
         val input = "Tue, 20 Jun 2023 02:57:43 GMT"
-        
+
         val output = dateParser.parseDate(input)
 
         // 기대하는 결과값

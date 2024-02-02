@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.bmsk.database.dao.NewsDao
@@ -12,9 +13,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.Date
-import junit.framework.TestCase.assertEquals
 import org.mockito.Mock
+import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 class NewsDaoTest {
@@ -27,7 +27,8 @@ class NewsDaoTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(
-            context, AppDatabase::class.java
+            context,
+            AppDatabase::class.java,
         ).build()
         newsDao = db.newsDao()
     }
@@ -57,6 +58,6 @@ class NewsDaoTest {
         link = "https://www.test.com",
         pubDate = "2023-06-24 11:11:00",
         imageUrl = null,
-        createdDate = Date()
+        createdDate = Date(),
     )
 }

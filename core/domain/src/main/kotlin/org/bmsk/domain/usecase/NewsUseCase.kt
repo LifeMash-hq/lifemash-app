@@ -7,7 +7,7 @@ import org.bmsk.model.section.SbsSection
 import javax.inject.Inject
 
 class NewsUseCase @Inject constructor(
-    private val newsRepository: NewsRepository
+    private val newsRepository: NewsRepository,
 ) {
     suspend fun getSbsNews(section: SbsSection): Flow<List<NewsModel>> {
         return newsRepository.getSbsNews(section)

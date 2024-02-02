@@ -12,6 +12,6 @@ interface SbsNewsService {
         sectionId: String = "02",
 
         @Query("plink")
-        plink: String = "RSSREADER"
+        plink: String = "RSSREADER",
     ): Response<NewsRss>
 }

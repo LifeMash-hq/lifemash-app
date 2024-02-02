@@ -8,6 +8,6 @@ import retrofit2.http.Query
 interface GoogleNewsService {
     @GET("rss/search?hl=ko&gl=KR&ceid=KR%3Ako")
     suspend fun search(
-        @Query("q") query: String
+        @Query("q") query: String,
     ): Response<NewsRss>
 }
