@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.bmsk.model.NewsModel
 import org.bmsk.topic.R
@@ -94,8 +93,10 @@ class TopicFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        binding.newsRecyclerView.adapter = newsAdapter
-        binding.newsRecyclerView.addOnScrollListener(createScrollListener())
+        binding.newsRecyclerView.apply {
+            adapter = newsAdapter
+            addOnScrollListener(createScrollListener())
+        }
     }
 
     private fun createScrollListener() = object : RecyclerView.OnScrollListener() {
@@ -121,9 +122,10 @@ class TopicFragment : Fragment() {
         binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 processSearchAction(v)
-                return@setOnEditorActionListener true
+                true
+            } else {
+                false
             }
-            return@setOnEditorActionListener false
         }
     }
 
