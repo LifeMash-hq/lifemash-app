@@ -12,9 +12,7 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
@@ -34,19 +32,19 @@ class TopicFragment : Fragment() {
     private val viewModel: TopicViewModel by viewModels()
     private val newsAdapter = NewsAdapter(
         ::navigateToWebFragment,
-        ::expandBottomOption
+        ::expandBottomOption,
     )
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = DataBindingUtil.inflate<FragmentTopicBinding>(
             inflater,
             R.layout.fragment_topic,
             container,
-            false
+            false,
         ).apply {
             lifecycleOwner = this@TopicFragment.viewLifecycleOwner
         }
@@ -160,12 +158,13 @@ class TopicFragment : Fragment() {
 
     private fun observeNewsList() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.newsStateFlow.collectLatest { newsList ->
-                newsAdapter.submitList(newsList)
-                binding.notFoundAnimationView.isVisible = newsList.isEmpty()
-
-                viewModel.fetchOpenGraphImage().collect {
-                    newsAdapter.notifyItemChanged(it)
+            with(viewModel) {
+                newsStateFlow.collectLatest { newsList ->
+                    newsAdapter.submitList(newsList)
+                    binding.notFoundAnimationView.isVisible = newsList.isEmpty()
+                    newsImageLoadingFlow.collect {
+                        newsAdapter.notifyItemChanged(it)
+                    }
                 }
             }
         }
