@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 
 class NewsRepositoryImpl @Inject constructor(
     private val newsClient: NewsClient,
-    private val ioDispatcher: CoroutineContext
+    private val ioDispatcher: CoroutineContext,
 ) : NewsRepository {
     override suspend fun getSbsNews(section: SbsSection): Flow<List<NewsModel>> {
         return flow {

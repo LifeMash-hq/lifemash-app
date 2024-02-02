@@ -2,9 +2,9 @@ package org.bmsk.buildsrc
 
 object Configuration {
     const val applicationId = "org.bmsk.lifemash_newsapp"
-    const val compileSdk = 33
-    const val targetSdk = 33
-    const val minSdk = 23
+    const val compileSdk = 34
+    const val targetSdk = 34
+    const val minSdk = 28
     const val majorVersion = 1
     const val minorVersion = 1
     const val patchVersion = 0

@@ -9,12 +9,12 @@ fun NewsModel.asEntity(createdDate: Date) = NewsEntity(
     link = link,
     pubDate = pubDate,
     imageUrl = imageUrl,
-    createdDate = createdDate
+    createdDate = createdDate,
 )
 
 fun NewsEntity.asModel() = NewsModel(
     title = title,
     link = link,
     pubDate = pubDate,
-    imageUrl = imageUrl
+    imageUrl = imageUrl,
 )

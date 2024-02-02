@@ -17,5 +17,5 @@ data class NewsEntity(
     @ColumnInfo
     val imageUrl: String? = null,
     @ColumnInfo
-    val createdDate: Date
+    val createdDate: Date,
 )

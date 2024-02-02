@@ -1,4 +1,3 @@
 package org.bmsk.chatgpt
 
-class ChatGpt {
-}
+class ChatGpt

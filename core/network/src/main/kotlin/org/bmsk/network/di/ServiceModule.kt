@@ -15,7 +15,7 @@ object ServiceModule {
     @Provides
     @Singleton
     fun providesGoogleNewsService(
-        @GoogleRetrofit retrofit: Retrofit
+        @GoogleRetrofit retrofit: Retrofit,
     ): GoogleNewsService {
         return retrofit.create(GoogleNewsService::class.java)
     }
@@ -23,7 +23,7 @@ object ServiceModule {
     @Provides
     @Singleton
     fun providesSbsNewsService(
-        @SbsRetrofit retrofit: Retrofit
+        @SbsRetrofit retrofit: Retrofit,
     ): SbsNewsService {
         return retrofit.create(SbsNewsService::class.java)
     }

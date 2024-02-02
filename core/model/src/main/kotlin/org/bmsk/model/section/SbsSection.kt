@@ -7,7 +7,8 @@ enum class SbsSection(val id: String) {
     LIFE_CULTURE("07"),
     INTERNATIONAL_GLOBAL("08"),
     SPORT("09"),
-    ENTERTAINMENT_BROADCAST("14");
+    ENTERTAINMENT_BROADCAST("14"),
+    ;
 
     companion object {
         fun getById(id: String): SbsSection {

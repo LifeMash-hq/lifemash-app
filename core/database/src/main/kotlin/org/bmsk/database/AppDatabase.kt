@@ -9,6 +9,6 @@ import org.bmsk.database.model.entity.NewsEntity
 
 @Database(entities = [NewsEntity::class], version = 1)
 @TypeConverters(DateConverter::class)
-abstract class AppDatabase: RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
     abstract fun newsDao(): NewsDao
 }

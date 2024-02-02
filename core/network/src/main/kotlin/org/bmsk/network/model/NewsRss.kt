@@ -15,7 +15,7 @@ data class RssChannel(
     @PropertyElement(name = "title")
     val title: String,
     @Element(name = "item")
-    val items: List<NewsItem>? = null
+    val items: List<NewsItem>? = null,
 )
 
 @Xml(name = "item")

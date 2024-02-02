@@ -39,7 +39,7 @@ object NetworkModule {
         return MoshiConverterFactory.create(
             Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
-                .build()
+                .build(),
         )
     }
 
@@ -49,7 +49,7 @@ object NetworkModule {
         return TikXmlConverterFactory.create(
             TikXml.Builder()
                 .exceptionOnUnreadXml(false)
-                .build()
+                .build(),
         )
     }
 

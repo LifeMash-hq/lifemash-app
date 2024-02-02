@@ -8,14 +8,14 @@ import javax.inject.Inject
 class NewsClient @Inject constructor(
     private val googleNewsService: GoogleNewsService,
     private val sbsNewsService: SbsNewsService,
-){
+) {
     suspend fun getSbsNews(
         section: SbsSection = SbsSection.ECONOMICS,
-        plink: String = "RSSREADER"
+        plink: String = "RSSREADER",
     ): Response<NewsRss> {
         return sbsNewsService.getNews(
             sectionId = section.id,
-            plink = plink
+            plink = plink,
         )
     }
 
@@ -23,7 +23,7 @@ class NewsClient @Inject constructor(
         query: String,
     ): Response<NewsRss> {
         return googleNewsService.search(
-            query = query
+            query = query,
         )
     }
 }
