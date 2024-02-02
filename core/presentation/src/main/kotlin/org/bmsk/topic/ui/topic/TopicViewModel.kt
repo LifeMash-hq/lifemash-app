@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -29,6 +28,9 @@ class TopicViewModel @Inject constructor(
     val newsImageLoadingFlow = _newsImageLoadingFlow.asSharedFlow()
     private var processingJob: Job? = null
 
+    private val _errorFlow = MutableSharedFlow<Throwable>()
+    val errorFlow = _errorFlow.asSharedFlow()
+
     init {
         fetchNews(SbsSection.ECONOMICS)
     }
@@ -36,35 +38,41 @@ class TopicViewModel @Inject constructor(
     fun fetchNews(
         section: SbsSection,
     ) {
-        fetchNews { newsUseCase.getSbsNews(section).first() }
+        processNewsFetching { newsUseCase.getSbsNews(section).first() }
     }
 
     fun fetchNewsSearchResults(query: String) {
-        fetchNews { newsUseCase.getGoogleNews(query).first() }
+        processNewsFetching { newsUseCase.getGoogleNews(query).first() }
     }
 
     fun bookmark(newsItem: NewsModel) {
     }
 
-    private fun fetchNews(fetcher: suspend () -> List<NewsModel>) {
+    private fun processNewsFetching(fetcher: suspend () -> List<NewsModel>) {
         viewModelScope.launch {
-            processingJob?.cancelAndJoin()
+            processingJob?.cancel() // 코루틴 작업 취소
             processingJob = launch {
-                val list = fetcher()
-                _newsStateFlow.value = list
-                list.forEachIndexed { index, news ->
-                    withContext(Dispatchers.IO) {
-                        val jsoup = Jsoup.connect(news.link)
-                            .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-                            .get()
-                        val elements = jsoup.select("meta[property^=og:]")
-                        val ogImageNode = elements.find { node ->
-                            node.attr("property") == "og:image"
-                        }
-                        news.imageUrl = ogImageNode?.attr("content")
+                try {
+                    val newsList = fetcher()
+                    _newsStateFlow.value = newsList
+                    loadNewsImages(newsList)
+                } catch (e: Exception) {
+                    _errorFlow.emit(e)
+                }
+            }
+        }
+    }
 
-                        _newsImageLoadingFlow.emit(index)
-                    }
+    private suspend fun loadNewsImages(newsList: List<NewsModel>) {
+        newsList.forEachIndexed { index, news ->
+            withContext(Dispatchers.IO) {
+                try {
+                    val document = Jsoup.connect(news.link).get()
+                    val imageUrl = document.select("meta[property=og:image]").attr("content")
+                    news.imageUrl = imageUrl
+                    _newsImageLoadingFlow.emit(index)
+                } catch (e: Exception) {
+                    // 이미지 로딩 실패 처리
                 }
             }
         }
