@@ -17,10 +17,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.bmsk.lifemash.presentation.R
+import org.bmsk.lifemash.presentation.databinding.FragmentTopicBinding
 import org.bmsk.model.NewsModel
-import org.bmsk.topic.R
 import org.bmsk.topic.adapter.NewsAdapter
-import org.bmsk.topic.databinding.FragmentTopicBinding
 
 @AndroidEntryPoint
 class TopicFragment : Fragment() {

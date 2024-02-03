@@ -11,11 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.topic.R
-import org.bmsk.topic.databinding.FragmentWebViewBinding
+import org.bmsk.lifemash.presentation.databinding.FragmentWebViewBinding
+import org.bmsk.lifemash.presentation.R
 
 @AndroidEntryPoint
-class WebViewFragment: Fragment() {
+class WebViewFragment : Fragment() {
     private var _binding: FragmentWebViewBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WebViewViewModel by viewModels()
@@ -24,7 +24,7 @@ class WebViewFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentWebViewBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = this@WebViewFragment.viewLifecycleOwner
@@ -44,7 +44,7 @@ class WebViewFragment: Fragment() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView(url: String) {
-        if(url.isEmpty()) {
+        if (url.isEmpty()) {
             Toast.makeText(requireContext(), R.string.invalid_url, Toast.LENGTH_SHORT).show()
         }
         binding.newsWebView.apply {

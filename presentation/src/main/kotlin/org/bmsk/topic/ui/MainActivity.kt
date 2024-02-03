@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.topic.R
-import org.bmsk.topic.databinding.ActivityMainBinding
+import org.bmsk.lifemash.presentation.R
+import org.bmsk.lifemash.presentation.databinding.ActivityMainBinding
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
@@ -36,8 +36,8 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(
                         this@MainActivity,
                         getString(R.string.guide_double_tab_exit),
-                        Toast.LENGTH_SHORT
-                    ).show();
+                        Toast.LENGTH_SHORT,
+                    ).show()
                 }
             }
 
