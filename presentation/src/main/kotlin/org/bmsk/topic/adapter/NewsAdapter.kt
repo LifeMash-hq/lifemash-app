@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import org.bmsk.lifemash.presentation.databinding.ItemNewsBinding
 import org.bmsk.model.NewsModel
-import org.bmsk.topic.databinding.ItemNewsBinding
 
 class NewsAdapter(
     private val onClickItem: (String) -> Unit,
@@ -34,8 +34,8 @@ class NewsAdapter(
             ItemNewsBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
-                false
-            )
+                false,
+            ),
         )
     }
 
