@@ -21,12 +21,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -41,8 +41,6 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import org.bmsk.core.designsystem.theme.LifeMashTheme
 import org.bmsk.core.model.NewsModel
 import org.bmsk.core.model.section.SbsSection
@@ -65,6 +63,24 @@ internal fun TopicRoute(
 }
 
 @Composable
+private fun LazyListState.isScrollingUp(): Boolean {
+    var previousIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
+    var previousScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (previousIndex != firstVisibleItemIndex) {
+                previousIndex > firstVisibleItemIndex
+            } else {
+                previousScrollOffset >= firstVisibleItemScrollOffset
+            }.also {
+                previousIndex = firstVisibleItemIndex
+                previousScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
+}
+
+@Composable
 private fun NotFoundAnimation() {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_not_found))
     LottieAnimation(composition, iterations = LottieConstants.IterateForever)
@@ -79,17 +95,6 @@ private fun TopicScreen(
     onClickNews: (String) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
-    var searchBarVisible by remember { mutableStateOf(true) }
-
-    // 스크롤 오프셋 변화 감지
-    LaunchedEffect(key1 = Unit) {
-        snapshotFlow { lazyListState.firstVisibleItemScrollOffset }
-            .map { offset -> offset > 0 } // 스크롤 오프셋이 0보다 크면 스크롤이 아래로 내려갔다는 의미
-            .distinctUntilChanged() // 상태 변화가 있을 때만 업데이트
-            .collect { isScrolled ->
-                searchBarVisible = !isScrolled // 스크롤되면 searchBar 숨기기
-            }
-    }
     Box(Modifier.fillMaxSize()) {
         NewsContent(
             newsList = newsList,
@@ -100,7 +105,7 @@ private fun TopicScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter),
-            visible = searchBarVisible,
+            visible = lazyListState.isScrollingUp(),
         ) {
             SearchBar(
                 currentSection = currentSection,
@@ -185,11 +190,5 @@ private fun SearchBar(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun TopicScreenPreview() {
     LifeMashTheme {
-//        TopicScreen(
-//            newsList = mutableStateListOf(),
-//            currentSection = SectionChip.ECONOMY,
-//            onClickSection = {},
-//            onSearchClick = {},
-//        )
     }
 }

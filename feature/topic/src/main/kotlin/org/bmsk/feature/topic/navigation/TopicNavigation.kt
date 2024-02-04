@@ -37,5 +37,5 @@ fun NavGraphBuilder.topicNavGraph(
 
 object TopicRoute {
     const val route: String = "topic"
-    fun createWebViewRoute(url: String?): String = "topic/$url"
+    fun createWebViewRoute(url: String): String = "webview?url=$url"
 }
