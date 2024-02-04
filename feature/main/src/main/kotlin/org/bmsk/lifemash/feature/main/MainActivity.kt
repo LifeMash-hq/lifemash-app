@@ -1,4 +1,4 @@
-package org.bmsk.feature.topic
+package org.bmsk.lifemash.feature.main
 
 import android.os.Bundle
 import android.widget.Toast
@@ -7,8 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.lifemash.feature.topic.R
-import org.bmsk.lifemash.feature.topic.databinding.ActivityMainBinding
+import org.bmsk.lifemash.feature.main.databinding.ActivityMainBinding
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
