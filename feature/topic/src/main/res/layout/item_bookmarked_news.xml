@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="org.bmsk.model.NewsModel" />
+            type="org.bmsk.core.model.NewsModel" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

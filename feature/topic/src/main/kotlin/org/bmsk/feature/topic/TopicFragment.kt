@@ -19,7 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.feature.topic.R
 import org.bmsk.lifemash.feature.topic.databinding.FragmentTopicBinding
-import org.bmsk.model.NewsModel
+import org.bmsk.core.model.NewsModel
 import org.bmsk.feature.topic.adapter.NewsAdapter
 
 @AndroidEntryPoint

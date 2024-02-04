@@ -1,4 +1,4 @@
-package org.bmsk.model
+package org.bmsk.core.model
 
 data class NewsModel(
     val title: String,
