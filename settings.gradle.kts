@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -23,9 +24,6 @@ include(
     ":core:network",
     ":core:data",
     ":core:common-ui",
-    ":core:database",
-    ":core:interactor",
-    ":core:chatgpt",
 
     "presentation",
 )

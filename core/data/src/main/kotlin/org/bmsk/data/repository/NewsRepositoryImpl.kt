@@ -7,7 +7,7 @@ import org.bmsk.data.asDomain
 import org.bmsk.domain.repository.NewsRepository
 import org.bmsk.model.NewsModel
 import org.bmsk.model.section.SbsSection
-import org.bmsk.network.service.NewsClient
+import org.bmsk.core.network.service.NewsClient
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 

@@ -1,27 +1,11 @@
-import org.bmsk.buildsrc.Configuration
-
 plugins {
-    id(libs.plugins.android.library.get().pluginId)
-    id(libs.plugins.kotlin.android.get().pluginId)
-    id(libs.plugins.hilt.plugin.get().pluginId)
-    id(libs.plugins.kotlin.kapt.get().pluginId)
-    id(libs.plugins.ksp.get().pluginId) version libs.versions.ksp.get()
+    id("lifemash.android.library")
+    id("lifemash.android.hilt")
+    id("kotlinx-serialization")
 }
 
 android {
-    namespace = "org.bmsk.network"
-    compileSdk = Configuration.compileSdk
-
-    defaultConfig {
-        minSdk = Configuration.minSdk
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    namespace = "org.bmsk.lifemash.core.network"
 }
 
 dependencies {
