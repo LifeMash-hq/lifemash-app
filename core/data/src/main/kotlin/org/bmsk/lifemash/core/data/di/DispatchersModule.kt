@@ -1,4 +1,4 @@
-package org.bmsk.data.di
+package org.bmsk.lifemash.core.data.di
 
 import dagger.Module
 import dagger.Provides

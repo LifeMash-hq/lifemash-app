@@ -1,7 +1,7 @@
 package org.bmsk.core.network.service
 
-import org.bmsk.model.section.SbsSection
 import org.bmsk.core.network.model.NewsRss
+import org.bmsk.model.section.SbsSection
 import retrofit2.Response
 import javax.inject.Inject
 

@@ -1,7 +1,7 @@
-package org.bmsk.domain.usecase
+package org.bmsk.lifemash.core.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
-import org.bmsk.domain.repository.NewsRepository
+import org.bmsk.lifemash.core.domain.repository.NewsRepository
 import org.bmsk.model.NewsModel
 import org.bmsk.model.section.SbsSection
 import javax.inject.Inject
