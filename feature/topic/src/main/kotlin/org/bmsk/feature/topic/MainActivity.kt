@@ -1,4 +1,4 @@
-package org.bmsk.topic.ui
+package org.bmsk.feature.topic
 
 import android.os.Bundle
 import android.widget.Toast

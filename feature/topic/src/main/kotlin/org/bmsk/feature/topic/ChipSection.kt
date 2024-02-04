@@ -1,4 +1,4 @@
-package org.bmsk.topic.ui.topic
+package org.bmsk.feature.topic
 
 import org.bmsk.lifemash.feature.topic.R
 import org.bmsk.model.section.SbsSection
