@@ -17,10 +17,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.feature.topic.R
-import org.bmsk.lifemash.feature.topic.databinding.FragmentTopicBinding
 import org.bmsk.core.model.NewsModel
 import org.bmsk.feature.topic.adapter.NewsAdapter
+import org.bmsk.lifemash.feature.topic.R
+import org.bmsk.lifemash.feature.topic.databinding.FragmentTopicBinding
 
 @AndroidEntryPoint
 class TopicFragment : Fragment() {
@@ -60,7 +60,7 @@ class TopicFragment : Fragment() {
         if (view is Chip) {
             binding.chipGroup.clearCheck()
             view.isChecked = true
-            val section = ChipSection.getSectionByChipId(view.id)
+            val section = SectionChip.getSectionByChipId(view.id)
             viewModel.fetchNews(section)
         }
     }
@@ -150,19 +150,19 @@ class TopicFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            launch {
-                viewModel.newsStateFlow.collect { newsList ->
-                    newsAdapter.submitList(newsList)
-                    binding.notFoundAnimationView.isVisible = newsList.isEmpty()
-                }
-            }
-            launch {
-                viewModel.newsImageLoadingFlow.collect { index ->
-                    newsAdapter.notifyItemChanged(index)
-                }
-            }
-        }
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            launch {
+//                viewModel.newsStateFlow.collect { newsList ->
+//                    newsAdapter.submitList(newsList)
+//                    binding.notFoundAnimationView.isVisible = newsList.isEmpty()
+//                }
+//            }
+//            launch {
+//                viewModel.newsImageLoadingFlow.collect { index ->
+//                    newsAdapter.notifyItemChanged(index)
+//                }
+//            }
+//        }
     }
 
     private fun navigateToWebFragment(url: String) {
