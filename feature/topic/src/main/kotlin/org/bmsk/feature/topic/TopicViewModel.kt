@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.bmsk.domain.usecase.NewsUseCase
+import org.bmsk.lifemash.core.domain.usecase.NewsUseCase
 import org.bmsk.model.NewsModel
 import org.bmsk.model.section.SbsSection
 import org.jsoup.Jsoup

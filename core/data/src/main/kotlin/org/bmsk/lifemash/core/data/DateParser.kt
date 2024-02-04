@@ -1,11 +1,11 @@
-package org.bmsk.data
+package org.bmsk.lifemash.core.data
 
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-object DateParser {
+internal object DateParser {
 
     fun parseDate(input: String): String {
         val parser = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)

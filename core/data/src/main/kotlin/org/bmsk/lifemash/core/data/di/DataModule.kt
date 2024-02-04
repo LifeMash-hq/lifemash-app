@@ -1,16 +1,16 @@
-package org.bmsk.data.di
+package org.bmsk.lifemash.core.data.di
 
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import org.bmsk.data.repository.NewsRepositoryImpl
-import org.bmsk.domain.repository.NewsRepository
+import org.bmsk.lifemash.core.data.repository.NewsRepositoryImpl
+import org.bmsk.lifemash.core.domain.repository.NewsRepository
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface DataModule {
+internal interface DataModule {
 
     @Binds
     @Singleton
