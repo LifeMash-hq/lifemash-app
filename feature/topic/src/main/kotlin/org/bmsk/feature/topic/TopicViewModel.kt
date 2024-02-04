@@ -35,9 +35,7 @@ class TopicViewModel @Inject constructor(
         fetchNews(SbsSection.ECONOMICS)
     }
 
-    fun fetchNews(
-        section: SbsSection,
-    ) {
+    fun fetchNews(section: SbsSection) {
         processNewsFetching { newsUseCase.getSbsNews(section).first() }
     }
 

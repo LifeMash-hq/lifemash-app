@@ -19,6 +19,7 @@ rootProject.name = "LifeMash_NewsApp"
 include(
     ":app",
 
+    ":core:designsystem",
     ":core:model",
     ":core:domain",
     ":core:network",
@@ -26,4 +27,5 @@ include(
     ":core:common-ui",
 
     ":feature:topic",
+    ":feature:all",
 )
