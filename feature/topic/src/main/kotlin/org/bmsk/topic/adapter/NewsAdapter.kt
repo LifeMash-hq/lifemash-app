@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import org.bmsk.lifemash.presentation.databinding.ItemNewsBinding
+import org.bmsk.lifemash.feature.topic.databinding.ItemNewsBinding
 import org.bmsk.model.NewsModel
 
 class NewsAdapter(

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "org.bmsk.lifemash.presentation"
+    namespace = "org.bmsk.lifemash.feature.topic"
 
     buildFeatures {
         dataBinding = true

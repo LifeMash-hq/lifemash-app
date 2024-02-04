@@ -40,25 +40,9 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(libs.android.desugarJdkLibs)
-
     implementation(projects.core.data)
     implementation(projects.core.model)
     implementation(projects.core.commonUi)
-    implementation(projects.presentation)
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.material)
-    implementation(libs.androidx.fragment)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintLayout)
-    implementation(libs.androidx.databinding)
+    implementation(projects.feature.topic)
     implementation(libs.androidx.appcompat)
-
-    // glide
-    implementation(libs.glide)
-
-    // di
-    kapt(libs.hilt.compiler)
-    implementation(libs.hilt.android)
 }

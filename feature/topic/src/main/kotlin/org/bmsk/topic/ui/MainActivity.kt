@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.lifemash.presentation.R
-import org.bmsk.lifemash.presentation.databinding.ActivityMainBinding
+import org.bmsk.lifemash.feature.topic.R
+import org.bmsk.lifemash.feature.topic.databinding.ActivityMainBinding
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint

@@ -1,6 +1,6 @@
 package org.bmsk.topic.ui.topic
 
-import org.bmsk.lifemash.presentation.R
+import org.bmsk.lifemash.feature.topic.R
 import org.bmsk.model.section.SbsSection
 
 enum class ChipSection(val chipId: Int, val section: SbsSection) {
@@ -15,7 +15,7 @@ enum class ChipSection(val chipId: Int, val section: SbsSection) {
 
     companion object {
         fun getSectionByChipId(chipId: Int): SbsSection {
-            return values().first { it.chipId == chipId }.section
+            return entries.first { it.chipId == chipId }.section
         }
     }
 }
