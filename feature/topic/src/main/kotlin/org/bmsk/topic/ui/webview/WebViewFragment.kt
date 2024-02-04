@@ -11,8 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.lifemash.presentation.databinding.FragmentWebViewBinding
-import org.bmsk.lifemash.presentation.R
+import org.bmsk.lifemash.feature.topic.R
+import org.bmsk.lifemash.feature.topic.databinding.FragmentWebViewBinding
 
 @AndroidEntryPoint
 class WebViewFragment : Fragment() {
