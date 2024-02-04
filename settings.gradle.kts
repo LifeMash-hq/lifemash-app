@@ -26,6 +26,7 @@ include(
     ":core:data",
     ":core:common-ui",
 
+    ":feature:main",
     ":feature:topic",
     ":feature:all",
 )

@@ -12,10 +12,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.model)
-    implementation(projects.core.domain)
-    implementation(projects.core.commonUi)
-
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity)
@@ -23,15 +19,12 @@ dependencies {
     implementation(libs.androidx.constraintLayout)
     implementation(libs.androidx.databinding)
     implementation(libs.androidx.lifecycle)
-
     implementation(libs.material)
     // jsoup
     implementation(libs.jsoup)
-    // di
-    kapt(libs.hilt.compiler)
-    implementation(libs.hilt.android)
     // lottie
     implementation(libs.lottie)
+    implementation(libs.lottie.compose)
     // glide
     implementation(libs.glide)
     // navigation
@@ -39,4 +32,11 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     // test
     testImplementation(libs.junit)
+
+    implementation(libs.kotlinx.immutable)
+
+    implementation(libs.compose.shimmer)
+    implementation(libs.landscapist.bom)
+    implementation(libs.landscapist.coil)
+    implementation(libs.landscapist.placeholder)
 }
