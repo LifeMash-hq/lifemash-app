@@ -3,16 +3,19 @@ package org.bmsk.lifemash.feature.main
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.databinding.DataBindingUtil
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.lifemash.feature.main.databinding.ActivityMainBinding
+import org.bmsk.core.designsystem.theme.LifeMashTheme
+import org.bmsk.feature.topic.navigation.topicNavGraph
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+//    private lateinit var binding: ActivityMainBinding
 
     private var backPressedTime = 0L
     private val exitAppWhenBackButtonPressedTwiceCallback =
@@ -20,9 +23,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding.lifecycleOwner = this
+//        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+//        binding.lifecycleOwner = this
         onBackPressedDispatcher.addCallback(exitAppWhenBackButtonPressedTwiceCallback)
+
+        setContent {
+            val navigator: MainNavigator = rememberMainNavigator()
+
+            LifeMashTheme {
+                NavHost(
+                    navController = rememberNavController(),
+                    startDestination = navigator.startDestination,
+                ) {
+                    topicNavGraph(
+                        onClickNews = { navigator.navigateWebView(it) },
+                    )
+                }
+            }
+        }
     }
 
     private fun createExitAppWhenBackButtonPressedTwiceCallback() =

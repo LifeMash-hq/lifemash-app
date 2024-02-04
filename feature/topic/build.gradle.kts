@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.jsoup)
     // lottie
     implementation(libs.lottie)
+    implementation(libs.lottie.compose)
     // glide
     implementation(libs.glide)
     // navigation
@@ -31,4 +32,11 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     // test
     testImplementation(libs.junit)
+
+    implementation(libs.kotlinx.immutable)
+
+    implementation(libs.compose.shimmer)
+    implementation(libs.landscapist.bom)
+    implementation(libs.landscapist.coil)
+    implementation(libs.landscapist.placeholder)
 }
