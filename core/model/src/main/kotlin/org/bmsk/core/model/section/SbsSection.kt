@@ -1,4 +1,4 @@
-package org.bmsk.model.section
+package org.bmsk.core.model.section
 
 enum class SbsSection(val id: String) {
     POLITICS("01"),
@@ -12,7 +12,7 @@ enum class SbsSection(val id: String) {
 
     companion object {
         fun getById(id: String): SbsSection {
-            return values().first { it.id == id }
+            return entries.first { it.id == id }
         }
     }
 }

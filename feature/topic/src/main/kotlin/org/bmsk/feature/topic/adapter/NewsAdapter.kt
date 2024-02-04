@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import org.bmsk.lifemash.feature.topic.databinding.ItemNewsBinding
-import org.bmsk.model.NewsModel
+import org.bmsk.core.model.NewsModel
 
 class NewsAdapter(
     private val onClickItem: (String) -> Unit,

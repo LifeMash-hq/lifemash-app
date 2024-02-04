@@ -1,7 +1,7 @@
 package org.bmsk.feature.topic
 
 import org.bmsk.lifemash.feature.topic.R
-import org.bmsk.model.section.SbsSection
+import org.bmsk.core.model.section.SbsSection
 
 enum class ChipSection(val chipId: Int, val section: SbsSection) {
     ECONOMY(R.id.economyChip, SbsSection.ECONOMICS),
