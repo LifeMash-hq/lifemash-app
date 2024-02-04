@@ -1,4 +1,4 @@
-package org.bmsk.topic.ui.topic
+package org.bmsk.feature.topic
 
 import android.os.Bundle
 import android.util.Log
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import org.bmsk.lifemash.feature.topic.R
 import org.bmsk.lifemash.feature.topic.databinding.FragmentTopicBinding
 import org.bmsk.model.NewsModel
-import org.bmsk.topic.adapter.NewsAdapter
+import org.bmsk.feature.topic.adapter.NewsAdapter
 
 @AndroidEntryPoint
 class TopicFragment : Fragment() {

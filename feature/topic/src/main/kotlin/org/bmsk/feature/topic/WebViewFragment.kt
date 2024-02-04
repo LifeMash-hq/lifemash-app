@@ -1,4 +1,4 @@
-package org.bmsk.topic.ui.webview
+package org.bmsk.feature.topic
 
 import android.annotation.SuppressLint
 import android.os.Bundle

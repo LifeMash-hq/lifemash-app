@@ -1,4 +1,4 @@
-package org.bmsk.topic.ui.topic
+package org.bmsk.feature.topic
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

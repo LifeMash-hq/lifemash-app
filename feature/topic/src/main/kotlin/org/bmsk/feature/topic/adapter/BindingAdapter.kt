@@ -1,4 +1,4 @@
-package org.bmsk.topic.adapter
+package org.bmsk.feature.topic.adapter
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
