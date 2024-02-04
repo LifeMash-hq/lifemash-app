@@ -1,39 +1,17 @@
-import org.bmsk.buildsrc.Configuration
-
 plugins {
-    id(libs.plugins.android.library.get().pluginId)
-    id(libs.plugins.kotlin.android.get().pluginId)
-    id(libs.plugins.kotlin.kapt.get().pluginId)
+    id("lifemash.android.library")
+    id("lifemash.android.hilt")
+    id("kotlinx-serialization")
 }
 
 android {
-    namespace = "org.bmsk.data"
-    compileSdk = Configuration.compileSdk
-
-    defaultConfig {
-        minSdk = Configuration.minSdk
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    namespace = "org.bmsk.lifemash.core.data"
 }
 
 dependencies {
-    implementation(project(":core:network"))
-    implementation(project(":core:model"))
-    implementation(project(":core:domain"))
-    implementation(project(":core:database"))
-
-    // coroutines
-    implementation(libs.coroutines)
-
-    // di
-    kapt(libs.hilt.compiler)
-    implementation(libs.hilt.android)
+    implementation(projects.core.network)
+    implementation(projects.core.model)
+    implementation(projects.core.domain)
 
     // retrofit
     implementation(libs.retrofit)

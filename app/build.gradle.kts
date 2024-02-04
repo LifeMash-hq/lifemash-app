@@ -1,15 +1,12 @@
 import org.bmsk.buildsrc.Configuration
 
 plugins {
-    id(libs.plugins.android.application.get().pluginId)
-    id(libs.plugins.kotlin.android.get().pluginId)
-    id(libs.plugins.kotlin.kapt.get().pluginId)
-    id(libs.plugins.hilt.plugin.get().pluginId)
-    id("androidx.navigation.safeargs.kotlin")
+    id("lifemash.android.application")
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 
 android {
-    namespace = "org.bmsk.lifemash_newsapp"
+    namespace = "org.bmsk.lifemash"
     compileSdk = Configuration.compileSdk
 
     defaultConfig {
@@ -26,7 +23,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -37,33 +34,15 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-
     buildFeatures {
         dataBinding = true
     }
 }
 
 dependencies {
-    implementation(project(":core:data"))
-    implementation(project(":core:model"))
-    implementation(project(":core:common-ui"))
-    implementation(project(":presentation"))
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.material)
-    implementation(libs.androidx.fragment)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintLayout)
-    implementation(libs.androidx.databinding)
+    implementation(projects.core.data)
+    implementation(projects.core.model)
+    implementation(projects.core.commonUi)
+    implementation(projects.feature.topic)
     implementation(libs.androidx.appcompat)
-
-    // glide
-    implementation(libs.glide)
-
-    // di
-    kapt(libs.hilt.compiler)
-    implementation(libs.hilt.android)
-    // navigation
-    implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.navigation.fragment.ktx)
 }
