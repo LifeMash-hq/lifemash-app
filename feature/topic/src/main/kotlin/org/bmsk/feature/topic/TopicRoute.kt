@@ -2,6 +2,8 @@ package org.bmsk.feature.topic
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,10 +39,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
 import org.bmsk.core.designsystem.theme.LifeMashTheme
 import org.bmsk.core.model.NewsModel
 import org.bmsk.core.model.section.SbsSection
@@ -63,30 +61,6 @@ internal fun TopicRoute(
 }
 
 @Composable
-private fun LazyListState.isScrollingUp(): Boolean {
-    var previousIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
-    var previousScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
-    return remember(this) {
-        derivedStateOf {
-            if (previousIndex != firstVisibleItemIndex) {
-                previousIndex > firstVisibleItemIndex
-            } else {
-                previousScrollOffset >= firstVisibleItemScrollOffset
-            }.also {
-                previousIndex = firstVisibleItemIndex
-                previousScrollOffset = firstVisibleItemScrollOffset
-            }
-        }
-    }.value
-}
-
-@Composable
-private fun NotFoundAnimation() {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_not_found))
-    LottieAnimation(composition, iterations = LottieConstants.IterateForever)
-}
-
-@Composable
 private fun TopicScreen(
     newsList: List<NewsModel>,
     currentSection: SbsSection,
@@ -105,7 +79,9 @@ private fun TopicScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter),
-            visible = lazyListState.isScrollingUp(),
+            visible = !lazyListState.isScrollingUp(),
+            enter = fadeIn(),
+            exit = fadeOut(),
         ) {
             SearchBar(
                 currentSection = currentSection,
@@ -114,6 +90,24 @@ private fun TopicScreen(
             )
         }
     }
+}
+
+@Composable
+private fun LazyListState.isScrollingUp(): Boolean {
+    var previousIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
+    var previousScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (previousIndex != firstVisibleItemIndex) {
+                previousIndex > firstVisibleItemIndex
+            } else {
+                previousScrollOffset < firstVisibleItemScrollOffset
+            }.also {
+                previousIndex = firstVisibleItemIndex
+                previousScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
 }
 
 @Composable
