@@ -6,10 +6,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.navigation.compose.NavHost
 import dagger.hilt.android.AndroidEntryPoint
 import org.bmsk.core.designsystem.theme.LifeMashTheme
-import org.bmsk.feature.topic.navigation.topicNavGraph
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
@@ -24,17 +22,8 @@ class MainActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(exitAppWhenBackButtonPressedTwiceCallback)
 
         setContent {
-            val navigator: MainNavigator = rememberMainNavigator()
-
             LifeMashTheme {
-                NavHost(
-                    navController = navigator.navController,
-                    startDestination = navigator.startDestination,
-                ) {
-                    topicNavGraph(
-                        onClickNews = { navigator.navigateWebView(it) },
-                    )
-                }
+                MainScreen()
             }
         }
     }
