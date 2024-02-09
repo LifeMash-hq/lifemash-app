@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -39,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.toPersistentList
 import org.bmsk.core.designsystem.theme.LifeMashTheme
 import org.bmsk.core.model.NewsModel
 import org.bmsk.core.model.section.SbsSection
@@ -52,7 +55,7 @@ internal fun TopicRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TopicScreen(
-        newsList = uiState.newsList,
+        newsList = uiState.newsList.toPersistentList(),
         currentSection = uiState.currentSection,
         onClickSection = viewModel::fetchNews,
         onSearchClick = viewModel::fetchNewsSearchResults,
@@ -62,13 +65,17 @@ internal fun TopicRoute(
 
 @Composable
 private fun TopicScreen(
-    newsList: List<NewsModel>,
+    newsList: PersistentList<NewsModel>,
     currentSection: SbsSection,
     onClickSection: (SbsSection) -> Unit,
     onSearchClick: (String) -> Unit,
     onClickNews: (String) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(newsList) {
+        lazyListState.scrollToItem(index = 0)
+    }
     Box(Modifier.fillMaxSize()) {
         NewsContent(
             newsList = newsList,
@@ -113,7 +120,7 @@ private fun LazyListState.isScrollingUp(): Boolean {
 @Composable
 private fun NewsContent(
     onClickNews: (String) -> Unit,
-    newsList: List<NewsModel>,
+    newsList: PersistentList<NewsModel>,
     listState: LazyListState,
 ) {
     LazyColumn(
@@ -125,7 +132,7 @@ private fun NewsContent(
     ) {
         items(
             items = newsList,
-            key = { it.title },
+            key = { it.link },
         ) {
             NewsCard(newsModel = it, onClick = { onClickNews(it.link) })
         }
