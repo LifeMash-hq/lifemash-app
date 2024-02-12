@@ -1,7 +1,7 @@
 package org.bmsk.lifemash.core.data
 
-import org.bmsk.core.network.model.NewsItem
-import org.bmsk.core.model.NewsModel
+import org.bmsk.lifemash.core.network.model.NewsItem
+import org.bmsk.lifemash.core.model.NewsModel
 
 internal fun List<NewsItem>.asDomain(): List<NewsModel> {
     return this.map {

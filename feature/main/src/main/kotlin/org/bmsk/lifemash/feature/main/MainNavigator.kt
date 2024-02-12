@@ -6,8 +6,8 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import org.bmsk.feature.topic.navigation.TopicRoute
-import org.bmsk.feature.topic.navigation.navigateWebView
+import org.bmsk.lifemash.feature.topic.navigation.TopicRoute
+import org.bmsk.lifemash.feature.topic.navigation.navigateWebView
 
 internal class MainNavigator(
     val navController: NavHostController,

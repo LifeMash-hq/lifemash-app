@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import dagger.hilt.android.AndroidEntryPoint
-import org.bmsk.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
