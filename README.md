@@ -69,3 +69,5 @@ Google News에서 (ex: news.google.com/rss/...) rss 키워드를 붙여주면 �
 # 2023.04.26 Update
 
 - Google News에서 이미지를 불러오는 것을 막아놓았기 때문에 SBS 뉴스로 변경함
+
+![](.README_images/project.dot.png)
