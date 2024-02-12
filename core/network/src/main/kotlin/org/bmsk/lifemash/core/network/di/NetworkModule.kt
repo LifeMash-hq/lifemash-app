@@ -23,15 +23,15 @@ import javax.inject.Singleton
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class SbsRetrofit
+internal annotation class SbsRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class GoogleRetrofit
+internal annotation class GoogleRetrofit
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+internal object NetworkModule {
 
     @Provides
     @Singleton
