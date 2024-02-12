@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.feature.topic
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -104,12 +105,13 @@ private fun TopicScreen(
 private fun LazyListState.isScrollingUp(): Boolean {
     var previousIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
     var previousScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
-    return remember(this) {
+    Log.e("previousIndex", "$previousIndex")
+    return remember {
         derivedStateOf {
             if (previousIndex != firstVisibleItemIndex) {
-                previousIndex > firstVisibleItemIndex
+                previousIndex < firstVisibleItemIndex
             } else {
-                previousScrollOffset < firstVisibleItemScrollOffset
+                previousScrollOffset > firstVisibleItemScrollOffset
             }.also {
                 previousIndex = firstVisibleItemIndex
                 previousScrollOffset = firstVisibleItemScrollOffset

@@ -11,7 +11,7 @@ import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+internal class MainActivity : AppCompatActivity() {
 
     private var backPressedTime = 0L
     private val exitAppWhenBackButtonPressedTwiceCallback =
