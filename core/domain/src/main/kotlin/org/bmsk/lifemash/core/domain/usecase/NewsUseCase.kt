@@ -2,8 +2,8 @@ package org.bmsk.lifemash.core.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
 import org.bmsk.lifemash.core.domain.repository.NewsRepository
-import org.bmsk.core.model.NewsModel
-import org.bmsk.core.model.section.SbsSection
+import org.bmsk.lifemash.core.model.NewsModel
+import org.bmsk.lifemash.core.model.section.SbsSection
 import javax.inject.Inject
 
 class NewsUseCase @Inject constructor(

@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.bmsk.lifemash.core.data.asDomain
 import org.bmsk.lifemash.core.domain.repository.NewsRepository
-import org.bmsk.core.model.NewsModel
-import org.bmsk.core.model.section.SbsSection
-import org.bmsk.core.network.service.NewsClient
+import org.bmsk.lifemash.core.model.NewsModel
+import org.bmsk.lifemash.core.model.section.SbsSection
+import org.bmsk.lifemash.core.network.service.NewsClient
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 

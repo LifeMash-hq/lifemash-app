@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.bmsk.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 
 @Composable
 internal fun AllRoute() {

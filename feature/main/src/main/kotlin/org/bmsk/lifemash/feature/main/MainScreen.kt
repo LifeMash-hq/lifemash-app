@@ -7,7 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import kotlinx.coroutines.launch
-import org.bmsk.feature.topic.navigation.topicNavGraph
+import org.bmsk.lifemash.feature.topic.navigation.topicNavGraph
 import java.net.UnknownHostException
 
 @Composable
@@ -21,8 +21,8 @@ internal fun MainScreen(
         coroutineScope.launch {
             snackbarHostState.showSnackbar(
                 when (throwable) {
-                    is UnknownHostException -> "네트워크 연결이 원할하지 않습니다"
-                    else -> "알 수 없는 오류가 발생했습니다"
+                    is UnknownHostException -> localContextResource.getString(R.string.the_network_connection_is_not_smooth)
+                    else -> localContextResource.getString(R.string.unknown_error_occurred)
                 },
             )
         }
@@ -34,6 +34,7 @@ internal fun MainScreen(
     ) {
         topicNavGraph(
             onClickNews = { navigator.navigateWebView(it) },
+            onShowErrorSnackbar = onShowErrorSnackbar,
         )
     }
 }
