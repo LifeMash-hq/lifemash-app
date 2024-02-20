@@ -9,7 +9,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
+    implementation(projects.core.model)
 
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.android)

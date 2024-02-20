@@ -10,16 +10,16 @@ interface NewsClient {
         section: SbsSection = SbsSection.ECONOMICS,
         plink: String = "RSSREADER",
     ): Response<NewsRss>
+
     suspend fun getGoogleNews(
         query: String,
     ): Response<NewsRss>
-
 }
 
 internal class NewsClientImpl @Inject constructor(
     private val googleNewsService: GoogleNewsService,
     private val sbsNewsService: SbsNewsService,
-): NewsClient {
+) : NewsClient {
     override suspend fun getSbsNews(
         section: SbsSection,
         plink: String,
