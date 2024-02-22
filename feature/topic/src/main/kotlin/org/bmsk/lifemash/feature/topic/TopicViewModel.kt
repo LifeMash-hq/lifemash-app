@@ -3,7 +3,6 @@ package org.bmsk.lifemash.feature.topic
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
@@ -47,9 +46,6 @@ internal class TopicViewModel @Inject constructor(
 
     fun fetchNewsSearchResults(query: String) {
         processNewsFetching { newsUseCase.getGoogleNews(query).first() }
-    }
-
-    fun bookmark(newsItem: NewsModel) {
     }
 
     private fun processNewsFetching(fetcher: suspend () -> List<NewsModel>) {

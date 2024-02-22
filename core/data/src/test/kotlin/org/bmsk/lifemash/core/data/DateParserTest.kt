@@ -1,8 +1,7 @@
-package org.bmsk.data
+package org.bmsk.lifemash.core.data
 
-import org.bmsk.lifemash.core.data.DateParser
-import org.junit.Assert.*
 import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.mockito.Mock
 
 class DateParserTest {

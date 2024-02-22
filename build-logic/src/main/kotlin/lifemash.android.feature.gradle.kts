@@ -27,4 +27,6 @@ dependencies {
 
     implementation(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
     implementation(libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
+
+    testImplementation(libs.findLibrary("mockk").get())
 }
