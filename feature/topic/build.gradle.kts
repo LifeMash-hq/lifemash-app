@@ -1,14 +1,9 @@
 plugins {
     id("lifemash.android.feature")
-    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
     namespace = "org.bmsk.lifemash.feature.topic"
-
-    buildFeatures {
-        dataBinding = true
-    }
 }
 
 dependencies {
@@ -30,8 +25,6 @@ dependencies {
     // navigation
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
-    // test
-    testImplementation(libs.junit)
 
     implementation(libs.kotlinx.immutable)
 

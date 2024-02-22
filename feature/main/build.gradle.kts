@@ -1,6 +1,5 @@
 plugins {
     id("lifemash.android.feature")
-    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -17,7 +16,4 @@ dependencies {
 
     // navigation
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    // test
-    testImplementation(libs.junit)
 }

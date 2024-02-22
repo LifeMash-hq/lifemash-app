@@ -46,6 +46,7 @@ androidxEspresso = "3.5.1"
 androidxTest = "1.5.0"
 androidxTestJunit = "1.1.5"
 androidTestRunner = "1.3.0-beta01"
+mockk = "1.13.5"
 mockito = "3.12.4"
 mockitoKotlin = "2.2.0"
 kotest = "5.6.2"
@@ -128,6 +129,7 @@ lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieCompose" }
 
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
