@@ -5,7 +5,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-internal object DateParser {
+object DateParser {
 
     fun parseDate(input: String): String {
         val parser = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
