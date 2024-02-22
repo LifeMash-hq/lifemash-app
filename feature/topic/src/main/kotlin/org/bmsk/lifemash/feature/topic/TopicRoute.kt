@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.collectLatest
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
@@ -56,7 +55,7 @@ internal fun TopicRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(true) { viewModel.errorFlow.collectLatest(onShowErrorSnackbar) }
     TopicScreen(
-        newsList = uiState.newsList.toPersistentList(),
+        newsList = uiState.newsList,
         currentSection = uiState.currentSection,
         onClickSection = viewModel::fetchNews,
         onSearchClick = viewModel::fetchNewsSearchResults,
