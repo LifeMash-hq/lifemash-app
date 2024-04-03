@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navOptions
 import org.bmsk.lifemash.feature.topic.TopicRoute
 import org.bmsk.lifemash.feature.topic.WebViewRoute
 
@@ -13,7 +14,12 @@ fun NavController.navigateTopic() {
 }
 
 fun NavController.navigateWebView(url: String) {
-    navigate(TopicRoute.createWebViewRoute(url))
+    navigate(
+        TopicRoute.createWebViewRoute(url),
+        navOptions {
+            restoreState = true
+        },
+    )
 }
 
 fun NavGraphBuilder.topicNavGraph(
