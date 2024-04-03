@@ -4,7 +4,6 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -45,7 +44,7 @@ class TopicViewModelTest {
             NewsModel("2", "Fake News Title 2", "Fake Source 2", "Fake URL 2"),
         )
 
-        coEvery { newsUseCase.getSbsNews(SbsSection.ECONOMICS) } returns flow { emit(fakeNewsList) }
+        coEvery { newsUseCase.getSbsNews(SbsSection.ECONOMICS) } returns fakeNewsList
 
         // When
         viewModel.fetchNews(SbsSection.ECONOMICS)
