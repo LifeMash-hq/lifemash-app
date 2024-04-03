@@ -2,18 +2,17 @@ package org.bmsk.lifemash.core.network.service
 
 import org.bmsk.lifemash.core.model.section.SbsSection
 import org.bmsk.lifemash.core.network.model.NewsRss
-import retrofit2.Response
 import javax.inject.Inject
 
 interface NewsClient {
     suspend fun getSbsNews(
         section: SbsSection = SbsSection.ECONOMICS,
         plink: String = "RSSREADER",
-    ): Response<NewsRss>
+    ): NewsRss
 
     suspend fun getGoogleNews(
         query: String,
-    ): Response<NewsRss>
+    ): NewsRss
 }
 
 internal class NewsClientImpl @Inject constructor(
@@ -23,7 +22,7 @@ internal class NewsClientImpl @Inject constructor(
     override suspend fun getSbsNews(
         section: SbsSection,
         plink: String,
-    ): Response<NewsRss> {
+    ): NewsRss {
         return sbsNewsService.getNews(
             sectionId = section.id,
             plink = plink,
@@ -32,7 +31,7 @@ internal class NewsClientImpl @Inject constructor(
 
     override suspend fun getGoogleNews(
         query: String,
-    ): Response<NewsRss> {
+    ): NewsRss {
         return googleNewsService.search(
             query = query,
         )

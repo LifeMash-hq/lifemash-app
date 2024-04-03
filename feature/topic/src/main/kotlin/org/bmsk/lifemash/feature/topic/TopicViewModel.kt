@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.core.domain.usecase.NewsUseCase
@@ -41,11 +40,11 @@ internal class TopicViewModel @Inject constructor(
 
     fun fetchNews(section: SbsSection) {
         _uiState.update { it.copy(currentSection = section) }
-        processNewsFetching { newsUseCase.getSbsNews(section).first() }
+        processNewsFetching { newsUseCase.getSbsNews(section) }
     }
 
     fun fetchNewsSearchResults(query: String) {
-        processNewsFetching { newsUseCase.getGoogleNews(query).first() }
+        processNewsFetching { newsUseCase.getGoogleNews(query) }
     }
 
     private fun processNewsFetching(fetcher: suspend () -> List<NewsModel>) {
