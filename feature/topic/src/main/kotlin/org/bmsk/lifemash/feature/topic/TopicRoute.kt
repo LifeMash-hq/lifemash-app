@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -42,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SbsSection
@@ -72,10 +74,7 @@ private fun TopicScreen(
     onClickNews: (String) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
-
-    LaunchedEffect(newsList) {
-        lazyListState.scrollToItem(index = 0)
-    }
+    val coroutineScope = rememberCoroutineScope()
     Box(Modifier.fillMaxSize()) {
         NewsContent(
             newsList = newsList,
@@ -92,7 +91,10 @@ private fun TopicScreen(
         ) {
             SearchBar(
                 currentSection = currentSection,
-                onClickChip = onClickSection,
+                onClickChip = { section ->
+                    coroutineScope.launch { lazyListState.scrollToItem(0) }
+                    onClickSection(section)
+                },
                 onSearch = onSearchClick,
             )
         }
