@@ -37,18 +37,15 @@ internal fun NewsCard(
     onClick: () -> Unit,
 ) {
     var imageUrl by remember { mutableStateOf(newsModel.imageUrl) }
-    LaunchedEffect(true) {
-        if (imageUrl == null) {
-            withContext(Dispatchers.IO) {
-                val document = Jsoup.connect(newsModel.link).get()
-                imageUrl = document.select("meta[property=og:image]").attr("content")
-            }
+    LaunchedEffect(imageUrl == null) {
+        withContext(Dispatchers.IO) {
+            val document = Jsoup.connect(newsModel.link).get()
+            imageUrl = document.select("meta[property=og:image]").attr("content")
         }
     }
     LifeMashCard(modifier = Modifier.clickable { onClick() }) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             NetworkImage(
                 modifier = Modifier.fillMaxWidth().aspectRatio(2f),
