@@ -12,44 +12,29 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.NetworkImage
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
-import org.jsoup.Jsoup
 
 @Composable
 internal fun NewsCard(
     newsModel: NewsModel,
     onClick: () -> Unit,
 ) {
-    var imageUrl by remember { mutableStateOf(newsModel.imageUrl) }
-    LaunchedEffect(imageUrl == null) {
-        withContext(Dispatchers.IO) {
-            val document = Jsoup.connect(newsModel.link).get()
-            imageUrl = document.select("meta[property=og:image]").attr("content")
-        }
-    }
     LifeMashCard(modifier = Modifier.clickable { onClick() }) {
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
             NetworkImage(
                 modifier = Modifier.fillMaxWidth().aspectRatio(2f),
-                imageUrl = imageUrl,
+                imageUrl = newsModel.imageUrl,
             )
             Column(
                 modifier = Modifier.fillMaxWidth().padding(12.dp),
