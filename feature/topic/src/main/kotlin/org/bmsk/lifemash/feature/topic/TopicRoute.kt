@@ -49,6 +49,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -65,6 +69,7 @@ internal fun TopicRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(true) { viewModel.errorFlow.collectLatest(onShowErrorSnackbar) }
     TopicScreen(
+        isLoading = uiState.isLoading,
         newsList = uiState.newsList,
         currentSection = uiState.currentSection,
         onClickSection = viewModel::fetchNews,
@@ -75,6 +80,7 @@ internal fun TopicRoute(
 
 @Composable
 private fun TopicScreen(
+    isLoading: Boolean,
     newsList: PersistentList<NewsModel>,
     currentSection: SbsSection,
     onClickSection: (SbsSection) -> Unit,
@@ -84,6 +90,7 @@ private fun TopicScreen(
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     Box(Modifier.fillMaxSize()) {
+        if (isLoading) { Loader() }
         NewsContent(
             newsList = newsList,
             listState = lazyListState,
@@ -93,7 +100,7 @@ private fun TopicScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter),
-            visible = lazyListState.isScrollingUp(),
+            visible = newsList.isEmpty() || lazyListState.isScrollingUp(),
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
@@ -107,6 +114,13 @@ private fun TopicScreen(
             )
         }
     }
+}
+
+@Composable
+fun Loader() {
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.search_not_found))
+    val progress by animateLottieCompositionAsState(composition = composition)
+    LottieAnimation(composition = composition, progress = { progress })
 }
 
 @Composable
