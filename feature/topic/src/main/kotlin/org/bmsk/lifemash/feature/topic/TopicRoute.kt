@@ -90,7 +90,7 @@ private fun TopicScreen(
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     Box(Modifier.fillMaxSize()) {
-        if (isLoading) { Loader() }
+        if (isLoading) Loader()
         NewsContent(
             newsList = newsList,
             listState = lazyListState,
