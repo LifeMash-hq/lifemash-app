@@ -1,12 +1,18 @@
 # LifeMash-NewsApp
 
-LifeMash is a cutting-edge, mobile news application designed with the modern user in mind.
+LifeMash is a mobile news application designed with the modern user in mind.
 It harnesses the power of the latest technologies to deliver a seamless and engaging news reading
 experience. This application is built using Jetpack Compose for UI, Material Design for styling, and
 leverages a combination of Retrofit, OkHttp, and Jsoup for efficient data retrieval and processing.
 The architecture is modularized for scalability and maintenance, while dependency injection is
 managed with Hilt for optimal performance. WebView is utilized for an integrated web browsing
 experience.
+
+<div align="center"> 
+Made By https://github.com/YiBeomSeok
+</div>
+
+---
 
 <img src="gif/use_ex.gif" height="600"> <img src="gif/use_lottie.gif" height="600">"
 
