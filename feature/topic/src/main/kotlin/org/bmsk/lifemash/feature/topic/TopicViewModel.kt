@@ -6,15 +6,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.bmsk.lifemash.core.domain.usecase.NewsUseCase
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SbsSection
@@ -25,6 +24,7 @@ import javax.inject.Inject
 internal class TopicViewModel @Inject constructor(
     private val newsUseCase: NewsUseCase,
 ) : ViewModel() {
+    private var currentIoJob: Job? = null
 
     private val _uiState = MutableStateFlow(
         TopicUiState(
@@ -42,22 +42,23 @@ internal class TopicViewModel @Inject constructor(
     }
 
     fun fetchNews(section: SbsSection) = viewModelScope.launch {
+        currentIoJob?.cancel()
         _uiState.update { it.copy(newsList = persistentListOf(), currentSection = section) }
-        processNewsFetching(section)
+        currentIoJob = processNewsFetching(section)
     }
 
     fun fetchNewsSearchResults(query: String) = viewModelScope.launch {
+        currentIoJob?.cancel()
         _uiState.update { it.copy(newsList = persistentListOf()) }
-        processNewsFetchingForSearch(query)
+        currentIoJob = processNewsFetchingForSearch(query)
     }
 
     private fun processNewsFetchingForSearch(query: String) = viewModelScope.launch {
         runCatching {
             newsUseCase.getGoogleNews(query)
         }.fold(
-            onSuccess = { news ->
-                val newsWithImages = fetchImageUrls(news)
-                _uiState.update { it.copy(newsList = newsWithImages.toPersistentList()) }
+            onSuccess = { newsItems ->
+                handleNewsSuccess(newsItems)
             },
             onFailure = { error -> _errorFlow.emit(error) },
         )
@@ -68,22 +69,50 @@ internal class TopicViewModel @Inject constructor(
             newsUseCase.getSbsNews(section)
         }.fold(
             onSuccess = { news ->
-                val newsWithImages = fetchImageUrls(news)
-                _uiState.update { it.copy(newsList = newsWithImages.toPersistentList()) }
+                handleNewsSuccess(news)
             },
-            onFailure = { error -> _errorFlow.emit(error) },
+            onFailure = { error ->
+                handleNewsFailure(error)
+            },
         )
     }
 
-    private suspend fun fetchImageUrls(newsList: List<NewsModel>): List<NewsModel> =
-        coroutineScope {
-            newsList.map { news ->
-                async(Dispatchers.IO) {
-                    Jsoup.connect(news.link).get().run {
-                        val imageUrl = select("meta[property=og:image]").attr("content")
-                        news.copy(imageUrl = imageUrl)
-                    }
-                }
-            }.awaitAll()
+    private suspend fun handleNewsSuccess(newsItems: List<NewsModel>) {
+        _uiState.update { it.copy(newsList = newsItems.toPersistentList()) }
+        newsItems.forEachIndexed { index, newsItem ->
+            fetchAndSetImageUrl(index, newsItem)
         }
+    }
+
+    private suspend fun handleNewsFailure(error: Throwable) {
+        _errorFlow.emit(error)
+    }
+
+    private suspend fun fetchAndSetImageUrl(index: Int, news: NewsModel) {
+        val imageUrl = fetchImageUrl(news.link)
+        updateNewsItemWithImageUrl(index, news, imageUrl)
+    }
+
+    private suspend fun fetchImageUrl(newsLink: String): String {
+        return withContext(Dispatchers.IO) {
+            Jsoup.connect(newsLink).get().select("meta[property=og:image]").attr("content")
+        }
+    }
+
+    private suspend fun updateNewsItemWithImageUrl(
+        index: Int,
+        newsItem: NewsModel,
+        imageUrl: String,
+    ) {
+        withContext(Dispatchers.Main) {
+            _uiState.update {
+                it.copy(
+                    newsList = it.newsList.set(
+                        index,
+                        newsItem.copy(imageUrl = imageUrl),
+                    ),
+                )
+            }
+        }
+    }
 }
