@@ -199,7 +199,6 @@ fun Modifier.simpleVerticalScrollbar(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun SearchBar(
     currentSection: SbsSection,
