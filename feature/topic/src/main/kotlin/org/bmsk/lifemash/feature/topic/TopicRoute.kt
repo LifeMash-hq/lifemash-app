@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -34,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
@@ -89,6 +87,7 @@ private fun TopicScreen(
 ) {
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
     Box(Modifier.fillMaxSize()) {
         if (isLoading) Loader()
         NewsContent(
@@ -105,6 +104,9 @@ private fun TopicScreen(
             exit = fadeOut(),
         ) {
             SearchBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter),
                 currentSection = currentSection,
                 onClickChip = { section ->
                     coroutineScope.launch { lazyListState.scrollToItem(0) }
@@ -130,9 +132,9 @@ private fun LazyListState.isScrollingUp(): Boolean {
     return remember {
         derivedStateOf {
             if (previousIndex != firstVisibleItemIndex) {
-                previousIndex < firstVisibleItemIndex
+                previousIndex > firstVisibleItemIndex
             } else {
-                previousScrollOffset > firstVisibleItemScrollOffset
+                previousScrollOffset >= firstVisibleItemScrollOffset
             }.also {
                 previousIndex = firstVisibleItemIndex
                 previousScrollOffset = firstVisibleItemScrollOffset
