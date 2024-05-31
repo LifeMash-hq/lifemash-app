@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.feature.topic
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -13,10 +14,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,6 +44,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -61,6 +65,7 @@ import org.bmsk.lifemash.core.designsystem.component.Loading
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SbsSection
+import kotlin.math.abs
 
 @Composable
 internal fun TopicRoute(
@@ -165,11 +170,20 @@ private fun NewsContent(
             .simpleVerticalScrollbar(listState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(
+        itemsIndexed(
             items = newsList,
-            key = { it.link },
-        ) {
-            NewsCard(newsModel = it, onClick = { onClickNews(it.link) })
+            key = { _, item -> item.link },
+        ) { index, item ->
+            NewsCard(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .graphicsLayer {
+                        if (index == listState.firstVisibleItemIndex) {
+                            alpha = .9f - listState.firstVisibleItemScrollOffset / size.height
+                        }
+                    },
+                newsModel = item, onClick = { onClickNews(item.link) }
+            )
         }
     }
 }
