@@ -14,7 +14,7 @@ Made By https://github.com/YiBeomSeok
 
 ---
 
-<img src="gif/use_ex.gif" height="600"> <img src="gif/use_lottie.gif" height="600">"
+<img src="gif/lifemash.gif" height="600">
 
 ## Core Features and Technologies
 
