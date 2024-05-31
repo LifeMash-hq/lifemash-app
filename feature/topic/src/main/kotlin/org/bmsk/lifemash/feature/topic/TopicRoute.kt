@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,8 +54,10 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.bmsk.lifemash.core.designsystem.component.Loading
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SbsSection
@@ -88,8 +92,12 @@ private fun TopicScreen(
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    Box(Modifier.fillMaxSize()) {
-        if (isLoading) Loader()
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        if (isLoading) Loading(modifier = Modifier.align(Alignment.Center))
         NewsContent(
             newsList = newsList,
             listState = lazyListState,
@@ -252,5 +260,13 @@ private fun SearchBar(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun TopicScreenPreview() {
     LifeMashTheme {
+        TopicScreen(
+            isLoading = true,
+            newsList = persistentListOf(),
+            currentSection = SbsSection.ECONOMICS,
+            onClickSection = {},
+            onSearchClick = {},
+            onClickNews = {},
+        )
     }
 }

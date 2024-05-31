@@ -1,19 +1,20 @@
-package org.bmsk.lifemash.feature.main
+@file:Suppress("MaximumLineLength", "MaxLineLength")
 
+package org.bmsk.lifemash.core.designsystem.component
+
+import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -27,23 +28,23 @@ import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.flatten
+import org.bmsk.lifemash.core.designsystem.component.LifeMashPath.path
+import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import kotlin.math.floor
 
 @Composable
-fun LifeMashSplash(
+fun Loading(
     modifier: Modifier = Modifier,
 ) {
-    val path = remember { LifeMashPath.path.map { it.toPath() } }
-
-    Box(modifier = modifier.background(color = MaterialTheme.colorScheme.surfaceDim)) {
-        path.forEach {
-            PathCanvas(it)
-        }
+    Box(
+        modifier = modifier.background(color = MaterialTheme.colorScheme.background)
+    ) {
+        path.forEach { PathCanvas(it) }
     }
 }
 
 @Composable
-private fun BoxScope.PathCanvas(
+private fun PathCanvas(
     path: Path,
 ) {
     val bounds = path.getBounds()
@@ -61,50 +62,50 @@ private fun BoxScope.PathCanvas(
     }
     LaunchedEffect(Unit) {
         progress.animateTo(
-            1f, animationSpec = infiniteRepeatable(tween(3000))
+            10f, animationSpec = infiniteRepeatable(tween(1500))
         )
     }
-    val scaleFactor = 5f // Scale factor to prevent overlapping
+    val scaleFactor = 7f // Scale factor to prevent overlapping
 
-    Canvas(modifier = Modifier
-        .aspectRatio(bounds.width * scaleFactor / bounds.height * scaleFactor)
-        .size(400.dp * scaleFactor)
-        .align(Alignment.TopStart), onDraw = {
-        val currentLength = totalLength * progress.value
-        lines.forEach { line ->
-            if (line.startFraction * totalLength < currentLength) {
-                val startColor = interpolateColors(line.startFraction, colors)
-                val endColor = interpolateColors(line.endFraction, colors)
-                drawLine(
-                    brush = Brush.linearGradient(listOf(startColor, endColor)),
-                    start = Offset(line.start.x * scaleFactor, line.start.y * scaleFactor),
-                    end = Offset(line.end.x * scaleFactor, line.end.y * scaleFactor),
-                    strokeWidth = 1.5f * scaleFactor, // Adjust stroke width accordingly
-                    cap = StrokeCap.Round
-                )
+    Canvas(
+        modifier = Modifier
+            .aspectRatio(bounds.width * scaleFactor / bounds.height * scaleFactor),
+        onDraw = {
+            val currentLength = totalLength * progress.value
+            lines.forEach { line ->
+                if (line.startFraction * totalLength < currentLength) {
+                    val startColor = interpolateColors(line.startFraction, colors)
+                    val endColor = interpolateColors(line.endFraction, colors)
+                    drawLine(
+                        brush = Brush.linearGradient(listOf(startColor, endColor)),
+                        start = Offset(line.start.x * scaleFactor, line.start.y * scaleFactor),
+                        end = Offset(line.end.x * scaleFactor, line.end.y * scaleFactor),
+                        strokeWidth = 1.7f * scaleFactor, // Adjust stroke width accordingly
+                        cap = StrokeCap.Round,
+                    )
+                }
             }
         }
-    })
+    )
 }
 
 private val colors = listOf(
-    Color(0xFF3FCEBC),
-    Color(0xFF3CBCEB),
-    Color(0xFF5F96E7),
-    Color(0xFF816FE3),
-    Color(0xFF9F5EE2),
-    Color(0xFFBD4CE0),
-    Color(0xFFDE589F),
-    Color(0xFFFF645E),
-    Color(0xFFFDA859),
-    Color(0xFFFAEC54),
-    Color(0xFF9EE671),
-    Color(0xFF67E282),
-    Color(0xFF3FCEBC)
+    Color(0xFF42A5F5), // Light Blue
+    Color(0xFFAB47BC), // Purple
+    Color(0xFFEC407A), // Pink
+    Color(0xFF7E57C2), // Deep Purple
+    Color(0xFF26C6DA), // Cyan
+    Color(0xFF66BB6A), // Green
+    Color(0xFFFFCA28), // Amber
+    Color(0xFFFF7043), // Deep Orange
+    Color(0xFF8D6E63), // Brown
+    Color(0xFF26A69A), // Teal
+    Color(0xFFEF5350), // Red
+    Color(0xFFFFEE58), // Yellow
 )
 
 object LifeMashPath {
-    val path = listOf(
+    val pathStrings = listOf(
 //        PathParser().parsePathString(
 //            "M-0.5,-0.5C66.17,-0.5 132.83,-0.5 199.5,-0.5C199.5,32.83 199.5,66.17 199.5,99.5C132.83,99.5 66.17,99.5 -0.5,99.5C-0.5,66.17 -0.5,32.83 -0.5,-0.5Z"
 //        ),
@@ -138,6 +139,8 @@ object LifeMashPath {
         PathParser().parsePathString("M80.5,45.5C82.66,45.12 84.33,45.78 85.5,47.5C83.17,48.83 80.83,48.83 78.5,47.5C79.24,46.82 79.91,46.15 80.5,45.5Z"),
         PathParser().parsePathString("M115.5,50.5C117.17,50.5 118.83,50.5 120.5,50.5C120.99,55.16 119.15,56.49 115,54.5C114.42,53.07 114.59,51.74 115.5,50.5Z"),
     )
+
+    val path = pathStrings.map { it.toPath() }
 }
 
 private fun interpolateColors(
@@ -155,6 +158,9 @@ private fun interpolateColors(
 
 @Composable
 @Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 private fun LifeMashSplashPreview() {
-    LifeMashSplash(modifier = Modifier.size(width = 400.dp, height = 200.dp))
+    LifeMashTheme {
+        Loading(modifier = Modifier.size(width = 1000.dp, height = 500.dp))
+    }
 }
