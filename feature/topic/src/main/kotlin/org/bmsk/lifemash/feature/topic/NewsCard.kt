@@ -25,10 +25,11 @@ import org.bmsk.lifemash.core.model.NewsModel
 
 @Composable
 internal fun NewsCard(
+    modifier: Modifier = Modifier,
     newsModel: NewsModel,
     onClick: () -> Unit,
 ) {
-    LifeMashCard(modifier = Modifier.clickable { onClick() }) {
+    LifeMashCard(modifier = modifier.clickable { onClick() }) {
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
