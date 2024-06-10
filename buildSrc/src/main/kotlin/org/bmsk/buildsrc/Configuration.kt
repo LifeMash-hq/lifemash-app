@@ -1,7 +1,7 @@
 package org.bmsk.buildsrc
 
 object Configuration {
-    const val applicationId = "org.bmsk.lifemash_newsapp"
+    const val applicationId = "org.bmsk.lifemash"
     const val compileSdk = 34
     const val targetSdk = 34
     const val minSdk = 28
