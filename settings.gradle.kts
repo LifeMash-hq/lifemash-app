@@ -26,6 +26,9 @@ include(
     ":core:data",
     ":core:common-ui",
 
+    ":core:repo:scrap:api",
+    ":core:repo:scrap:impl",
+
     ":feature:main-nav-graph",
 
     ":feature:main",
