@@ -5,3 +5,8 @@ plugins {
 android {
     namespace = "org.bmsk.lifemash.feature.scrap"
 }
+
+dependencies {
+    implementation(projects.feature.scrapApi)
+    implementation(projects.feature.mainNavGraph)
+}
