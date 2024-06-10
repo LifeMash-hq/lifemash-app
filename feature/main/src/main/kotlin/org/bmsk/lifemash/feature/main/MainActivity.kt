@@ -8,6 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.feature.scrap.api.ScrapNavController
+import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
@@ -17,13 +20,25 @@ internal class MainActivity : AppCompatActivity() {
     private val exitAppWhenBackButtonPressedTwiceCallback =
         createExitAppWhenBackButtonPressedTwiceCallback()
 
+    @Inject
+    lateinit var scrapNavGraph: ScrapNavGraph
+    @Inject
+    lateinit var scrapNavController: ScrapNavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(exitAppWhenBackButtonPressedTwiceCallback)
 
         setContent {
             LifeMashTheme {
-                MainScreen()
+                val navigator = rememberMainNavigator(
+                    scrapNavController = scrapNavController
+                )
+
+                MainScreen(
+                    navigator = navigator,
+                    scrapNavGraph = scrapNavGraph,
+                )
             }
         }
     }
