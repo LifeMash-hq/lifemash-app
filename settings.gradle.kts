@@ -26,7 +26,12 @@ include(
     ":core:data",
     ":core:common-ui",
 
+    ":feature:main-nav-graph",
+
     ":feature:main",
     ":feature:topic",
     ":feature:all",
+
+    ":feature:scrap-api",
+    ":feature:scrap",
 )
