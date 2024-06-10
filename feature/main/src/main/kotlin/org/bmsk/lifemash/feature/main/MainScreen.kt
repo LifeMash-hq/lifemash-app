@@ -7,17 +7,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import kotlinx.coroutines.launch
+import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
+import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraphInfo
 import org.bmsk.lifemash.feature.topic.navigation.topicNavGraph
 import java.net.UnknownHostException
 
 @Composable
 internal fun MainScreen(
-    navigator: MainNavigator = rememberMainNavigator(),
+    navigator: MainNavigator,
+    scrapNavGraph: ScrapNavGraph,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val localContextResource = LocalContext.current.resources
-    val onShowErrorSnackbar: (Throwable) -> Unit = { throwable ->
+    val onShowErrorSnackbar: (Throwable?) -> Unit = { throwable ->
         coroutineScope.launch {
             snackbarHostState.showSnackbar(
                 when (throwable) {
@@ -35,6 +38,11 @@ internal fun MainScreen(
         topicNavGraph(
             onClickNews = { navigator.navigateWebView(it) },
             onShowErrorSnackbar = onShowErrorSnackbar,
+        )
+
+        scrapNavGraph.buildNavGraph(
+            navGraphBuilder = this,
+            navInfo = ScrapNavGraphInfo(onShowErrorSnackbar)
         )
     }
 }
