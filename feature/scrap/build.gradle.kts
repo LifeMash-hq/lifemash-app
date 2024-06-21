@@ -9,4 +9,6 @@ android {
 dependencies {
     implementation(projects.feature.scrapApi)
     implementation(projects.feature.mainNavGraph)
+
+    implementation(libs.kotlinx.immutable)
 }
