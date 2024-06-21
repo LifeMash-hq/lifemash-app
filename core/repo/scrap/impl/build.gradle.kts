@@ -11,6 +11,7 @@ android {
 
 dependencies {
     implementation(projects.core.repo.scrap.api)
+    implementation(projects.core.model)
 
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
