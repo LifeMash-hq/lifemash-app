@@ -121,7 +121,6 @@ coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 tikxml-annotation = { module = "com.tickaroo.tikxml:annotation", version.ref = "tikxml" }
-tikxml-core = { module = "com.tickaroo.tikxml:annotation", version.ref = "tikxml" }
 tikxml-processor = { module = "com.tickaroo.tikxml:processor", version.ref = "tikxml" }
 tikxml-retrofit = { module = "com.tickaroo.tikxml:retrofit-converter", version.ref = "tikxml" }
 
