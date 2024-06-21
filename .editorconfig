@@ -1,0 +1,7 @@
+root = true
+
+[*]
+
+# ktlint specific settings for Compose
+[*.kt]
+ktlint_function_naming_ignore_when_annotated_with=Composable
