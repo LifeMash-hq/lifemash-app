@@ -2,6 +2,7 @@ plugins {
     id("lifemash.android.library")
     id("lifemash.android.hilt")
     id("kotlinx-serialization")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -10,4 +11,8 @@ android {
 
 dependencies {
     implementation(projects.core.repo.scrap.api)
+
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 }
