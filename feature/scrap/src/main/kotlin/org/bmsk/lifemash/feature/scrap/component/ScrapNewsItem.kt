@@ -2,6 +2,7 @@ package org.bmsk.lifemash.feature.scrap.component
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -41,33 +42,38 @@ import org.bmsk.lifemash.feature.scrap.R
 internal fun ScrapNewsItem(
     modifier: Modifier = Modifier,
     newsModel: NewsModel,
+    state: ScrapNewsItemState,
     onClick: () -> Unit,
     onClickDelete: () -> Unit,
 ) {
     LifeMashCard(modifier = modifier) {
-        var longClicked by remember { mutableStateOf(false) }
+        val weightTarget = if (state.isLongClicked) 0.3f else 0.001f
+        val weight by animateFloatAsState(targetValue = weightTarget, label = "")
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16 / 5f)
-                .padding(8.dp)
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = { longClicked = longClicked.not() }
-                )
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16 / 5f)
+                    .padding(8.dp)
+                    .combinedClickable(
+                        onClick = onClick,
+                        onLongClick = state::onLongClick,
+                    ),
         ) {
             NetworkImage(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1 / 1f),
+                modifier =
+                    Modifier
+                        .fillMaxHeight()
+                        .aspectRatio(1 / 1f),
                 imageUrl = newsModel.imageUrl,
             )
             Column(
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .fillMaxHeight()
-                    .weight(1f),
+                modifier =
+                    Modifier
+                        .padding(start = 8.dp)
+                        .fillMaxHeight()
+                        .weight(1f),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
@@ -88,8 +94,8 @@ internal fun ScrapNewsItem(
             }
 
             AnimatedVisibility(
-                modifier = Modifier.weight(.3f),
-                visible = longClicked,
+                modifier = Modifier.weight(weight),
+                visible = state.isLongClicked,
                 enter = slideInHorizontally(),
                 exit = slideOutHorizontally(targetOffsetX = { it }),
             ) {
@@ -100,16 +106,18 @@ internal fun ScrapNewsItem(
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_delete_24),
                         contentDescription = null,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { onClickDelete() },
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .clickable { onClickDelete() },
                     )
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_cancel_presentation_24),
                         contentDescription = null,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { longClicked = false },
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .clickable { state.onLongClick() },
                     )
                 }
             }
@@ -117,22 +125,44 @@ internal fun ScrapNewsItem(
     }
 }
 
+internal class ScrapNewsItemState(
+    initialIsLongClicked: Boolean = false,
+) {
+    var isLongClicked by mutableStateOf(initialIsLongClicked)
+        private set
+
+    fun onLongClick() {
+        isLongClicked = isLongClicked.not()
+    }
+}
+
+@Composable
+internal fun rememberScrapNewsItemState(initialIsLongClicked: Boolean = false): ScrapNewsItemState =
+    remember {
+        ScrapNewsItemState(initialIsLongClicked)
+    }
+
 @Composable
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 private fun ScrapNewsItemPreview() {
-    val fakeNews = NewsModel(
-        title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-        link = "",
-        pubDate = "2024-06-06",
-        imageUrl = ""
-    )
+    val fakeNews =
+        NewsModel(
+            title =
+                "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews" +
+                    "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
+            link = "",
+            pubDate = "2024-06-06",
+            imageUrl = "",
+        )
+
     LifeMashTheme {
         ScrapNewsItem(
             modifier = Modifier,
             newsModel = fakeNews,
-            {},
-            {},
+            state = rememberScrapNewsItemState(),
+            onClick = {},
+            onClickDelete = {},
         )
     }
 }
