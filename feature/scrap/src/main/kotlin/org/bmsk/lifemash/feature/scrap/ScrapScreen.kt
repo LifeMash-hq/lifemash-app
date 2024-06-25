@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.core.model.DateParser
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.feature.scrap.component.ScrapNewsItem
 import org.bmsk.lifemash.feature.scrap.component.rememberScrapNewsItemState
@@ -40,43 +41,43 @@ private fun ScrapScreenPreview() {
                     NewsModel(
                         title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
                         link = "",
-                        pubDate = "2024-06-06",
+                        pubDate = DateParser.parseDate("2024-06-06"),
                         imageUrl = "",
                     ),
                     NewsModel(
                         title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
                         link = "",
-                        pubDate = "2024-06-06",
+                        pubDate = DateParser.parseDate("2024-06-06"),
                         imageUrl = "",
                     ),
                     NewsModel(
                         title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
                         link = "",
-                        pubDate = "2024-06-06",
+                        pubDate = DateParser.parseDate("2024-06-06"),
                         imageUrl = "",
                     ),
                     NewsModel(
                         title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
                         link = "",
-                        pubDate = "2024-06-06",
+                        pubDate = DateParser.parseDate("2024-06-06"),
                         imageUrl = "",
                     ),
                     NewsModel(
                         title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
                         link = "",
-                        pubDate = "2024-06-06",
+                        pubDate = DateParser.parseDate("2024-06-06"),
                         imageUrl = "",
                     ),
                     NewsModel(
                         title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
                         link = "",
-                        pubDate = "2024-06-06",
+                        pubDate = DateParser.parseDate("2024-06-06"),
                         imageUrl = "",
                     ),
                     NewsModel(
                         title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
                         link = "",
-                        pubDate = "2024-06-06",
+                        pubDate = DateParser.parseDate("2024-06-06"),
                         imageUrl = "",
                     ),
                 ),

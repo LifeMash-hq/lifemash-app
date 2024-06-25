@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.NetworkImage
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.core.model.DateParser
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.feature.scrap.R
 
@@ -88,7 +89,7 @@ internal fun ScrapNewsItem(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = newsModel.pubDate,
+                        text = DateParser.formatDate(newsModel.pubDate),
                     )
                 }
             }
@@ -152,7 +153,7 @@ private fun ScrapNewsItemPreview() {
                 "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews" +
                     "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
             link = "",
-            pubDate = "2024-06-06",
+            pubDate = DateParser.parseDate("Wed, 21 Jun 2023 12:34:56 GMT"),
             imageUrl = "",
         )
 
