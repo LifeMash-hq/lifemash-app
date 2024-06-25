@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.NetworkImage
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.core.model.DateParser
 import org.bmsk.lifemash.core.model.NewsModel
 
 @Composable
@@ -51,7 +52,7 @@ internal fun NewsCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = newsModel.pubDate,
+                        text = DateParser.formatDate(newsModel.pubDate),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -69,7 +70,7 @@ internal fun NewsCard(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun NewsCardPreview() {
-    val fakeNewsModel = NewsModel(title = "News Card", link = "", pubDate = "2023-08-20")
+    val fakeNewsModel = NewsModel(title = "News Card", link = "", pubDate = DateParser.parseDate("2023-08-20"))
     LifeMashTheme {
         NewsCard(
             newsModel = fakeNewsModel,
