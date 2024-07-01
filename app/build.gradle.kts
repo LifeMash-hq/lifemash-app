@@ -49,6 +49,8 @@ dependencies {
     implementation(projects.feature.main)
     implementation(projects.feature.mainNavGraph)
     implementation(projects.feature.scrap)
+    implementation(projects.feature.topic)
+    implementation(projects.feature.webview)
 
     implementation(libs.androidx.appcompat)
 }
