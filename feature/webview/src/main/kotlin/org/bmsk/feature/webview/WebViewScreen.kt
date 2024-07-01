@@ -1,4 +1,4 @@
-package org.bmsk.lifemash.feature.topic
+package org.bmsk.feature.webview
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
@@ -6,16 +6,9 @@ import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
 
-@Composable
-internal fun WebViewRoute(
-    url: String,
-) {
-    WebViewScreen(url = url)
-}
-
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-private fun WebViewScreen(
+internal fun WebViewScreen(
     url: String,
 ) {
     AndroidView(

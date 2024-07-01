@@ -9,13 +9,18 @@ import androidx.navigation.compose.NavHost
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraphInfo
-import org.bmsk.lifemash.feature.topic.navigation.topicNavGraph
+import org.bmsk.lifemash.feature.topic.api.TopicNavGraph
+import org.bmsk.lifemash.feature.topic.api.TopicNavGraphInfo
+import org.bmsk.lifemash.feature.topic.api.WebViewNavGraph
+import org.bmsk.lifemash.feature.topic.api.WebViewNavGraphInfo
 import java.net.UnknownHostException
 
 @Composable
 internal fun MainScreen(
     navigator: MainNavigator,
     scrapNavGraph: ScrapNavGraph,
+    topicNavGraph: TopicNavGraph,
+    webViewNavGraph: WebViewNavGraph,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -35,14 +40,22 @@ internal fun MainScreen(
         navController = navigator.navController,
         startDestination = navigator.startDestination,
     ) {
-        topicNavGraph(
-            onClickNews = { navigator.navigateWebView(it) },
-            onShowErrorSnackbar = onShowErrorSnackbar,
+        topicNavGraph.buildNavGraph(
+            navGraphBuilder = this,
+            navInfo = TopicNavGraphInfo(
+                onClickNews = { navigator.navigateWebView(it) },
+                onShowErrorSnackbar = onShowErrorSnackbar,
+            )
         )
 
         scrapNavGraph.buildNavGraph(
             navGraphBuilder = this,
             navInfo = ScrapNavGraphInfo(onShowErrorSnackbar)
+        )
+
+        webViewNavGraph.buildNavGraph(
+            navGraphBuilder = this,
+            navInfo = WebViewNavGraphInfo(onShowErrorSnackbar),
         )
     }
 }
