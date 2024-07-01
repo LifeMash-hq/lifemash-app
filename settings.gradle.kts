@@ -33,8 +33,13 @@ include(
 
     ":feature:main",
     ":feature:topic",
+    ":feature:topic-api",
+
     ":feature:all",
 
     ":feature:scrap-api",
     ":feature:scrap",
+
+    ":feature:webview-api",
+    ":feature:webview",
 )
