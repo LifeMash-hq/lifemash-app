@@ -3,7 +3,7 @@ package org.bmsk.lifemash.core.repo.scrap.impl
 import androidx.room.TypeConverter
 import java.util.Date
 
-class DateConverter {
+internal class DateConverter {
     @TypeConverter
     fun fromTimestamp(value: Long): Date = Date(value)
 

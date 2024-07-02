@@ -2,16 +2,25 @@ package org.bmsk.lifemash.feature.topic
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,8 +31,16 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -57,6 +74,7 @@ import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SbsSection
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TopicScreen(
     isLoading: Boolean,
@@ -65,9 +83,12 @@ internal fun TopicScreen(
     onClickSection: (SbsSection) -> Unit,
     onSearchClick: (String) -> Unit,
     onClickNews: (String) -> Unit,
+    onClickScrap: (NewsModel) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
+    var bottomSheetState by remember { mutableStateOf<NewsModel?>(null) }
 
     Box(
         Modifier
@@ -79,6 +100,7 @@ internal fun TopicScreen(
             newsList = newsList,
             listState = lazyListState,
             onClickNews = onClickNews,
+            onClickNewsMore = { newsModel -> bottomSheetState = newsModel },
         )
         AnimatedVisibility(
             modifier = Modifier
@@ -99,6 +121,37 @@ internal fun TopicScreen(
                 },
                 onSearch = onSearchClick,
             )
+        }
+
+        AnimatedVisibility(
+            visible = bottomSheetState != null
+        ) {
+            ModalBottomSheet(
+                onDismissRequest = { bottomSheetState = null },
+            ) {
+                val newsModel = bottomSheetState ?: return@ModalBottomSheet
+
+                Button(
+                    onClick = { onClickScrap(newsModel) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Star,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(
+                        text = "스크랩",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Spacer(Modifier.navigationBarsPadding())
+            }
         }
     }
 }
@@ -124,6 +177,7 @@ private fun LazyListState.isScrollingUp(): Boolean {
 @Composable
 private fun NewsContent(
     onClickNews: (String) -> Unit,
+    onClickNewsMore: (NewsModel) -> Unit,
     newsList: PersistentList<NewsModel>,
     listState: LazyListState,
 ) {
@@ -147,7 +201,9 @@ private fun NewsContent(
                             alpha = .9f - listState.firstVisibleItemScrollOffset / size.height
                         }
                     },
-                newsModel = item, onClick = { onClickNews(item.link) }
+                newsModel = item,
+                onClick = { onClickNews(item.link) },
+                onClickMore = { onClickNewsMore(item) }
             )
         }
     }
@@ -155,7 +211,7 @@ private fun NewsContent(
 
 fun Modifier.simpleVerticalScrollbar(
     state: LazyListState,
-    width: Dp = 4.dp,
+    width: Dp = 2.dp,
 ): Modifier = composed {
     val targetAlpha = if (state.isScrollInProgress) 1f else 0f
     val duration = if (state.isScrollInProgress) 150 else 500
@@ -246,6 +302,7 @@ private fun TopicScreenPreview() {
             onClickSection = {},
             onSearchClick = {},
             onClickNews = {},
+            onClickScrap = {},
         )
     }
 }

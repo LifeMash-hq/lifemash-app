@@ -2,10 +2,13 @@ package org.bmsk.lifemash.core.repo.scrap.impl
 
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.repo.scrap.api.ScrapNewsRepository
+import org.bmsk.lifemash.core.repo.scrap.impl.dao.ScrapNewsDao
 import java.util.Date
 import javax.inject.Inject
 
-internal class ScrapNewsRepositoryImpl @Inject constructor() : ScrapNewsRepository {
+internal class ScrapNewsRepositoryImpl @Inject constructor(
+    private val scrapNewsDao: ScrapNewsDao,
+) : ScrapNewsRepository {
 
     override fun addNewsToDB(newsModel: NewsModel) {
         TODO("Not yet implemented")
@@ -24,7 +27,7 @@ internal class ScrapNewsRepositoryImpl @Inject constructor() : ScrapNewsReposito
     }
 
     override fun updateNewsFromDB(newsModel: NewsModel) {
-        TODO("Not yet implemented")
+        scrapNewsDao.updateNews(newsModel.toEntity())
     }
 
     override fun updateAllNewsFromDB(newsModels: List<NewsModel>) {
