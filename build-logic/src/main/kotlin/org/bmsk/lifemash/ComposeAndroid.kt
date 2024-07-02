@@ -10,6 +10,10 @@ internal fun Project.configureComposeAndroid() {
 
     val libs = extensions.libs
     androidExtension.apply {
+        buildFeatures {
+            compose = true
+        }
+
         dependencies {
             val bom = libs.findLibrary("androidx-compose-bom").get()
             add("implementation", platform(bom))

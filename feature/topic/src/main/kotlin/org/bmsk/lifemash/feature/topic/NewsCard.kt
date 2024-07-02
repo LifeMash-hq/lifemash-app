@@ -1,8 +1,10 @@
 package org.bmsk.lifemash.feature.topic
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,11 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.NetworkImage
+import org.bmsk.lifemash.core.designsystem.effect.noRippleClickable
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.DateParser
 import org.bmsk.lifemash.core.model.NewsModel
@@ -29,6 +33,7 @@ internal fun NewsCard(
     modifier: Modifier = Modifier,
     newsModel: NewsModel,
     onClick: () -> Unit,
+    onClickMore: () -> Unit,
 ) {
     LifeMashCard(modifier = modifier.clickable { onClick() }) {
         Column(
@@ -56,10 +61,16 @@ internal fun NewsCard(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.baseline_more_vert_24),
-                        contentDescription = null,
-                    )
+                    Box(
+                        modifier = Modifier
+                            .noRippleClickable { onClickMore() }
+                            .padding(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.baseline_more_vert_24),
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
         }
@@ -75,6 +86,7 @@ private fun NewsCardPreview() {
         NewsCard(
             newsModel = fakeNewsModel,
             onClick = {},
+            onClickMore = {},
         )
     }
 }

@@ -17,7 +17,7 @@ data class NewsEntity(
     @ColumnInfo(name = "link")
     val link: String,
 
-    @ColumnInfo(name = "pubDate")
+    @ColumnInfo(name = "pub_date")
     val pubDate: Date,
 
     @ColumnInfo(name = "image_url")

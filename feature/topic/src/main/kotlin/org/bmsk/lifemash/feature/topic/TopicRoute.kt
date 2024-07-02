@@ -25,6 +25,7 @@ internal object TopicRoute {
             onClickSection = viewModel::fetchNews,
             onSearchClick = viewModel::fetchNewsSearchResults,
             onClickNews = onClickNews,
+            onClickScrap = viewModel::scrapNews,
         )
     }
 }

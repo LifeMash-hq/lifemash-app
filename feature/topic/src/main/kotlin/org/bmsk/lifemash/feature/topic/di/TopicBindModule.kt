@@ -4,10 +4,14 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 import org.bmsk.lifemash.feature.topic.api.TopicNavController
 import org.bmsk.lifemash.feature.topic.api.TopicNavGraph
 import org.bmsk.lifemash.feature.topic.navigation.TopicNavControllerImpl
 import org.bmsk.lifemash.feature.topic.navigation.TopicNavGraphImpl
+import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
+import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCaseImpl
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -22,4 +26,14 @@ internal abstract class TopicBindModule {
     abstract fun bindTopicNavGraph(
         dataSource: TopicNavGraphImpl
     ): TopicNavGraph
+}
+
+@Module
+@InstallIn(ViewModelComponent::class)
+internal abstract class UseCaseBindModule {
+    @Binds
+    @ViewModelScoped
+    abstract fun scrapNewsUseCase(
+        dataSource: ScrapNewsUseCaseImpl
+    ): ScrapNewsUseCase
 }

@@ -52,5 +52,7 @@ dependencies {
     implementation(projects.feature.topic)
     implementation(projects.feature.webview)
 
+    implementation(projects.core.repo.scrap.impl)
+
     implementation(libs.androidx.appcompat)
 }
