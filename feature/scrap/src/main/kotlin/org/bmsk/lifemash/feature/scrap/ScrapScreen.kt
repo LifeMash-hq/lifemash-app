@@ -45,50 +45,51 @@ private fun ScrapScreenPreview() {
     LifeMashTheme {
         ScrapScreen(
             scrapNewsList =
-                persistentListOf(
-                    NewsModel(
-                        title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-                        link = "",
-                        pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
-                        imageUrl = "",
-                    ),
-                    NewsModel(
-                        title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-                        link = "",
-                        pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
-                        imageUrl = "",
-                    ),
-                    NewsModel(
-                        title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-                        link = "",
-                        pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
-                        imageUrl = "",
-                    ),
-                    NewsModel(
-                        title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-                        link = "",
-                        pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
-                        imageUrl = "",
-                    ),
-                    NewsModel(
-                        title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-                        link = "",
-                        pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
-                        imageUrl = "",
-                    ),
-                    NewsModel(
-                        title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-                        link = "",
-                        pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
-                        imageUrl = "",
-                    ),
-                    NewsModel(
-                        title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-                        link = "",
-                        pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
-                        imageUrl = "",
-                    ),
+            persistentListOf(
+                NewsModel(
+                    title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsN",
+                    link = "",
+                    pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
+                    imageUrl = "",
                 ),
+                NewsModel(
+                    title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsN",
+                    link = "",
+                    pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
+                    imageUrl = "",
+                ),
+                NewsModel(
+                    title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsN",
+                    link = "",
+                    pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
+                    imageUrl = "",
+                ),
+                NewsModel(
+                    title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNe",
+                    link = "",
+                    pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
+                    imageUrl = "",
+                ),
+                NewsModel(
+                    title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsN",
+                    link = "",
+                    pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
+                    imageUrl = "",
+                ),
+                NewsModel(
+                    title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsN",
+                    link = "",
+                    pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
+                    imageUrl = "",
+                ),
+                NewsModel(
+                    title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNew" +
+                            "sNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
+                    link = "",
+                    pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
+                    imageUrl = "",
+                ),
+            ),
             deleteScrapNews = {},
         )
     }

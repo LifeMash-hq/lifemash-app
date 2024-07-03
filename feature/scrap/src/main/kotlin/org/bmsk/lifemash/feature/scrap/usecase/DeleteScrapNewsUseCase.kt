@@ -10,7 +10,7 @@ internal interface DeleteScrapNewsUseCase {
 
 internal class DeleteScrapNewsUseCaseImpl @Inject constructor(
     private val repository: ScrapNewsRepository
-): DeleteScrapNewsUseCase {
+) : DeleteScrapNewsUseCase {
     override fun invoke(newsModel: NewsModel) {
         repository.deleteNewsFromDB(newsModel)
     }
