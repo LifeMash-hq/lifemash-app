@@ -44,6 +44,7 @@ internal fun MainScreen(
             navGraphBuilder = this,
             navInfo = TopicNavGraphInfo(
                 onClickNews = { navigator.navigateWebView(it) },
+                onClickScrapPage = { navigator.navigateScrap() },
                 onShowErrorSnackbar = onShowErrorSnackbar,
             )
         )

@@ -22,8 +22,15 @@ internal object ScrapRoute {
             viewModel.errorFlow.collectLatest { onShowErrorSnackbar(it) }
         }
 
-        ScrapScreen(
-            scrapNewsList = persistentListOf(),
-        )
+        when (val uiState = scrapUiState) {
+            is ScrapUiState.Loading -> {}
+            is ScrapUiState.Success -> {
+                ScrapScreen(
+                    scrapNewsList = uiState.scraps,
+                )
+            }
+            is ScrapUiState.Fail -> {}
+        }
+
     }
 }

@@ -6,5 +6,6 @@ interface TopicNavGraph: LifeMashNavGraph<TopicNavGraphInfo>
 
 data class TopicNavGraphInfo(
     val onClickNews: (url: String) -> Unit,
+    val onClickScrapPage: () -> Unit,
     val onShowErrorSnackbar: (Throwable?) -> Unit,
 )

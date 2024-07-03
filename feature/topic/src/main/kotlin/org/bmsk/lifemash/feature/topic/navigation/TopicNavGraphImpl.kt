@@ -12,6 +12,7 @@ internal class TopicNavGraphImpl @Inject constructor() : TopicNavGraph {
        navGraphBuilder.composable(route = TopicRoute.ROUTE) {
            TopicRoute(
                onClickNews = navInfo.onClickNews,
+               onClickScrapPage = navInfo.onClickScrapPage,
                onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
            )
        }

@@ -12,6 +12,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -29,6 +31,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -84,6 +87,7 @@ internal fun TopicScreen(
     onSearchClick: (String) -> Unit,
     onClickNews: (String) -> Unit,
     onClickScrap: (NewsModel) -> Unit,
+    onClickScrapPage: () -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -120,6 +124,7 @@ internal fun TopicScreen(
                     onClickSection(section)
                 },
                 onSearch = onSearchClick,
+                onClickScrapPage = onClickScrapPage,
             )
         }
 
@@ -249,6 +254,7 @@ private fun SearchBar(
     currentSection: SbsSection,
     onClickChip: (SbsSection) -> Unit,
     onSearch: (String) -> Unit,
+    onClickScrapPage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchText by remember { mutableStateOf("") }
@@ -271,21 +277,33 @@ private fun SearchBar(
                     )
                 }
             }
-            OutlinedTextField(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                value = searchText,
-                onValueChange = { searchText = it },
-                placeholder = { Text(text = stringResource(id = R.string.search_news)) },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Search,
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        onSearch(searchText)
-                        keyboardController?.hide()
-                    },
-                ),
-            )
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    placeholder = { Text(text = stringResource(id = R.string.search_news)) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Search,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            onSearch(searchText)
+                            keyboardController?.hide()
+                        },
+                    ),
+                )
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clickable { onClickScrapPage() },
+                    contentDescription = "스크랩",
+                    tint = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
         }
     }
 }
@@ -303,6 +321,7 @@ private fun TopicScreenPreview() {
             onSearchClick = {},
             onClickNews = {},
             onClickScrap = {},
+            onClickScrapPage = {},
         )
     }
 }
