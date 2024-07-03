@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import org.bmsk.lifemash.core.repo.scrap.impl.dao.ScrapNewsDao
 import org.bmsk.lifemash.core.repo.scrap.impl.db.ScrapNewsDB
+import org.bmsk.lifemash.core.repo.scrap.impl.entity.MIGRATION_1_2
 import javax.inject.Singleton
 
 @Module
@@ -27,5 +28,5 @@ internal class ScrapDBModule {
         context = context,
         klass = ScrapNewsDB::class.java,
         name = ScrapNewsDB.SCRAP_NEWS_DB_NAME
-    ).build()
+    ).addMigrations(MIGRATION_1_2).build()
 }

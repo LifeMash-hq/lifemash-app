@@ -14,7 +14,7 @@ internal abstract class ScrapNewsDB: RoomDatabase() {
     abstract fun newsDao(): ScrapNewsDao
 
     companion object {
-        const val SCRAP_NEWS_DB_VERSION = 1
+        const val SCRAP_NEWS_DB_VERSION = 2
         const val SCRAP_NEWS_DB_NAME = "scrap_news_db"
     }
 }

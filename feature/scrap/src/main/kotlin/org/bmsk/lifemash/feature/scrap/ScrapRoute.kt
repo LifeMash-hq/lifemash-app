@@ -27,6 +27,7 @@ internal object ScrapRoute {
             is ScrapUiState.Success -> {
                 ScrapScreen(
                     scrapNewsList = uiState.scraps,
+                    deleteScrapNews = viewModel::deleteScrapNews
                 )
             }
             is ScrapUiState.Fail -> {}

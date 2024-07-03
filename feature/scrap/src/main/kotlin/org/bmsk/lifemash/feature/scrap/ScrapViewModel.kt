@@ -12,12 +12,15 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.bmsk.lifemash.core.model.NewsModel
+import org.bmsk.lifemash.feature.scrap.usecase.DeleteScrapNewsUseCase
 import org.bmsk.lifemash.feature.scrap.usecase.GetScrapNewsUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ScrapViewModel @Inject constructor(
-    private val getScrapNewsUseCase: GetScrapNewsUseCase
+    private val getScrapNewsUseCase: GetScrapNewsUseCase,
+    private val deleteScrapNewsUseCase: DeleteScrapNewsUseCase
 ) : ViewModel() {
     private val _errorFlow = MutableSharedFlow<Throwable>()
     val errorFlow = _errorFlow.asSharedFlow()
@@ -31,5 +34,13 @@ internal class ScrapViewModel @Inject constructor(
             Log.e("ScrapViewModel", "scrapNews: $scrapNews")
             _uiState.update { ScrapUiState.Success(scrapNews.toPersistentList()) }
         }
+    }
+
+    fun deleteScrapNews(newsModel: NewsModel) = viewModelScope.launch(Dispatchers.IO) {
+        val currentState = _uiState.value
+        if (currentState !is ScrapUiState.Success) return@launch
+
+        deleteScrapNewsUseCase(newsModel)
+        _uiState.update { currentState.copy(scraps = currentState.scraps.remove(newsModel)) }
     }
 }

@@ -10,6 +10,8 @@ import org.bmsk.lifemash.feature.scrap.api.ScrapNavController
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
 import org.bmsk.lifemash.feature.scrap.navigation.ScrapNavControllerImpl
 import org.bmsk.lifemash.feature.scrap.navigation.ScrapNavGraphImpl
+import org.bmsk.lifemash.feature.scrap.usecase.DeleteScrapNewsUseCase
+import org.bmsk.lifemash.feature.scrap.usecase.DeleteScrapNewsUseCaseImpl
 import org.bmsk.lifemash.feature.scrap.usecase.GetScrapNewsUseCase
 import org.bmsk.lifemash.feature.scrap.usecase.GetScrapNewsUseCaseImpl
 
@@ -35,4 +37,10 @@ internal abstract class UseCaseBindModule {
     abstract fun getScrapNewsUseCase(
         dataSource: GetScrapNewsUseCaseImpl
     ): GetScrapNewsUseCase
+
+    @ViewModelScoped
+    @Binds
+    abstract fun deleteScrapNewsUseCase(
+        dataSource: DeleteScrapNewsUseCaseImpl
+    ): DeleteScrapNewsUseCase
 }
