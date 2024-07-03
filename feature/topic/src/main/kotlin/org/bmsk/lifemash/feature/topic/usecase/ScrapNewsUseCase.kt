@@ -10,8 +10,11 @@ internal interface ScrapNewsUseCase {
 
 internal class ScrapNewsUseCaseImpl @Inject constructor(
     private val scrapNewsRepository: ScrapNewsRepository
-): ScrapNewsUseCase {
+) : ScrapNewsUseCase {
     override fun invoke(newsModel: NewsModel) {
-        scrapNewsRepository.updateNewsFromDB(newsModel)
+        val isExist = scrapNewsRepository.getNewsByLink(newsModel.link) != null
+        if (isExist) return
+
+        scrapNewsRepository.addNewsToDB(newsModel)
     }
 }

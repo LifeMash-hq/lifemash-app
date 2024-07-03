@@ -99,26 +99,19 @@ internal class TopicViewModel @Inject constructor(
         updateNewsItemWithImageUrl(index, news, imageUrl)
     }
 
-    private suspend fun fetchImageUrl(newsLink: String): String {
-        return withContext(Dispatchers.IO) {
-            Jsoup.connect(newsLink).get().select("meta[property=og:image]").attr("content")
-        }
+    private suspend fun fetchImageUrl(newsLink: String): String = withContext(Dispatchers.IO) {
+        Jsoup.connect(newsLink).get().select("meta[property=og:image]").attr("content")
     }
 
-    private suspend fun updateNewsItemWithImageUrl(
+    private fun updateNewsItemWithImageUrl(
         index: Int,
         newsItem: NewsModel,
         imageUrl: String,
     ) {
-        withContext(Dispatchers.Main) {
-            _uiState.update {
-                it.copy(
-                    newsList = it.newsList.set(
-                        index,
-                        newsItem.copy(imageUrl = imageUrl),
-                    ),
-                )
-            }
+        _uiState.update { currentState ->
+            currentState.copy(
+                newsList = currentState.newsList.set(index, newsItem.copy(imageUrl = imageUrl)),
+            )
         }
     }
 }

@@ -13,6 +13,7 @@ internal object TopicRoute {
     @Composable
     operator fun invoke(
         onClickNews: (url: String) -> Unit,
+        onClickScrapPage: () -> Unit,
         onShowErrorSnackbar: (throwable: Throwable) -> Unit,
         viewModel: TopicViewModel = hiltViewModel(),
     ) {
@@ -26,6 +27,7 @@ internal object TopicRoute {
             onSearchClick = viewModel::fetchNewsSearchResults,
             onClickNews = onClickNews,
             onClickScrap = viewModel::scrapNews,
+            onClickScrapPage = onClickScrapPage
         )
     }
 }
