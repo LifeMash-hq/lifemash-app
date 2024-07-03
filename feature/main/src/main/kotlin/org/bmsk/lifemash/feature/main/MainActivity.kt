@@ -1,7 +1,6 @@
 package org.bmsk.lifemash.feature.main
 
 import android.os.Bundle
-import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -9,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
-import org.bmsk.lifemash.feature.nav.LifeMashNavController
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavController
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
 import org.bmsk.lifemash.feature.topic.api.TopicNavController

@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collectLatest
 
 internal object ScrapRoute {
@@ -30,8 +29,8 @@ internal object ScrapRoute {
                     deleteScrapNews = viewModel::deleteScrapNews
                 )
             }
+
             is ScrapUiState.Fail -> {}
         }
-
     }
 }

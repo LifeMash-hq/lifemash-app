@@ -1,7 +1,6 @@
 package org.bmsk.lifemash.feature.topic
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,11 +38,15 @@ internal fun NewsCard(
             modifier = Modifier.fillMaxWidth(),
         ) {
             NetworkImage(
-                modifier = Modifier.fillMaxWidth().aspectRatio(2f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f),
                 imageUrl = newsModel.imageUrl,
             )
             Column(
-                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
@@ -81,7 +83,8 @@ internal fun NewsCard(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun NewsCardPreview() {
-    val fakeNewsModel = NewsModel(title = "News Card", link = "", pubDate = DateParser.parseDate("2023-08-20"))
+    val fakeNewsModel =
+        NewsModel(title = "News Card", link = "", pubDate = DateParser.parseDate("2023-08-20"))
     LifeMashTheme {
         NewsCard(
             newsModel = fakeNewsModel,

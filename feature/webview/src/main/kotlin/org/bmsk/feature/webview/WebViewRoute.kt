@@ -14,4 +14,3 @@ internal object WebViewRoute {
         WebViewScreen(url = url)
     }
 }
-

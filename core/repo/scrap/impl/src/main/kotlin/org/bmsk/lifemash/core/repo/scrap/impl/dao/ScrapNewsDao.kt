@@ -43,5 +43,4 @@ interface ScrapNewsDao {
 
     @Query("SELECT * FROM scrap_news WHERE image_url = :imageUrl LIMIT 1")
     fun getNewsByImageUrl(imageUrl: String): NewsEntity?
-
 }

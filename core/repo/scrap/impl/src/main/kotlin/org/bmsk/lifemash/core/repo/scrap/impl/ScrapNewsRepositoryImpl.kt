@@ -15,7 +15,8 @@ internal class ScrapNewsRepositoryImpl @Inject constructor(
         scrapNewsDao.insertNews(newsModel.toEntity())
     }
 
-    override fun getNewsFromDB(): List<NewsModel> = scrapNewsDao.getAllNews().map(NewsEntity::toModel)
+    override fun getNewsFromDB(): List<NewsModel> =
+        scrapNewsDao.getAllNews().map(NewsEntity::toModel)
 
     override fun deleteNewsFromDB(newsModel: NewsModel) {
         scrapNewsDao.deleteNews(newsModel.toEntity())
@@ -37,7 +38,8 @@ internal class ScrapNewsRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override fun getNewsByLink(link: String): NewsModel? = scrapNewsDao.getNewsByLink(link)?.toModel()
+    override fun getNewsByLink(link: String): NewsModel? =
+        scrapNewsDao.getNewsByLink(link)?.toModel()
 
     override fun getNewsByPubDate(pubDate: Date): NewsModel? {
         TODO("Not yet implemented")

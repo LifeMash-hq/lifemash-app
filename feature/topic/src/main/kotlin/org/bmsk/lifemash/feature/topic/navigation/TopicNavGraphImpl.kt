@@ -9,12 +9,12 @@ import javax.inject.Inject
 
 internal class TopicNavGraphImpl @Inject constructor() : TopicNavGraph {
     override fun buildNavGraph(navGraphBuilder: NavGraphBuilder, navInfo: TopicNavGraphInfo) {
-       navGraphBuilder.composable(route = TopicRoute.ROUTE) {
-           TopicRoute(
-               onClickNews = navInfo.onClickNews,
-               onClickScrapPage = navInfo.onClickScrapPage,
-               onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
-           )
-       }
+        navGraphBuilder.composable(route = TopicRoute.ROUTE) {
+            TopicRoute(
+                onClickNews = navInfo.onClickNews,
+                onClickScrapPage = navInfo.onClickScrapPage,
+                onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
+            )
+        }
     }
 }
