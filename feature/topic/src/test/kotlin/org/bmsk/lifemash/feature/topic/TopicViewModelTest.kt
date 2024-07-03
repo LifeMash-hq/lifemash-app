@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import org.bmsk.lifemash.core.domain.usecase.NewsUseCase
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SbsSection
+import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -23,13 +24,14 @@ class TopicViewModelTest {
     private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
 
     private val newsUseCase = mockk<NewsUseCase>()
+    private val scrapNewsUseCase = mockk<ScrapNewsUseCase>()
 
     private lateinit var viewModel: TopicViewModel
 
     @BeforeEach
     fun beforeEach() {
         Dispatchers.setMain(dispatcher)
-        viewModel = TopicViewModel(newsUseCase)
+        viewModel = TopicViewModel(newsUseCase, scrapNewsUseCase)
     }
 
     @AfterEach
