@@ -7,6 +7,10 @@ android {
 }
 
 dependencies {
+    implementation(projects.feature.topicApi)
+    implementation(projects.feature.mainNavGraph)
+    implementation(projects.core.repo.scrap.api)
+
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity)

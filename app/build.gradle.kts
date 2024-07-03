@@ -10,6 +10,7 @@ android {
     compileSdk = Configuration.compileSdk
 
     defaultConfig {
+        applicationId = Configuration.applicationId
         minSdk = Configuration.minSdk
         targetSdk = Configuration.targetSdk
         versionCode = Configuration.versionCode
@@ -46,6 +47,12 @@ dependencies {
     implementation(projects.core.commonUi)
 
     implementation(projects.feature.main)
+    implementation(projects.feature.mainNavGraph)
+    implementation(projects.feature.scrap)
+    implementation(projects.feature.topic)
+    implementation(projects.feature.webview)
+
+    implementation(projects.core.repo.scrap.impl)
 
     implementation(libs.androidx.appcompat)
 }

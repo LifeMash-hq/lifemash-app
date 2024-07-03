@@ -21,7 +21,6 @@ dependencies {
     implementation(libs.moshi)
 
     kapt(libs.tikxml.processor)
-    implementation(libs.tikxml.core)
     implementation(libs.tikxml.annotation)
     implementation(libs.tikxml.retrofit)
 }

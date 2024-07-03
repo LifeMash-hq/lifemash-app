@@ -3,6 +3,7 @@ package org.bmsk.lifemash.feature.topic
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -20,7 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.NetworkImage
+import org.bmsk.lifemash.core.designsystem.effect.noRippleClickable
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.core.model.DateParser
 import org.bmsk.lifemash.core.model.NewsModel
 
 @Composable
@@ -28,17 +31,22 @@ internal fun NewsCard(
     modifier: Modifier = Modifier,
     newsModel: NewsModel,
     onClick: () -> Unit,
+    onClickMore: () -> Unit,
 ) {
     LifeMashCard(modifier = modifier.clickable { onClick() }) {
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
             NetworkImage(
-                modifier = Modifier.fillMaxWidth().aspectRatio(2f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f),
                 imageUrl = newsModel.imageUrl,
             )
             Column(
-                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
@@ -51,14 +59,20 @@ internal fun NewsCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = newsModel.pubDate,
+                        text = DateParser.formatDate(newsModel.pubDate),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.baseline_more_vert_24),
-                        contentDescription = null,
-                    )
+                    Box(
+                        modifier = Modifier
+                            .noRippleClickable { onClickMore() }
+                            .padding(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.baseline_more_vert_24),
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
         }
@@ -69,11 +83,13 @@ internal fun NewsCard(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun NewsCardPreview() {
-    val fakeNewsModel = NewsModel(title = "News Card", link = "", pubDate = "2023-08-20")
+    val fakeNewsModel =
+        NewsModel(title = "News Card", link = "", pubDate = DateParser.parseDate("2023-08-20"))
     LifeMashTheme {
         NewsCard(
             newsModel = fakeNewsModel,
             onClick = {},
+            onClickMore = {},
         )
     }
 }
