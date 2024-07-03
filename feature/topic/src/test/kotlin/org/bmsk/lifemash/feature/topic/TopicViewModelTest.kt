@@ -12,23 +12,26 @@ import kotlinx.coroutines.test.setMain
 import org.bmsk.lifemash.core.domain.usecase.NewsUseCase
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SbsSection
+import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.Date
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TopicViewModelTest {
     private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
 
     private val newsUseCase = mockk<NewsUseCase>()
+    private val scrapNewsUseCase = mockk<ScrapNewsUseCase>()
 
     private lateinit var viewModel: TopicViewModel
 
     @BeforeEach
     fun beforeEach() {
         Dispatchers.setMain(dispatcher)
-        viewModel = TopicViewModel(newsUseCase)
+        viewModel = TopicViewModel(newsUseCase, scrapNewsUseCase)
     }
 
     @AfterEach
@@ -40,8 +43,8 @@ class TopicViewModelTest {
     fun `when fetchNews is called, uiState updates with new news list`() = runTest {
         // Given
         val fakeNewsList = listOf(
-            NewsModel("1", "Fake News Title 1", "Fake Source 1", "Fake URL 1"),
-            NewsModel("2", "Fake News Title 2", "Fake Source 2", "Fake URL 2"),
+            NewsModel("1", "Fake News Title 1", Date(), "Fake URL 1"),
+            NewsModel("2", "Fake News Title 2", Date(), "Fake URL 2"),
         )
 
         coEvery { newsUseCase.getSbsNews(SbsSection.ECONOMICS) } returns fakeNewsList

@@ -1,4 +1,3 @@
-import gradle.kotlin.dsl.accessors._285dcef16d8875fee0ec91e18e07daf9.implementation
 import org.bmsk.lifemash.configureHiltAndroid
 import org.bmsk.lifemash.configureKotestAndroid
 import org.bmsk.lifemash.configureKotlinAndroid

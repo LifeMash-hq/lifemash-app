@@ -7,17 +7,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.feature.topic.navigation.topicNavGraph
+import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
+import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraphInfo
+import org.bmsk.lifemash.feature.topic.api.TopicNavGraph
+import org.bmsk.lifemash.feature.topic.api.TopicNavGraphInfo
+import org.bmsk.lifemash.feature.topic.api.WebViewNavGraph
+import org.bmsk.lifemash.feature.topic.api.WebViewNavGraphInfo
 import java.net.UnknownHostException
 
 @Composable
 internal fun MainScreen(
-    navigator: MainNavigator = rememberMainNavigator(),
+    navigator: MainNavigator,
+    scrapNavGraph: ScrapNavGraph,
+    topicNavGraph: TopicNavGraph,
+    webViewNavGraph: WebViewNavGraph,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val localContextResource = LocalContext.current.resources
-    val onShowErrorSnackbar: (Throwable) -> Unit = { throwable ->
+    val onShowErrorSnackbar: (Throwable?) -> Unit = { throwable ->
         coroutineScope.launch {
             snackbarHostState.showSnackbar(
                 when (throwable) {
@@ -32,9 +40,23 @@ internal fun MainScreen(
         navController = navigator.navController,
         startDestination = navigator.startDestination,
     ) {
-        topicNavGraph(
-            onClickNews = { navigator.navigateWebView(it) },
-            onShowErrorSnackbar = onShowErrorSnackbar,
+        topicNavGraph.buildNavGraph(
+            navGraphBuilder = this,
+            navInfo = TopicNavGraphInfo(
+                onClickNews = { navigator.navigateWebView(it) },
+                onClickScrapPage = { navigator.navigateScrap() },
+                onShowErrorSnackbar = onShowErrorSnackbar,
+            )
+        )
+
+        scrapNavGraph.buildNavGraph(
+            navGraphBuilder = this,
+            navInfo = ScrapNavGraphInfo(onShowErrorSnackbar)
+        )
+
+        webViewNavGraph.buildNavGraph(
+            navGraphBuilder = this,
+            navInfo = WebViewNavGraphInfo(onShowErrorSnackbar),
         )
     }
 }

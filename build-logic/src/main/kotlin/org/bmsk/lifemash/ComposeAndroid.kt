@@ -4,14 +4,14 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 internal fun Project.configureComposeAndroid() {
+    with(plugins) {
+        apply("org.jetbrains.kotlin.plugin.compose")
+    }
+
     val libs = extensions.libs
     androidExtension.apply {
         buildFeatures {
             compose = true
-        }
-        composeOptions {
-            kotlinCompilerExtensionVersion =
-                libs.findVersion("androidxComposeCompiler").get().toString()
         }
 
         dependencies {

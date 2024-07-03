@@ -17,12 +17,14 @@ import kotlinx.coroutines.withContext
 import org.bmsk.lifemash.core.domain.usecase.NewsUseCase
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SbsSection
+import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
 import org.jsoup.Jsoup
 import javax.inject.Inject
 
 @HiltViewModel
 internal class TopicViewModel @Inject constructor(
     private val newsUseCase: NewsUseCase,
+    private val scrapNewsUseCase: ScrapNewsUseCase,
 ) : ViewModel() {
     private var currentIoJob: Job? = null
 
@@ -39,6 +41,10 @@ internal class TopicViewModel @Inject constructor(
 
     init {
         fetchNews(SbsSection.ECONOMICS)
+    }
+
+    fun scrapNews(newsModel: NewsModel) = viewModelScope.launch(Dispatchers.IO) {
+        scrapNewsUseCase(newsModel)
     }
 
     fun fetchNews(section: SbsSection) = viewModelScope.launch {
@@ -93,26 +99,19 @@ internal class TopicViewModel @Inject constructor(
         updateNewsItemWithImageUrl(index, news, imageUrl)
     }
 
-    private suspend fun fetchImageUrl(newsLink: String): String {
-        return withContext(Dispatchers.IO) {
-            Jsoup.connect(newsLink).get().select("meta[property=og:image]").attr("content")
-        }
+    private suspend fun fetchImageUrl(newsLink: String): String = withContext(Dispatchers.IO) {
+        Jsoup.connect(newsLink).get().select("meta[property=og:image]").attr("content")
     }
 
-    private suspend fun updateNewsItemWithImageUrl(
+    private fun updateNewsItemWithImageUrl(
         index: Int,
         newsItem: NewsModel,
         imageUrl: String,
     ) {
-        withContext(Dispatchers.Main) {
-            _uiState.update {
-                it.copy(
-                    newsList = it.newsList.set(
-                        index,
-                        newsItem.copy(imageUrl = imageUrl),
-                    ),
-                )
-            }
+        _uiState.update { currentState ->
+            currentState.copy(
+                newsList = currentState.newsList.set(index, newsItem.copy(imageUrl = imageUrl)),
+            )
         }
     }
 }
