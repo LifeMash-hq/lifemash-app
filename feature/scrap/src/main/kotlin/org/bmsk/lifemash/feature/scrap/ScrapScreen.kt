@@ -18,7 +18,10 @@ import org.bmsk.lifemash.feature.scrap.component.ScrapNewsItem
 import org.bmsk.lifemash.feature.scrap.component.rememberScrapNewsItemState
 
 @Composable
-internal fun ScrapScreen(scrapNewsList: PersistentList<NewsModel>) {
+internal fun ScrapScreen(
+    scrapNewsList: PersistentList<NewsModel>,
+    deleteScrapNews: (NewsModel) -> Unit,
+) {
     val scrapNewsItemState = rememberScrapNewsItemState()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -29,7 +32,7 @@ internal fun ScrapScreen(scrapNewsList: PersistentList<NewsModel>) {
                 newsModel = news,
                 state = scrapNewsItemState,
                 onClick = {},
-                onClickDelete = {},
+                onClickDelete = { deleteScrapNews(news) },
             )
         }
     }
@@ -86,6 +89,7 @@ private fun ScrapScreenPreview() {
                         imageUrl = "",
                     ),
                 ),
+            deleteScrapNews = {},
         )
     }
 }
