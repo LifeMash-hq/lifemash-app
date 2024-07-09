@@ -51,7 +51,10 @@ internal fun MainScreen(
 
         scrapNavGraph.buildNavGraph(
             navGraphBuilder = this,
-            navInfo = ScrapNavGraphInfo(onShowErrorSnackbar)
+            navInfo = ScrapNavGraphInfo(
+                onClickNews = { navigator.navigateWebView(it) },
+                onShowErrorSnackbar = onShowErrorSnackbar,
+            )
         )
 
         webViewNavGraph.buildNavGraph(

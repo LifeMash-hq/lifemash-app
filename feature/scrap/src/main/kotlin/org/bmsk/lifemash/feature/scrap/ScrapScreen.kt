@@ -19,6 +19,7 @@ import org.bmsk.lifemash.feature.scrap.component.rememberScrapNewsItemState
 
 @Composable
 internal fun ScrapScreen(
+    onClickNews: (url: String) -> Unit,
     scrapNewsList: PersistentList<NewsModel>,
     deleteScrapNews: (NewsModel) -> Unit,
 ) {
@@ -31,7 +32,7 @@ internal fun ScrapScreen(
             ScrapNewsItem(
                 newsModel = news,
                 state = scrapNewsItemState,
-                onClick = {},
+                onClick = { onClickNews(news.link) },
                 onClickDelete = { deleteScrapNews(news) },
             )
         }
@@ -44,8 +45,8 @@ internal fun ScrapScreen(
 private fun ScrapScreenPreview() {
     LifeMashTheme {
         ScrapScreen(
-            scrapNewsList =
-            persistentListOf(
+            onClickNews = {},
+            scrapNewsList = persistentListOf(
                 NewsModel(
                     title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsN",
                     link = "",
