@@ -12,6 +12,7 @@ internal object ScrapRoute {
 
     @Composable
     operator fun invoke(
+        onClickNews: (url: String) -> Unit,
         onShowErrorSnackbar: (Throwable?) -> Unit,
         viewModel: ScrapViewModel = hiltViewModel(),
     ) {
@@ -25,6 +26,7 @@ internal object ScrapRoute {
             is ScrapUiState.Loading -> {}
             is ScrapUiState.Success -> {
                 ScrapScreen(
+                    onClickNews = onClickNews,
                     scrapNewsList = uiState.scraps,
                     deleteScrapNews = viewModel::deleteScrapNews
                 )

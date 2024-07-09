@@ -10,7 +10,10 @@ import javax.inject.Inject
 internal class ScrapNavGraphImpl @Inject constructor() : ScrapNavGraph {
     override fun buildNavGraph(navGraphBuilder: NavGraphBuilder, navInfo: ScrapNavGraphInfo) {
         navGraphBuilder.composable(route = ScrapRoute.ROUTE) {
-            ScrapRoute(onShowErrorSnackbar = navInfo.onShowErrorSnackbar)
+            ScrapRoute(
+                onClickNews = navInfo.onClickNews,
+                onShowErrorSnackbar = navInfo.onShowErrorSnackbar
+            )
         }
     }
 }
