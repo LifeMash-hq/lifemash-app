@@ -15,7 +15,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LifeMash_NewsApp"
+rootProject.name = "LifeMash"
 include(
     ":app",
 
