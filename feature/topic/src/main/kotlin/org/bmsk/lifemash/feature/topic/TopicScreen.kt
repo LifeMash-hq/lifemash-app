@@ -68,15 +68,15 @@ import kotlinx.coroutines.launch
 import org.bmsk.lifemash.core.designsystem.component.Loading
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
-import org.bmsk.lifemash.core.model.section.SbsSection
+import org.bmsk.lifemash.core.model.section.SBSSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TopicScreen(
     isLoading: Boolean,
     newsList: PersistentList<NewsModel>,
-    currentSection: SbsSection,
-    onClickSection: (SbsSection) -> Unit,
+    currentSection: SBSSection,
+    onClickSection: (SBSSection) -> Unit,
     onSearchClick: (String) -> Unit,
     onClickNews: (String) -> Unit,
     onClickScrap: (NewsModel) -> Unit,
@@ -244,8 +244,8 @@ fun Modifier.simpleVerticalScrollbar(
 
 @Composable
 private fun SearchBar(
-    currentSection: SbsSection,
-    onClickChip: (SbsSection) -> Unit,
+    currentSection: SBSSection,
+    onClickChip: (SBSSection) -> Unit,
     onSearch: (String) -> Unit,
     onClickScrapPage: () -> Unit,
     modifier: Modifier = Modifier,
@@ -309,7 +309,7 @@ private fun TopicScreenPreview() {
         TopicScreen(
             isLoading = true,
             newsList = persistentListOf(),
-            currentSection = SbsSection.ECONOMICS,
+            currentSection = SBSSection.ECONOMICS,
             onClickSection = {},
             onSearchClick = {},
             onClickNews = {},

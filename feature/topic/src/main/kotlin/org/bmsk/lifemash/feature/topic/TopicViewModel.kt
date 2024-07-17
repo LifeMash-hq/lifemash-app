@@ -14,23 +14,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.bmsk.lifemash.core.domain.usecase.NewsUseCase
 import org.bmsk.lifemash.core.model.NewsModel
-import org.bmsk.lifemash.core.model.section.SbsSection
+import org.bmsk.lifemash.core.model.section.SBSSection
+import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCase
+import org.bmsk.lifemash.feature.topic.usecase.GetSBSNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
 import org.jsoup.Jsoup
 import javax.inject.Inject
 
 @HiltViewModel
 internal class TopicViewModel @Inject constructor(
-    private val newsUseCase: NewsUseCase,
+    private val getSBSNewsUseCase: GetSBSNewsUseCase,
+    private val getGoogleNewsUseCase: GetGoogleNewsUseCase,
     private val scrapNewsUseCase: ScrapNewsUseCase,
 ) : ViewModel() {
     private var currentIoJob: Job? = null
 
     private val _uiState = MutableStateFlow(
         TopicUiState(
-            currentSection = SbsSection.ECONOMICS,
+            currentSection = SBSSection.ECONOMICS,
             newsList = persistentListOf(),
         ),
     )
@@ -40,14 +42,14 @@ internal class TopicViewModel @Inject constructor(
     val errorFlow = _errorFlow.asSharedFlow()
 
     init {
-        fetchNews(SbsSection.ECONOMICS)
+        fetchNews(SBSSection.ECONOMICS)
     }
 
     fun scrapNews(newsModel: NewsModel) = viewModelScope.launch(Dispatchers.IO) {
         scrapNewsUseCase(newsModel)
     }
 
-    fun fetchNews(section: SbsSection) = viewModelScope.launch {
+    fun fetchNews(section: SBSSection) = viewModelScope.launch {
         currentIoJob?.cancel()
         _uiState.update { it.copy(newsList = persistentListOf(), currentSection = section) }
         currentIoJob = processNewsFetching(section)
@@ -61,7 +63,7 @@ internal class TopicViewModel @Inject constructor(
 
     private fun processNewsFetchingForSearch(query: String) = viewModelScope.launch {
         runCatching {
-            newsUseCase.getGoogleNews(query)
+            getGoogleNewsUseCase(query)
         }.fold(
             onSuccess = { newsItems ->
                 handleNewsSuccess(newsItems)
@@ -70,9 +72,9 @@ internal class TopicViewModel @Inject constructor(
         )
     }
 
-    private fun processNewsFetching(section: SbsSection) = viewModelScope.launch {
+    private fun processNewsFetching(section: SBSSection) = viewModelScope.launch {
         runCatching {
-            newsUseCase.getSbsNews(section)
+            getSBSNewsUseCase(section)
         }.fold(
             onSuccess = { news ->
                 handleNewsSuccess(news)

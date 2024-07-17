@@ -21,13 +21,13 @@ include(
 
     ":core:designsystem",
     ":core:model",
-    ":core:domain",
     ":core:network",
-    ":core:data",
     ":core:common-ui",
 
     ":core:repo:scrap:api",
     ":core:repo:scrap:impl",
+    ":core:repo:search:api",
+    ":core:repo:search:impl",
 
     ":feature:main-nav-graph",
 
