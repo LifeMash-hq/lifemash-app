@@ -15,6 +15,9 @@ dependencyResolutionManagement {
     }
 }
 
+gradle.startParameter.excludedTaskNames.addAll(listOf(":buildSrc:testClasses"))
+gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:testClasses"))
+
 rootProject.name = "LifeMash"
 include(
     ":app",
