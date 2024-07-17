@@ -35,15 +35,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures {
-        dataBinding = true
-    }
 }
 
 dependencies {
-    implementation(projects.core.data)
     implementation(projects.core.model)
-    implementation(projects.core.domain)
     implementation(projects.core.commonUi)
 
     implementation(projects.feature.main)
@@ -53,6 +48,7 @@ dependencies {
     implementation(projects.feature.webview)
 
     implementation(projects.core.repo.scrap.impl)
+    implementation(projects.core.repo.search.impl)
 
     implementation(libs.androidx.appcompat)
 }

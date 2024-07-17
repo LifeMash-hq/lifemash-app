@@ -10,6 +10,10 @@ import org.bmsk.lifemash.feature.topic.api.TopicNavController
 import org.bmsk.lifemash.feature.topic.api.TopicNavGraph
 import org.bmsk.lifemash.feature.topic.navigation.TopicNavControllerImpl
 import org.bmsk.lifemash.feature.topic.navigation.TopicNavGraphImpl
+import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCase
+import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCaseImpl
+import org.bmsk.lifemash.feature.topic.usecase.GetSBSNewsUseCase
+import org.bmsk.lifemash.feature.topic.usecase.GetSBSNewsUseCaseImpl
 import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCaseImpl
 
@@ -36,4 +40,16 @@ internal abstract class UseCaseBindModule {
     abstract fun scrapNewsUseCase(
         dataSource: ScrapNewsUseCaseImpl
     ): ScrapNewsUseCase
+
+    @Binds
+    @ViewModelScoped
+    abstract fun getGoogleNewsUseCase(
+        dataSource: GetGoogleNewsUseCaseImpl
+    ): GetGoogleNewsUseCase
+
+    @Binds
+    @ViewModelScoped
+    abstract fun getSBSNewsUseCase(
+        dataSource: GetSBSNewsUseCaseImpl
+    ): GetSBSNewsUseCase
 }

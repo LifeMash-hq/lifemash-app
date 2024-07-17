@@ -1,27 +1,27 @@
 package org.bmsk.lifemash.feature.topic
 
-import org.bmsk.lifemash.core.model.section.SbsSection
+import org.bmsk.lifemash.core.model.section.SBSSection
 
-internal enum class SectionChip(val section: SbsSection, val chipNameId: Int) {
-    ECONOMY(SbsSection.ECONOMICS, R.string.economy),
+internal enum class SectionChip(val section: SBSSection, val chipNameId: Int) {
+    ECONOMY(SBSSection.ECONOMICS, R.string.economy),
 
-    POLITICS(SbsSection.POLITICS, R.string.politics), SOCIAL(
-        SbsSection.SOCIAL,
+    POLITICS(SBSSection.POLITICS, R.string.politics), SOCIAL(
+        SBSSection.SOCIAL,
         R.string.social,
     ),
     LIFE_CULTURE(
-        SbsSection.LIFE_CULTURE,
+        SBSSection.LIFE_CULTURE,
         R.string.life_culture,
     ),
     INTERNATIONAL_GLOBAL(
 
-        SbsSection.INTERNATIONAL_GLOBAL,
+        SBSSection.INTERNATIONAL_GLOBAL,
         R.string.international_global,
     ),
     ENTERTAINMENT_BROADCAST(
 
-        SbsSection.ENTERTAINMENT_BROADCAST,
+        SBSSection.ENTERTAINMENT_BROADCAST,
         R.string.entertainment_broadcast,
     ),
-    SPORT(SbsSection.SPORT, R.string.sport),
+    SPORT(SBSSection.SPORT, R.string.sport),
 }

@@ -9,9 +9,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.bmsk.lifemash.core.domain.usecase.NewsUseCase
 import org.bmsk.lifemash.core.model.NewsModel
-import org.bmsk.lifemash.core.model.section.SbsSection
+import org.bmsk.lifemash.core.model.section.SBSSection
+import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCase
+import org.bmsk.lifemash.feature.topic.usecase.GetSBSNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -23,7 +24,8 @@ import java.util.Date
 class TopicViewModelTest {
     private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
 
-    private val newsUseCase = mockk<NewsUseCase>()
+    private val getGoogleNewsUseCase = mockk<GetGoogleNewsUseCase>()
+    private val getSBSNewsUseCase = mockk<GetSBSNewsUseCase>()
     private val scrapNewsUseCase = mockk<ScrapNewsUseCase>()
 
     private lateinit var viewModel: TopicViewModel
@@ -31,7 +33,11 @@ class TopicViewModelTest {
     @BeforeEach
     fun beforeEach() {
         Dispatchers.setMain(dispatcher)
-        viewModel = TopicViewModel(newsUseCase, scrapNewsUseCase)
+        viewModel = TopicViewModel(
+            getSBSNewsUseCase = getSBSNewsUseCase,
+            getGoogleNewsUseCase = getGoogleNewsUseCase,
+            scrapNewsUseCase = scrapNewsUseCase
+        )
     }
 
     @AfterEach
@@ -47,13 +53,13 @@ class TopicViewModelTest {
             NewsModel("2", "Fake News Title 2", Date(), "Fake URL 2"),
         )
 
-        coEvery { newsUseCase.getSbsNews(SbsSection.ECONOMICS) } returns fakeNewsList
+        coEvery { getSBSNewsUseCase(SBSSection.ECONOMICS) } returns fakeNewsList
 
         // When
-        viewModel.fetchNews(SbsSection.ECONOMICS)
+        viewModel.fetchNews(SBSSection.ECONOMICS)
 
         // Then
-        assertEquals(SbsSection.ECONOMICS, viewModel.uiState.value.currentSection)
+        assertEquals(SBSSection.ECONOMICS, viewModel.uiState.value.currentSection)
         assertEquals(fakeNewsList, viewModel.uiState.value.newsList)
     }
 }
