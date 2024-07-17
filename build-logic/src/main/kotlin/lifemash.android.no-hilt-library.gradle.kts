@@ -1,5 +1,4 @@
 import org.bmsk.lifemash.configureCoroutineAndroid
-import org.bmsk.lifemash.configureHiltAndroid
 import org.bmsk.lifemash.configureKotest
 import org.bmsk.lifemash.configureKotlinAndroid
 
