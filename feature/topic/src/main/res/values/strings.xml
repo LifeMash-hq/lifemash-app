@@ -12,4 +12,5 @@
     <string name="search_news">뉴스 검색</string>
     <string name="share">공유</string>
     <string name="bookmark">북마크</string>
+    <string name="description_option">옵션</string>
 </resources>

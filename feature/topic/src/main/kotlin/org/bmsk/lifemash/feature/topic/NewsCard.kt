@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,6 +27,7 @@ import org.bmsk.lifemash.core.designsystem.effect.noRippleClickable
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.DateParser
 import org.bmsk.lifemash.core.model.NewsModel
+import java.util.Date
 
 @Composable
 internal fun NewsCard(
@@ -66,11 +69,15 @@ internal fun NewsCard(
                     Box(
                         modifier = Modifier
                             .noRippleClickable { onClickMore() }
-                            .padding(4.dp)
+                            .defaultMinSize(
+                                minWidth = 48.dp,
+                                minHeight = 48.dp
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.baseline_more_vert_24),
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.description_option),
                         )
                     }
                 }
@@ -84,7 +91,7 @@ internal fun NewsCard(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun NewsCardPreview() {
     val fakeNewsModel =
-        NewsModel(title = "News Card", link = "", pubDate = DateParser.parseDate("2023-08-20"))
+        NewsModel(title = "News Card", link = "", pubDate = Date())
     LifeMashTheme {
         NewsCard(
             newsModel = fakeNewsModel,

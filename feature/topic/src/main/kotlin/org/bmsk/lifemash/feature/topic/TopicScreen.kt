@@ -69,6 +69,7 @@ import org.bmsk.lifemash.core.designsystem.component.Loading
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SBSSection
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -308,7 +309,13 @@ private fun TopicScreenPreview() {
     LifeMashTheme {
         TopicScreen(
             isLoading = true,
-            newsList = persistentListOf(),
+            newsList = persistentListOf(
+                NewsModel(
+                    title = "",
+                    link = "",
+                    pubDate = Date(),
+                )
+            ),
             currentSection = SBSSection.ECONOMICS,
             onClickSection = {},
             onSearchClick = {},
