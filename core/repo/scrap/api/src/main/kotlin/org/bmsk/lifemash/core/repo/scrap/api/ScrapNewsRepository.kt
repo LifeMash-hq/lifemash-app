@@ -18,7 +18,7 @@ interface ScrapNewsRepository {
 
     fun getNewsByTitle(title: String): NewsModel?
 
-    fun getNewsByLink(link: String): NewsModel?
+    suspend fun getNewsByLink(link: String): NewsModel?
 
     fun getNewsByPubDate(pubDate: Date): NewsModel?
 
