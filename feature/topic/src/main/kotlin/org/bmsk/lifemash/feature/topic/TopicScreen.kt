@@ -2,8 +2,6 @@ package org.bmsk.lifemash.feature.topic
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -38,14 +36,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
@@ -171,8 +164,7 @@ private fun NewsContent(
         state = listState,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .simpleVerticalScrollbar(listState),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         itemsIndexed(
@@ -190,41 +182,6 @@ private fun NewsContent(
                 newsModel = item,
                 onClick = { onClickNews(item.link) },
                 onClickMore = { onClickNewsMore(item) }
-            )
-        }
-    }
-}
-
-fun Modifier.simpleVerticalScrollbar(
-    state: LazyListState,
-    width: Dp = 2.dp,
-): Modifier = composed {
-    val targetAlpha = if (state.isScrollInProgress) 1f else 0f
-    val duration = if (state.isScrollInProgress) 150 else 500
-
-    val alpha by animateFloatAsState(
-        targetValue = targetAlpha,
-        animationSpec = tween(durationMillis = duration),
-        label = "",
-    )
-
-    drawWithContent {
-        drawContent()
-
-        val firstVisibleElementIndex =
-            state.layoutInfo.visibleItemsInfo.firstOrNull()?.index ?: return@drawWithContent
-        val needDrawScrollbar = state.isScrollInProgress || alpha > 0.0f
-
-        if (needDrawScrollbar) {
-            val elementHeight = this.size.height / state.layoutInfo.totalItemsCount
-            val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
-            val scrollbarHeight = state.layoutInfo.visibleItemsInfo.size * elementHeight
-
-            drawOval(
-                color = Color.Cyan.copy(alpha = 0.5f),
-                topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
-                size = Size(width.toPx(), scrollbarHeight),
-                alpha = alpha,
             )
         }
     }

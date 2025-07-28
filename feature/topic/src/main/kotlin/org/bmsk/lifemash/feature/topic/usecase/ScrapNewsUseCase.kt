@@ -5,13 +5,13 @@ import org.bmsk.lifemash.core.repo.scrap.api.ScrapNewsRepository
 import javax.inject.Inject
 
 internal interface ScrapNewsUseCase {
-    operator fun invoke(newsModel: NewsModel)
+    suspend operator fun invoke(newsModel: NewsModel)
 }
 
 internal class ScrapNewsUseCaseImpl @Inject constructor(
     private val scrapNewsRepository: ScrapNewsRepository
 ) : ScrapNewsUseCase {
-    override fun invoke(newsModel: NewsModel) {
+    override suspend fun invoke(newsModel: NewsModel) {
         val isExist = scrapNewsRepository.getNewsByLink(newsModel.link) != null
         if (isExist) return
 

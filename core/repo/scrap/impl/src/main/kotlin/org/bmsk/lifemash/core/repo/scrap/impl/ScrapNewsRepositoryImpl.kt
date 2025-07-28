@@ -1,5 +1,7 @@
 package org.bmsk.lifemash.core.repo.scrap.impl
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.repo.scrap.api.ScrapNewsRepository
 import org.bmsk.lifemash.core.repo.scrap.impl.dao.ScrapNewsDao
@@ -38,8 +40,8 @@ internal class ScrapNewsRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override fun getNewsByLink(link: String): NewsModel? =
-        scrapNewsDao.getNewsByLink(link)?.toModel()
+    override suspend fun getNewsByLink(link: String): NewsModel? =
+        Dispatchers.IO { scrapNewsDao.getNewsByLink(link)?.toModel() }
 
     override fun getNewsByPubDate(pubDate: Date): NewsModel? {
         TODO("Not yet implemented")
