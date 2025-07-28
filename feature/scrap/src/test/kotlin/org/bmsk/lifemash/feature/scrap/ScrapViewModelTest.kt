@@ -36,10 +36,10 @@ class ScrapViewModelTest {
     fun `뉴스가 비어있으면 NewsEmpty`() = runTest {
         // Given: 빈 뉴스 리스트를 반환하는 Fake UseCase 세팅
         val fakeGet = object : GetScrapNewsUseCase {
-            override fun invoke(): List<NewsModel> = emptyList()
+            override suspend fun invoke(): List<NewsModel> = emptyList()
         }
         val fakeDelete = object : DeleteScrapNewsUseCase {
-            override fun invoke(newsModel: NewsModel) {}
+            override suspend fun invoke(newsModel: NewsModel) {}
         }
         val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 
@@ -58,10 +58,10 @@ class ScrapViewModelTest {
             NewsModel("title", "link", Date(), "img")
         )
         val fakeGet = object : GetScrapNewsUseCase {
-            override fun invoke(): List<NewsModel> = newsList
+            override suspend fun invoke(): List<NewsModel> = newsList
         }
         val fakeDelete = object : DeleteScrapNewsUseCase {
-            override fun invoke(newsModel: NewsModel) {}
+            override suspend fun invoke(newsModel: NewsModel) {}
         }
         val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 
@@ -82,10 +82,10 @@ class ScrapViewModelTest {
         // Given: 예외를 발생시키는 Fake UseCase 세팅
         val error = RuntimeException("DB Error")
         val fakeGet = object : GetScrapNewsUseCase {
-            override fun invoke(): List<NewsModel> = throw error
+            override suspend fun invoke(): List<NewsModel> = throw error
         }
         val fakeDelete = object : DeleteScrapNewsUseCase {
-            override fun invoke(newsModel: NewsModel) {}
+            override suspend fun invoke(newsModel: NewsModel) {}
         }
         val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 
@@ -106,10 +106,10 @@ class ScrapViewModelTest {
         val news = NewsModel("title", "link", Date(), "img")
         val error = IllegalStateException("삭제 실패")
         val fakeGet = object : GetScrapNewsUseCase {
-            override fun invoke(): List<NewsModel> = emptyList()
+            override suspend fun invoke(): List<NewsModel> = emptyList()
         }
         val fakeDelete = object : DeleteScrapNewsUseCase {
-            override fun invoke(newsModel: NewsModel) { throw error }
+            override suspend fun invoke(newsModel: NewsModel) { throw error }
         }
         val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 

@@ -33,6 +33,7 @@ internal class ScrapViewModel @Inject constructor(
                     _uiState.update { ScrapUiState.NewsLoaded(newsModels.toPersistentList()) }
                 }
             }.onFailure { t ->
+                t.printStackTrace()
                 _uiState.update { ScrapUiState.Error(t) }
             }
         }
@@ -42,6 +43,12 @@ internal class ScrapViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 deleteScrapNewsUseCase(newsModel)
+                val newsModels = getScrapNewsUseCase()
+                if (newsModels.isEmpty()) {
+                    _uiState.update { ScrapUiState.NewsEmpty }
+                } else {
+                    _uiState.update { ScrapUiState.NewsLoaded(newsModels.toPersistentList()) }
+                }
             }.onFailure { t ->
                 _uiState.update { ScrapUiState.Error(t) }
             }
