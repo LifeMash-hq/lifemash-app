@@ -23,7 +23,7 @@ internal class ScrapViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun getScrapNews() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCatching {
                 getScrapNewsUseCase()
             }.onSuccess { newsModels ->
@@ -39,7 +39,7 @@ internal class ScrapViewModel @Inject constructor(
     }
 
     fun deleteScrapNews(newsModel: NewsModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCatching {
                 deleteScrapNewsUseCase(newsModel)
             }.onFailure { t ->
