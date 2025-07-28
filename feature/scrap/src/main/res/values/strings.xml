@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_scrap_error_occurrence">에러가 발생했습니다.</string>
+    <string name="feature_scrap_empty_news">스크랩한 뉴스가 없어요</string>
+    <string name="feature_scrap_retry">다시 시도해 주세요.</string>
+    <string name="feature_scrap_news_here">스크랩한 뉴스가 여기에 표시됩니다.</string>
+    <string name="feature_scrap_header">스크랩한 뉴스</string>
+    <string name="feature_scrap_count">%1$s개</string>
+</resources>
