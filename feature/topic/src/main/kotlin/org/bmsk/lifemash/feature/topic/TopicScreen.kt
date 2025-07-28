@@ -7,38 +7,26 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -56,9 +44,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -85,7 +70,7 @@ internal fun TopicScreen(
 ) {
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
+    var searchText by remember { mutableStateOf("") }
     var bottomSheetState by remember { mutableStateOf<NewsModel?>(null) }
 
     Box(
@@ -117,6 +102,8 @@ internal fun TopicScreen(
                     coroutineScope.launch { lazyListState.scrollToItem(0) }
                     onClickSection(section)
                 },
+                searchText = searchText,
+                onSearchTextChange = { searchText = it },
                 onSearch = onSearchClick,
                 onClickScrapPage = onClickScrapPage,
             )
@@ -239,65 +226,6 @@ fun Modifier.simpleVerticalScrollbar(
                 size = Size(width.toPx(), scrollbarHeight),
                 alpha = alpha,
             )
-        }
-    }
-}
-
-@Composable
-private fun SearchBar(
-    currentSection: SBSSection,
-    onClickChip: (SBSSection) -> Unit,
-    onSearch: (String) -> Unit,
-    onClickScrapPage: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var searchText by remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    Surface(modifier = modifier) {
-        Column {
-            LazyRow(
-                modifier = Modifier,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                items(
-                    items = SectionChip.entries,
-                    key = { it.name },
-                ) { sectionChip ->
-                    FilterChip(
-                        selected = sectionChip.section == currentSection,
-                        onClick = { onClickChip(sectionChip.section) },
-                        label = { Text(text = stringResource(id = sectionChip.chipNameId)) },
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier.weight(1f),
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    placeholder = { Text(text = stringResource(id = R.string.search_news)) },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Search,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            onSearch(searchText)
-                            keyboardController?.hide()
-                        },
-                    ),
-                )
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clickable { onClickScrapPage() },
-                    contentDescription = "스크랩",
-                    tint = MaterialTheme.colorScheme.inversePrimary
-                )
-            }
         }
     }
 }
