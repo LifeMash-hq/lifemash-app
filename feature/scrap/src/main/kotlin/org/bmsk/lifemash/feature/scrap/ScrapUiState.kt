@@ -4,11 +4,13 @@ import kotlinx.collections.immutable.PersistentList
 import org.bmsk.lifemash.core.model.NewsModel
 
 internal sealed interface ScrapUiState {
-    data object Loading : ScrapUiState
+    data object NewsLoading : ScrapUiState
 
-    data class Success(
+    data class NewsLoaded(
         val scraps: PersistentList<NewsModel>
     ) : ScrapUiState
 
-    data object Fail : ScrapUiState
+    data object NewsEmpty : ScrapUiState
+
+    data class Error(val throwable: Throwable) : ScrapUiState
 }

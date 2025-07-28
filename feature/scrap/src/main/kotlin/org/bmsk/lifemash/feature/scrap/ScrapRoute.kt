@@ -18,21 +18,20 @@ internal object ScrapRoute {
     ) {
         val scrapUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        LaunchedEffect(key1 = true) {
-            viewModel.errorFlow.collectLatest { onShowErrorSnackbar(it) }
-        }
-
-        when (val uiState = scrapUiState) {
-            is ScrapUiState.Loading -> {}
-            is ScrapUiState.Success -> {
-                ScrapScreen(
-                    onClickNews = onClickNews,
-                    scrapNewsList = uiState.scraps,
-                    deleteScrapNews = viewModel::deleteScrapNews
-                )
+        LaunchedEffect(scrapUiState) {
+            when (scrapUiState) {
+                is ScrapUiState.Error -> {}
+                ScrapUiState.NewsEmpty -> {}
+                is ScrapUiState.NewsLoaded -> {}
+                ScrapUiState.NewsLoading -> {
+                    viewModel.getScrapNews()
+                }
             }
-
-            is ScrapUiState.Fail -> {}
         }
+        ScrapNewsScreen(
+            scrapUiState = scrapUiState,
+            onClickNews = onClickNews,
+            deleteScrapNews = viewModel::deleteScrapNews
+        )
     }
 }
