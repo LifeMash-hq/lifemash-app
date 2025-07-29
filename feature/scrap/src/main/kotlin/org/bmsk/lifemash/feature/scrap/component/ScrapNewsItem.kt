@@ -52,8 +52,7 @@ internal fun ScrapNewsItem(
         val weight by animateFloatAsState(targetValue = weightTarget, label = "")
 
         Row(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(16 / 5f)
                 .padding(8.dp)
@@ -63,15 +62,13 @@ internal fun ScrapNewsItem(
                 ),
         ) {
             NetworkImage(
-                modifier =
-                Modifier
+                modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(1 / 1f),
                 imageUrl = newsModel.imageUrl,
             )
             Column(
-                modifier =
-                Modifier
+                modifier = Modifier
                     .padding(start = 8.dp)
                     .fillMaxHeight()
                     .weight(1f),
@@ -107,16 +104,14 @@ internal fun ScrapNewsItem(
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_delete_24),
                         contentDescription = null,
-                        modifier =
-                        Modifier
+                        modifier = Modifier
                             .weight(1f)
                             .clickable { onClickDelete() },
                     )
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_cancel_presentation_24),
                         contentDescription = null,
-                        modifier =
-                        Modifier
+                        modifier = Modifier
                             .weight(1f)
                             .clickable { state.onLongClick() },
                     )
@@ -150,8 +145,8 @@ private fun ScrapNewsItemPreview() {
     val fakeNews =
         NewsModel(
             title =
-            "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews" +
-                    "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
+                "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews" +
+                        "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
             link = "",
             pubDate = DateParser.parseDate("Wed, 21 Jun 2023 12:34:56 GMT"),
             imageUrl = "",

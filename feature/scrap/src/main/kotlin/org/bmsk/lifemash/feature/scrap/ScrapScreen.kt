@@ -137,7 +137,7 @@ internal fun ScrapNewsEmptyScreen() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        androidx.compose.foundation.layout.Column(
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
