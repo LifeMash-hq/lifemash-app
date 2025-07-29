@@ -45,8 +45,10 @@ internal class TopicViewModel @Inject constructor(
         fetchNews(SBSSection.ECONOMICS)
     }
 
-    fun scrapNews(newsModel: NewsModel) = viewModelScope.launch {
-        scrapNewsUseCase(newsModel)
+    fun scrapNews(newsModel: NewsModel) {
+        viewModelScope.launch {
+            scrapNewsUseCase(newsModel)
+        }
     }
 
     fun fetchNews(section: SBSSection) = viewModelScope.launch {

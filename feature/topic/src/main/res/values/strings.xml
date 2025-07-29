@@ -13,4 +13,7 @@
     <string name="share">공유</string>
     <string name="bookmark">북마크</string>
     <string name="description_option">옵션</string>
+    <string name="feature_topic_scrap">스크랩</string>
+    <string name="feature_topic_scrap_do">스크랩하기</string>
+    <string name="feature_topic_scrap_complete">스크랩 완료</string>
 </resources>
