@@ -4,7 +4,7 @@ import org.bmsk.lifemash.core.model.NewsModel
 import java.util.Date
 
 interface ScrapNewsRepository {
-    fun addNewsToDB(newsModel: NewsModel)
+    suspend fun addNewsToDB(newsModel: NewsModel)
 
     fun getNewsFromDB(): List<NewsModel>
 
