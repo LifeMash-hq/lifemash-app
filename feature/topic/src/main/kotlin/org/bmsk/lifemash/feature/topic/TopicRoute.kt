@@ -5,29 +5,36 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.collectLatest
 
 internal object TopicRoute {
     const val ROUTE = "topic"
 
     @Composable
     operator fun invoke(
-        onClickNews: (url: String) -> Unit,
-        onClickScrapPage: () -> Unit,
+        onNewsClick: (url: String) -> Unit,
+        onScrapPageClick: () -> Unit,
         onShowErrorSnackbar: (throwable: Throwable) -> Unit,
-        viewModel: TopicViewModel = hiltViewModel(),
+        viewModel: TopicViewModel2 = hiltViewModel(),
     ) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        LaunchedEffect(true) { viewModel.errorFlow.collectLatest(onShowErrorSnackbar) }
+
+        LaunchedEffect(uiState.selectedSection) {
+            viewModel.getNews(uiState.selectedSection)
+        }
+
         TopicScreen(
-            isLoading = uiState.isLoading,
-            newsList = uiState.newsList,
-            currentSection = uiState.currentSection,
-            onClickSection = viewModel::fetchNews,
-            onSearchClick = viewModel::fetchNewsSearchResults,
-            onClickNews = onClickNews,
-            onClickScrap = viewModel::scrapNews,
-            onClickScrapPage = onClickScrapPage
+            uiState = uiState,
+            onQueryChange = viewModel::setQuery,
+            onSectionClick = viewModel::setSection,
+            onSearchClick = viewModel::getGoogleNews,
+            onNewsClick = onNewsClick,
+            onScrapNewsClick = viewModel::scrapNews,
+            onScrapPageClick = onScrapPageClick,
+            onNewsOverflowMenuClick = viewModel::setSelectedOverflowMenuNews,
+            onDismissSelectedNews = {
+                viewModel.setSelectedOverflowMenuNews(null)
+                viewModel.setScrapingUiState()
+            }
         )
     }
 }

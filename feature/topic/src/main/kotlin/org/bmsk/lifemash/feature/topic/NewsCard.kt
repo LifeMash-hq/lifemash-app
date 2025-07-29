@@ -34,7 +34,7 @@ internal fun NewsCard(
     modifier: Modifier = Modifier,
     newsModel: NewsModel,
     onClick: () -> Unit,
-    onClickMore: () -> Unit,
+    onOverflowMenuClick: () -> Unit,
 ) {
     LifeMashCard(modifier = modifier.clickable { onClick() }) {
         Column(
@@ -68,7 +68,7 @@ internal fun NewsCard(
                     )
                     Box(
                         modifier = Modifier
-                            .noRippleClickable { onClickMore() }
+                            .noRippleClickable { onOverflowMenuClick() }
                             .defaultMinSize(
                                 minWidth = 48.dp,
                                 minHeight = 48.dp
@@ -96,7 +96,7 @@ private fun NewsCardPreview() {
         NewsCard(
             newsModel = fakeNewsModel,
             onClick = {},
-            onClickMore = {},
+            onOverflowMenuClick = {},
         )
     }
 }

@@ -11,8 +11,8 @@ internal class TopicNavGraphImpl @Inject constructor() : TopicNavGraph {
     override fun buildNavGraph(navGraphBuilder: NavGraphBuilder, navInfo: TopicNavGraphInfo) {
         navGraphBuilder.composable(route = TopicRoute.ROUTE) {
             TopicRoute(
-                onClickNews = navInfo.onClickNews,
-                onClickScrapPage = navInfo.onClickScrapPage,
+                onNewsClick = navInfo.onClickNews,
+                onScrapPageClick = navInfo.onClickScrapPage,
                 onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
             )
         }
