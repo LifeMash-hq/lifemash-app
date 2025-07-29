@@ -2,12 +2,12 @@ package org.bmsk.buildsrc
 
 object Configuration {
     const val applicationId = "org.bmsk.lifemash"
-    const val compileSdk = 34
-    const val targetSdk = 34
+    const val compileSdk = 35
+    const val targetSdk = 35
     const val minSdk = 28
     const val majorVersion = 1
     const val minorVersion = 2
     const val patchVersion = 3
     const val versionName = "$majorVersion.$minorVersion.$patchVersion"
-    const val versionCode = 1
+    const val versionCode = 10
 }
