@@ -58,7 +58,7 @@ import java.util.Date
 
 @Composable
 internal fun TopicScreen(
-    uiState: TopicUiState2,
+    uiState: TopicUiState,
     onQueryChange: (String) -> Unit,
     onSectionClick: (SBSSection) -> Unit,
     onSearchClick: (String) -> Unit,
