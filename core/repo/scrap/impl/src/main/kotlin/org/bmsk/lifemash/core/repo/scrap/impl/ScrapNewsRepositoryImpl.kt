@@ -13,8 +13,8 @@ internal class ScrapNewsRepositoryImpl @Inject constructor(
     private val scrapNewsDao: ScrapNewsDao,
 ) : ScrapNewsRepository {
 
-    override fun addNewsToDB(newsModel: NewsModel) {
-        scrapNewsDao.insertNews(newsModel.toEntity())
+    override suspend fun addNewsToDB(newsModel: NewsModel) {
+        Dispatchers.IO { scrapNewsDao.insertNews(newsModel.toEntity()) }
     }
 
     override fun getNewsFromDB(): List<NewsModel> =
