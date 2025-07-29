@@ -8,15 +8,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -49,8 +47,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.bmsk.lifemash.core.designsystem.component.ErrorBox
 import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.Loading
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
@@ -60,70 +58,79 @@ import java.util.Date
 
 @Composable
 internal fun TopicScreen(
-    isLoading: Boolean,
-    newsList: PersistentList<NewsModel>,
-    currentSection: SBSSection,
-    onClickSection: (SBSSection) -> Unit,
+    uiState: TopicUiState2,
+    onQueryChange: (String) -> Unit,
+    onSectionClick: (SBSSection) -> Unit,
     onSearchClick: (String) -> Unit,
-    onClickNews: (String) -> Unit,
-    onClickScrap: (NewsModel) -> Unit,
-    onClickScrapPage: () -> Unit,
+    onNewsClick: (String) -> Unit,
+    onScrapNewsClick: (NewsModel) -> Unit,
+    onScrapPageClick: () -> Unit,
+    onNewsOverflowMenuClick: (NewsModel) -> Unit,
+    onDismissSelectedNews: () -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
-    var searchText by remember { mutableStateOf("") }
-    var selectedNewsModel by remember { mutableStateOf<NewsModel?>(null) }
-    var scrapCompleted by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+    val selectedSection = uiState.selectedSection
+    val selectedSectionUiState = uiState.getNewsLoadUiState(selectedSection)
 
-    TopicScreen(
-        isLoading = isLoading,
-        newsList = newsList,
-        currentSection = currentSection,
-        searchText = searchText,
-        onSearchTextChange = { searchText = it },
-        lazyListState = lazyListState,
-        scrapCompleted = scrapCompleted,
-        onClickSection = onClickSection,
-        onSearchClick = onSearchClick,
-        onClickNews = onClickNews,
-        selectedNewsModel = selectedNewsModel,
-        onClickNewsMore = {
-            selectedNewsModel = it
-            scrapCompleted = false
-        },
-        onClickScrap = {
-            onClickScrap(it)
-            scrapCompleted = true
-            coroutineScope.launch {
-                delay(1000)
-                selectedNewsModel = null
-                scrapCompleted = false
-            }
-        },
-        onClickScrapPage = onClickScrapPage,
-        onDismissBottomSheet = {
-            selectedNewsModel = null
-            scrapCompleted = false
+    when (selectedSectionUiState) {
+        is NewsLoadUiState.Loading -> {
+            TopicLoadingScreen()
         }
-    )
+
+        is NewsLoadUiState.Loaded -> {
+            TopicLoadedScreen(
+                newsList = selectedSectionUiState.newsModels,
+                currentSection = selectedSection,
+                searchText = uiState.query,
+                onSearchTextChange = onQueryChange,
+                lazyListState = lazyListState,
+                scrapingUiState = uiState.scrapingUiState,
+                onClickSection = onSectionClick,
+                onSearchClick = onSearchClick,
+                onClickNews = onNewsClick,
+                selectedNewsModel = uiState.selectedOverflowMenuNews,
+                onOverflowMenuClick = onNewsOverflowMenuClick,
+                onScrapClick = onScrapNewsClick,
+                onClickScrapPage = onScrapPageClick,
+                onDismissBottomSheet = onDismissSelectedNews
+            )
+        }
+
+        is NewsLoadUiState.Error -> {
+            ErrorBox(modifier = Modifier.fillMaxSize())
+        }
+    }
+}
+
+@Composable
+internal fun TopicLoadingScreen(
+    paddingValues: PaddingValues = PaddingValues(),
+) {
+    Box(
+        Modifier
+            .padding(paddingValues)
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Loading(modifier = Modifier.align(Alignment.Center))
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun TopicScreen(
-    isLoading: Boolean,
-    newsList: PersistentList<NewsModel>,
+internal fun TopicLoadedScreen(
+    newsList: List<NewsModel>,
     currentSection: SBSSection,
     searchText: String,
     onSearchTextChange: (String) -> Unit,
     lazyListState: LazyListState,
-    scrapCompleted: Boolean,
+    scrapingUiState: ScrapingUiState,
     onClickSection: (SBSSection) -> Unit,
     onSearchClick: (String) -> Unit,
     onClickNews: (String) -> Unit,
     selectedNewsModel: NewsModel?,
-    onClickNewsMore: (NewsModel) -> Unit,
-    onClickScrap: (NewsModel) -> Unit,
+    onOverflowMenuClick: (NewsModel) -> Unit,
+    onScrapClick: (NewsModel) -> Unit,
     onClickScrapPage: () -> Unit,
     onDismissBottomSheet: () -> Unit,
 ) {
@@ -138,13 +145,11 @@ internal fun TopicScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            if (isLoading) Loading(modifier = Modifier.align(Alignment.Center))
-
             NewsContent(
                 newsList = newsList,
                 listState = lazyListState,
                 onClickNews = onClickNews,
-                onClickNewsMore = onClickNewsMore,
+                onOverflowMenuClick = onOverflowMenuClick,
             )
 
             AnimatedVisibility(
@@ -198,23 +203,29 @@ internal fun TopicScreen(
                                 Spacer(Modifier.height(24.dp))
 
                                 Button(
-                                    onClick = { onClickScrap(selectedNewsModel) },
-                                    enabled = !scrapCompleted,
+                                    onClick = { onScrapClick(selectedNewsModel) },
+                                    enabled = scrapingUiState == ScrapingUiState.Idle,
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (scrapCompleted)
-                                            MaterialTheme.colorScheme.secondary
-                                        else
-                                            MaterialTheme.colorScheme.primary,
+                                        containerColor = when (scrapingUiState) {
+                                            is ScrapingUiState.Idle -> MaterialTheme.colorScheme.primary
+                                            is ScrapingUiState.IsScraping -> MaterialTheme.colorScheme.primary
+                                            is ScrapingUiState.ScrapCompleted -> MaterialTheme.colorScheme.secondary
+                                            is ScrapingUiState.ScrapingError -> MaterialTheme.colorScheme.error
+                                            else -> error("Unknown state")
+                                        },
                                         contentColor = MaterialTheme.colorScheme.onPrimary
                                     )
                                 ) {
                                     Text(
-                                        text = if (scrapCompleted)
-                                            stringResource(R.string.feature_topic_scrap_complete)
-                                        else
-                                            stringResource(R.string.feature_topic_scrap_do),
+                                        text = when (scrapingUiState) {
+                                            is ScrapingUiState.Idle -> stringResource(R.string.feature_topic_scrap_do)
+                                            is ScrapingUiState.IsScraping -> stringResource(R.string.feature_topic_scrap_doing)
+                                            is ScrapingUiState.ScrapCompleted -> stringResource(R.string.feature_topic_scrap_complete)
+                                            is ScrapingUiState.ScrapingError -> stringResource(R.string.feature_topic_scrap_error)
+                                            else -> error("Unknown state")
+                                        },
                                         style = MaterialTheme.typography.titleMedium
                                     )
                                 }
@@ -249,8 +260,8 @@ private fun LazyListState.isScrollingUp(): Boolean {
 @Composable
 private fun NewsContent(
     onClickNews: (String) -> Unit,
-    onClickNewsMore: (NewsModel) -> Unit,
-    newsList: PersistentList<NewsModel>,
+    onOverflowMenuClick: (NewsModel) -> Unit,
+    newsList: List<NewsModel>,
     listState: LazyListState,
 ) {
     LazyColumn(
@@ -274,7 +285,7 @@ private fun NewsContent(
                     },
                 newsModel = item,
                 onClick = { onClickNews(item.link) },
-                onClickMore = { onClickNewsMore(item) }
+                onOverflowMenuClick = { onOverflowMenuClick(item) }
             )
         }
     }
@@ -286,7 +297,6 @@ private data class TopicScreenPreviewState(
     val currentSection: SBSSection,
     val searchText: String = "",
     val selectedNewsModel: NewsModel? = null,
-    val scrapCompleted: Boolean = false
 )
 
 private class TopicScreenPreviewProvider : PreviewParameterProvider<TopicScreenPreviewState> {
@@ -322,7 +332,6 @@ private class TopicScreenPreviewProvider : PreviewParameterProvider<TopicScreenP
                 link = "https://sbs.co.kr/news/2",
                 pubDate = Date()
             ),
-            scrapCompleted = false
         ),
         TopicScreenPreviewState(
             isLoading = false,
@@ -339,7 +348,6 @@ private class TopicScreenPreviewProvider : PreviewParameterProvider<TopicScreenP
                 link = "https://sbs.co.kr/news/3",
                 pubDate = Date()
             ),
-            scrapCompleted = true
         )
     )
 }
@@ -351,20 +359,19 @@ private fun TopicScreenPreview(
     @PreviewParameter(TopicScreenPreviewProvider::class) state: TopicScreenPreviewState
 ) {
     LifeMashTheme {
-        TopicScreen(
-            isLoading = state.isLoading,
+        TopicLoadedScreen(
             newsList = state.newsList,
             currentSection = state.currentSection,
             searchText = state.searchText,
             onSearchTextChange = {},
             lazyListState = rememberLazyListState(),
-            scrapCompleted = state.scrapCompleted,
+            scrapingUiState = ScrapingUiState.Idle,
             onClickSection = {},
             onSearchClick = {},
             onClickNews = {},
             selectedNewsModel = state.selectedNewsModel,
-            onClickNewsMore = {},
-            onClickScrap = {},
+            onOverflowMenuClick = {},
+            onScrapClick = {},
             onClickScrapPage = {},
             onDismissBottomSheet = {}
         )
