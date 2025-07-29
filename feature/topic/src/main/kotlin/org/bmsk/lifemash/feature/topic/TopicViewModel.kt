@@ -1,121 +1,157 @@
 package org.bmsk.lifemash.feature.topic
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SBSSection
 import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCase
+import org.bmsk.lifemash.feature.topic.usecase.GetNewsImageUrlUseCase
 import org.bmsk.lifemash.feature.topic.usecase.GetSBSNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
-import org.jsoup.Jsoup
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @HiltViewModel
 internal class TopicViewModel @Inject constructor(
     private val getSBSNewsUseCase: GetSBSNewsUseCase,
     private val getGoogleNewsUseCase: GetGoogleNewsUseCase,
     private val scrapNewsUseCase: ScrapNewsUseCase,
+    private val getNewsImageUrlUseCase: GetNewsImageUrlUseCase
 ) : ViewModel() {
-    private var currentIoJob: Job? = null
-
-    private val _uiState = MutableStateFlow(
-        TopicUiState(
-            currentSection = SBSSection.ECONOMICS,
-            newsList = persistentListOf(),
-        ),
-    )
+    private val _uiState = MutableStateFlow(TopicUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _errorFlow = MutableSharedFlow<Throwable>()
-    val errorFlow = _errorFlow.asSharedFlow()
+    private var lastAwaitJob: Job? = null
 
-    init {
-        fetchNews(SBSSection.ECONOMICS)
+    fun setSelectedOverflowMenuNews(newsModel: NewsModel?) {
+        _uiState.update { it.copy(selectedOverflowMenuNews = newsModel) }
+    }
+
+    fun setSection(section: SBSSection) {
+        _uiState.update { it.copy(selectedSection = section) }
+    }
+
+    fun getNews(section: SBSSection) {
+        viewModelScope.awaitAndLaunch {
+            runCatching {
+                // 이 시점에 이미 뉴스 로딩이 끝났을 수 있음
+                val currentNewsLoadUiState = _uiState.value.getNewsLoadUiState(section)
+                if (currentNewsLoadUiState is NewsLoadUiState.Loaded) {
+                    return@awaitAndLaunch
+                }
+
+                // 뉴스 로딩 중으로 변경함
+                val currentSectionStates = _uiState.value.sectionStates
+                _uiState.update { state ->
+                    state.copy(
+                        sectionStates = currentSectionStates.map { sectionState ->
+                            if (sectionState.section == section) {
+                                sectionState.copy(newsLoadUiState = NewsLoadUiState.Loading)
+                            } else {
+                                sectionState
+                            }
+                        }
+                    )
+                }
+
+                val newsModels = getSBSNewsUseCase(section)
+                val selectedSection0 = _uiState.value.selectedSection
+                val newsLoadUiState0 = NewsLoadUiState.Loaded(newsModels)
+                _uiState.update { it.setNewsLoadUiState(selectedSection0, newsLoadUiState0) }
+
+                val imageUrlUpdatedNewsModels = updateNewsImageUrl(newsModels)
+                val selectedSection1 = _uiState.value.selectedSection
+                val newsLoadUiState1 = NewsLoadUiState.Loaded(imageUrlUpdatedNewsModels)
+                _uiState.update { it.setNewsLoadUiState(selectedSection1, newsLoadUiState1) }
+            }.onFailure { t ->
+                val newsLoadUiState = NewsLoadUiState.Error(t)
+                val selectedSection = _uiState.value.selectedSection
+                _uiState.update { it.setNewsLoadUiState(selectedSection, newsLoadUiState) }
+            }
+        }
+    }
+
+    fun setQuery(query: String) {
+        _uiState.update { it.copy(query = query) }
+    }
+
+    fun getGoogleNews(query: String) {
+        viewModelScope.launch {
+            runCatching {
+                getGoogleNewsUseCase(query)
+            }.onSuccess { newsModels ->
+                _uiState.update { it.copy(googleNewsModels = newsModels) }
+            }.onFailure { t ->
+                _uiState.update { it.copy(searchErrorEvent = t) }
+            }
+        }
     }
 
     fun scrapNews(newsModel: NewsModel) {
         viewModelScope.launch {
-            scrapNewsUseCase(newsModel)
+            _uiState.update { it.copy(scrapingUiState = ScrapingUiState.IsScraping) }
+            runCatching {
+                scrapNewsUseCase(newsModel)
+            }.onFailure { t ->
+                _uiState.update { it.copy(scrapingUiState = ScrapingUiState.ScrapingError(t)) }
+            }
+            _uiState.update { it.copy(scrapingUiState = ScrapingUiState.ScrapCompleted) }
         }
     }
 
-    fun fetchNews(section: SBSSection) = viewModelScope.launch {
-        currentIoJob?.cancel()
-        _uiState.update { it.copy(newsList = persistentListOf(), currentSection = section) }
-        currentIoJob = processNewsFetching(section)
-    }
-
-    fun fetchNewsSearchResults(query: String) = viewModelScope.launch {
-        currentIoJob?.cancel()
-        _uiState.update { it.copy(newsList = persistentListOf()) }
-        currentIoJob = processNewsFetchingForSearch(query)
-    }
-
-    private fun processNewsFetchingForSearch(query: String) = viewModelScope.launch {
-        runCatching {
-            getGoogleNewsUseCase(query)
-        }.fold(
-            onSuccess = { newsItems ->
-                handleNewsSuccess(newsItems)
-            },
-            onFailure = { error -> _errorFlow.emit(error) },
-        )
-    }
-
-    private fun processNewsFetching(section: SBSSection) = viewModelScope.launch {
-        runCatching {
-            getSBSNewsUseCase(section)
-        }.fold(
-            onSuccess = { news ->
-                handleNewsSuccess(news)
-            },
-            onFailure = { error ->
-                handleNewsFailure(error)
-            },
-        )
-    }
-
-    private suspend fun handleNewsSuccess(newsItems: List<NewsModel>) {
-        _uiState.update { it.copy(newsList = newsItems.toPersistentList()) }
-        newsItems.forEachIndexed { index, newsItem ->
-            fetchAndSetImageUrl(index, newsItem)
+    private suspend fun updateNewsImageUrl(newsModels: List<NewsModel>): List<NewsModel> {
+        return coroutineScope {
+            newsModels.map { newsModel ->
+                async {
+                    val imageUrl = getNewsImageUrlUseCase(newsModel.link).also { Log.e("ddd", it) }
+                    newsModel.copy(imageUrl = imageUrl)
+                }
+            }.awaitAll()
         }
     }
 
-    private suspend fun handleNewsFailure(error: Throwable) {
-        _errorFlow.emit(error)
+    fun handleSearchErrorEvent() {
+        _uiState.update { it.copy(searchErrorEvent = null) }
     }
 
-    private suspend fun fetchAndSetImageUrl(index: Int, news: NewsModel) {
-        val imageUrl = fetchImageUrl(news.link)
-        updateNewsItemWithImageUrl(index, news, imageUrl)
+    fun handleScrapErrorEvent() {
+        _uiState.update { it.copy(scrapErrorEvent = null) }
     }
 
-    private suspend fun fetchImageUrl(newsLink: String): String = withContext(Dispatchers.IO) {
-        Jsoup.connect(newsLink).get().select("meta[property=og:image]").attr("content")
+    fun setScrapingUiState(state: ScrapingUiState = ScrapingUiState.Idle) {
+        _uiState.update { it.copy(scrapingUiState = state) }
     }
 
-    private fun updateNewsItemWithImageUrl(
-        index: Int,
-        newsItem: NewsModel,
-        imageUrl: String,
+    private fun CoroutineScope.awaitAndLaunch(
+        context: CoroutineContext = EmptyCoroutineContext,
+        block: suspend CoroutineScope.() -> Unit,
     ) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                newsList = currentState.newsList.set(index, newsItem.copy(imageUrl = imageUrl)),
-            )
+        val job = launch(
+            context = context,
+            start = CoroutineStart.LAZY,
+            block = block,
+        )
+        with(lastAwaitJob) {
+            if (this == null || this.isCompleted) {
+                job.start()
+            } else {
+                job.invokeOnCompletion { job.start() }
+            }
+
         }
+        lastAwaitJob = job
     }
 }

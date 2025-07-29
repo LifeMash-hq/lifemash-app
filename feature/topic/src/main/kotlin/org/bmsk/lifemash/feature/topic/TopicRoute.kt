@@ -14,7 +14,7 @@ internal object TopicRoute {
         onNewsClick: (url: String) -> Unit,
         onScrapPageClick: () -> Unit,
         onShowErrorSnackbar: (throwable: Throwable) -> Unit,
-        viewModel: TopicViewModel2 = hiltViewModel(),
+        viewModel: TopicViewModel = hiltViewModel(),
     ) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
