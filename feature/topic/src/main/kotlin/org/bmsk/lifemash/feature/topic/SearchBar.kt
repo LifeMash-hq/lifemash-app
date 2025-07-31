@@ -47,10 +47,10 @@ import org.bmsk.lifemash.core.model.section.SBSSection
 internal fun SearchBar(
     modifier: Modifier = Modifier,
     currentSection: SBSSection,
-    searchText: String,
-    onSearchTextChange: (String) -> Unit,
+    queryText: String,
+    onQueryTextChange: (String) -> Unit,
     onClickChip: (SBSSection) -> Unit,
-    onSearch: (String) -> Unit,
+    onSearchClick: (String) -> Unit,
     onClickScrapPage: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -91,8 +91,8 @@ internal fun SearchBar(
                     modifier = Modifier
                         .weight(1f)
                         .height(54.dp),
-                    value = searchText,
-                    onValueChange = onSearchTextChange,
+                    value = queryText,
+                    onValueChange = onQueryTextChange,
                     placeholder = { Text(text = stringResource(id = R.string.search_news)) },
                     leadingIcon = {
                         Icon(
@@ -108,7 +108,7 @@ internal fun SearchBar(
                     ),
                     keyboardActions = KeyboardActions(
                         onSearch = {
-                            onSearch(searchText)
+                            onSearchClick(queryText)
                             keyboardController?.hide()
                         },
                     ),
@@ -161,10 +161,10 @@ private fun SearchBarPreview() {
         SearchBar(
             modifier = Modifier,
             currentSection = selectedSection,
-            searchText = searchText,
-            onSearchTextChange = { searchText = it },
+            queryText = searchText,
+            onQueryTextChange = { searchText = it },
             onClickChip = { selectedSection = it },
-            onSearch = {},
+            onSearchClick = {},
             onClickScrapPage = {}
         )
     }

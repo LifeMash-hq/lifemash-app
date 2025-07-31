@@ -1,15 +1,11 @@
 package org.bmsk.lifemash.feature.topic
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,7 +13,7 @@ import kotlinx.coroutines.launch
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.SBSSection
 import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCase
-import org.bmsk.lifemash.feature.topic.usecase.GetNewsImageUrlUseCase
+import org.bmsk.lifemash.feature.topic.usecase.GetNewsWithImagesUseCase
 import org.bmsk.lifemash.feature.topic.usecase.GetSBSNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
 import javax.inject.Inject
@@ -29,7 +25,7 @@ internal class TopicViewModel @Inject constructor(
     private val getSBSNewsUseCase: GetSBSNewsUseCase,
     private val getGoogleNewsUseCase: GetGoogleNewsUseCase,
     private val scrapNewsUseCase: ScrapNewsUseCase,
-    private val getNewsImageUrlUseCase: GetNewsImageUrlUseCase
+    private val getNewsWIthImagesUrlUseCase: GetNewsWithImagesUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TopicUiState())
     val uiState = _uiState.asStateFlow()
@@ -68,14 +64,16 @@ internal class TopicViewModel @Inject constructor(
                 }
 
                 val newsModels = getSBSNewsUseCase(section)
-                val selectedSection0 = _uiState.value.selectedSection
-                val newsLoadUiState0 = NewsLoadUiState.Loaded(newsModels)
-                _uiState.update { it.setNewsLoadUiState(selectedSection0, newsLoadUiState0) }
+                _uiState.update { state ->
+                    val newsLoadUiState0 = NewsLoadUiState.Loaded(newsModels)
+                    state.setNewsLoadUiState(section, newsLoadUiState0)
+                }
 
-                val imageUrlUpdatedNewsModels = updateNewsImageUrl(newsModels)
-                val selectedSection1 = _uiState.value.selectedSection
-                val newsLoadUiState1 = NewsLoadUiState.Loaded(imageUrlUpdatedNewsModels)
-                _uiState.update { it.setNewsLoadUiState(selectedSection1, newsLoadUiState1) }
+                val imageUrlUpdatedNewsModels = getNewsWIthImagesUrlUseCase(newsModels)
+                _uiState.update { state ->
+                    val newsLoadUiState1 = NewsLoadUiState.Loaded(imageUrlUpdatedNewsModels)
+                    state.setNewsLoadUiState(section, newsLoadUiState1)
+                }
             }.onFailure { t ->
                 val newsLoadUiState = NewsLoadUiState.Error(t)
                 val selectedSection = _uiState.value.selectedSection
@@ -113,17 +111,6 @@ internal class TopicViewModel @Inject constructor(
         }
     }
 
-    private suspend fun updateNewsImageUrl(newsModels: List<NewsModel>): List<NewsModel> {
-        return coroutineScope {
-            newsModels.map { newsModel ->
-                async {
-                    val imageUrl = getNewsImageUrlUseCase(newsModel.link).also { Log.e("ddd", it) }
-                    newsModel.copy(imageUrl = imageUrl)
-                }
-            }.awaitAll()
-        }
-    }
-
     fun handleSearchErrorEvent() {
         _uiState.update { it.copy(searchErrorEvent = null) }
     }
@@ -149,7 +136,7 @@ internal class TopicViewModel @Inject constructor(
             if (this == null || this.isCompleted) {
                 job.start()
             } else {
-                job.invokeOnCompletion { job.start() }
+                this.invokeOnCompletion { job.start() }
             }
 
         }

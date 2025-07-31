@@ -53,7 +53,7 @@ internal sealed interface NewsLoadUiState {
     ) : NewsLoadUiState
 }
 
-internal interface ScrapingUiState {
+internal sealed interface ScrapingUiState {
     data object Idle : ScrapingUiState
     data object IsScraping : ScrapingUiState
     data object ScrapCompleted : ScrapingUiState
