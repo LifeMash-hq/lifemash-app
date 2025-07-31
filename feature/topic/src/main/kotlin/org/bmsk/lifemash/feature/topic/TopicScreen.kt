@@ -71,34 +71,65 @@ internal fun TopicScreen(
     val lazyListState = rememberLazyListState()
     val selectedSection = uiState.selectedSection
     val selectedSectionUiState = uiState.getNewsLoadUiState(selectedSection)
+    val coroutineScope = rememberCoroutineScope()
 
-    when (selectedSectionUiState) {
-        is NewsLoadUiState.Loading -> {
-            TopicLoadingScreen()
+    Scaffold(
+        contentWindowInsets = WindowInsets.systemBars,
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        ) {
+            when (selectedSectionUiState) {
+                is NewsLoadUiState.Loading -> {
+                    TopicLoadingScreen()
+                }
+
+                is NewsLoadUiState.Loaded -> {
+                    TopicLoadedScreen(
+                        newsList = selectedSectionUiState.newsModels,
+                        lazyListState = lazyListState,
+                        scrapingUiState = uiState.scrapingUiState,
+                        onClickNews = onNewsClick,
+                        selectedNewsModel = uiState.selectedOverflowMenuNews,
+                        onOverflowMenuClick = onNewsOverflowMenuClick,
+                        onScrapClick = onScrapNewsClick,
+                        onDismissBottomSheet = onDismissSelectedNews
+                    )
+                }
+
+                is NewsLoadUiState.Error -> {
+                    ErrorBox(modifier = Modifier.fillMaxSize())
+                }
+            }
+
+            AnimatedVisibility(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter),
+                visible = lazyListState.isScrollingUp(),
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                SearchBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter),
+                    currentSection = uiState.selectedSection,
+                    onClickChip = {
+                        coroutineScope.launch { lazyListState.scrollToItem(0) }
+                        onSectionClick(it)
+                    },
+                    queryText = uiState.query,
+                    onQueryTextChange = onQueryChange,
+                    onSearchClick = onSearchClick,
+                    onClickScrapPage = onScrapPageClick,
+                )
+            }
         }
 
-        is NewsLoadUiState.Loaded -> {
-            TopicLoadedScreen(
-                newsList = selectedSectionUiState.newsModels,
-                currentSection = selectedSection,
-                searchText = uiState.query,
-                onSearchTextChange = onQueryChange,
-                lazyListState = lazyListState,
-                scrapingUiState = uiState.scrapingUiState,
-                onClickSection = onSectionClick,
-                onSearchClick = onSearchClick,
-                onClickNews = onNewsClick,
-                selectedNewsModel = uiState.selectedOverflowMenuNews,
-                onOverflowMenuClick = onNewsOverflowMenuClick,
-                onScrapClick = onScrapNewsClick,
-                onClickScrapPage = onScrapPageClick,
-                onDismissBottomSheet = onDismissSelectedNews
-            )
-        }
-
-        is NewsLoadUiState.Error -> {
-            ErrorBox(modifier = Modifier.fillMaxSize())
-        }
     }
 }
 
@@ -120,119 +151,80 @@ internal fun TopicLoadingScreen(
 @Composable
 internal fun TopicLoadedScreen(
     newsList: List<NewsModel>,
-    currentSection: SBSSection,
-    searchText: String,
-    onSearchTextChange: (String) -> Unit,
     lazyListState: LazyListState,
     scrapingUiState: ScrapingUiState,
-    onClickSection: (SBSSection) -> Unit,
-    onSearchClick: (String) -> Unit,
     onClickNews: (String) -> Unit,
     selectedNewsModel: NewsModel?,
     onOverflowMenuClick: (NewsModel) -> Unit,
     onScrapClick: (NewsModel) -> Unit,
-    onClickScrapPage: () -> Unit,
     onDismissBottomSheet: () -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        NewsContent(
+            newsList = newsList,
+            listState = lazyListState,
+            onClickNews = onClickNews,
+            onOverflowMenuClick = onOverflowMenuClick,
+        )
 
-    Scaffold(
-        contentWindowInsets = WindowInsets.systemBars,
-    ) { paddingValues ->
-        Box(
-            Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            NewsContent(
-                newsList = newsList,
-                listState = lazyListState,
-                onClickNews = onClickNews,
-                onOverflowMenuClick = onOverflowMenuClick,
-            )
-
-            AnimatedVisibility(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
-                visible = newsList.isEmpty() || lazyListState.isScrollingUp(),
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                SearchBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter),
-                    currentSection = currentSection,
-                    onClickChip = {
-                        coroutineScope.launch { lazyListState.scrollToItem(0) }
-                        onClickSection(it)
-                    },
-                    searchText = searchText,
-                    onSearchTextChange = onSearchTextChange,
-                    onSearch = onSearchClick,
-                    onClickScrapPage = onClickScrapPage,
-                )
-            }
-
-            if (selectedNewsModel != null) {
-                AnimatedVisibility(visible = true) {
-                    ModalBottomSheet(
-                        onDismissRequest = onDismissBottomSheet,
-                        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                        tonalElevation = 8.dp,
-                        scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f),
+        if (selectedNewsModel != null) {
+            AnimatedVisibility(visible = true) {
+                ModalBottomSheet(
+                    onDismissRequest = onDismissBottomSheet,
+                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                    tonalElevation = 8.dp,
+                    scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f),
+                ) {
+                    LifeMashCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
                     ) {
-                        LifeMashCard(
-                            modifier = Modifier
+                        Column(
+                            Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
+                                .padding(20.dp)
                         ) {
-                            Column(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(20.dp)
+                            Text(
+                                text = stringResource(R.string.feature_topic_scrap),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+
+                            Spacer(Modifier.height(24.dp))
+
+                            Button(
+                                onClick = { onScrapClick(selectedNewsModel) },
+                                enabled = scrapingUiState == ScrapingUiState.Idle,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = when (scrapingUiState) {
+                                        is ScrapingUiState.Idle -> MaterialTheme.colorScheme.primary
+                                        is ScrapingUiState.IsScraping -> MaterialTheme.colorScheme.primary
+                                        is ScrapingUiState.ScrapCompleted -> MaterialTheme.colorScheme.secondary
+                                        is ScrapingUiState.ScrapingError -> MaterialTheme.colorScheme.error
+                                    },
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                )
                             ) {
                                 Text(
-                                    text = stringResource(R.string.feature_topic_scrap),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.primary
+                                    text = when (scrapingUiState) {
+                                        is ScrapingUiState.Idle -> stringResource(R.string.feature_topic_scrap_do)
+                                        is ScrapingUiState.IsScraping -> stringResource(R.string.feature_topic_scrap_doing)
+                                        is ScrapingUiState.ScrapCompleted -> stringResource(R.string.feature_topic_scrap_complete)
+                                        is ScrapingUiState.ScrapingError -> stringResource(R.string.feature_topic_scrap_error)
+                                    },
+                                    style = MaterialTheme.typography.titleMedium
                                 )
-
-                                Spacer(Modifier.height(24.dp))
-
-                                Button(
-                                    onClick = { onScrapClick(selectedNewsModel) },
-                                    enabled = scrapingUiState == ScrapingUiState.Idle,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = when (scrapingUiState) {
-                                            is ScrapingUiState.Idle -> MaterialTheme.colorScheme.primary
-                                            is ScrapingUiState.IsScraping -> MaterialTheme.colorScheme.primary
-                                            is ScrapingUiState.ScrapCompleted -> MaterialTheme.colorScheme.secondary
-                                            is ScrapingUiState.ScrapingError -> MaterialTheme.colorScheme.error
-                                            else -> error("Unknown state")
-                                        },
-                                        contentColor = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                ) {
-                                    Text(
-                                        text = when (scrapingUiState) {
-                                            is ScrapingUiState.Idle -> stringResource(R.string.feature_topic_scrap_do)
-                                            is ScrapingUiState.IsScraping -> stringResource(R.string.feature_topic_scrap_doing)
-                                            is ScrapingUiState.ScrapCompleted -> stringResource(R.string.feature_topic_scrap_complete)
-                                            is ScrapingUiState.ScrapingError -> stringResource(R.string.feature_topic_scrap_error)
-                                            else -> error("Unknown state")
-                                        },
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                }
                             }
                         }
-                        Spacer(Modifier.navigationBarsPadding())
                     }
+                    Spacer(Modifier.navigationBarsPadding())
                 }
             }
         }
@@ -273,7 +265,6 @@ private fun NewsContent(
     ) {
         itemsIndexed(
             items = newsList,
-            key = { _, item -> item.link },
         ) { index, item ->
             NewsCard(
                 modifier = Modifier
@@ -300,6 +291,39 @@ private data class TopicScreenPreviewState(
 )
 
 private class TopicScreenPreviewProvider : PreviewParameterProvider<TopicScreenPreviewState> {
+    private val newsList = persistentListOf(
+        NewsModel(
+            title = "사회 뉴스1",
+            link = "https://placehold.co/300x200?text=No+Image",
+            pubDate = Date()
+        ),
+        NewsModel(
+            title = "사회 뉴스2",
+            link = "https://placehold.co/300x200?text=No+Image",
+            pubDate = Date()
+        ),
+        NewsModel(
+            title = "사회 뉴스3",
+            link = "https://placehold.co/300x200?text=No+Image",
+            pubDate = Date()
+        ),
+        NewsModel(
+            title = "사회 뉴스4",
+            link = "https://placehold.co/300x200?text=No+Image",
+            pubDate = Date()
+        ),
+        NewsModel(
+            title = "사회 뉴스5",
+            link = "https://placehold.co/300x200?text=No+Image",
+            pubDate = Date()
+        ),
+        NewsModel(
+            title = "사회 뉴스6",
+            link = "https://placehold.co/300x200?text=No+Image",
+            pubDate = Date()
+        )
+    )
+
     override val values = sequenceOf(
         TopicScreenPreviewState(
             isLoading = true,
@@ -308,47 +332,19 @@ private class TopicScreenPreviewProvider : PreviewParameterProvider<TopicScreenP
         ),
         TopicScreenPreviewState(
             isLoading = false,
-            newsList = persistentListOf(
-                NewsModel(
-                    title = "경제 뉴스",
-                    link = "https://sbs.co.kr/news/1",
-                    pubDate = Date()
-                )
-            ),
+            newsList = newsList,
             currentSection = SBSSection.ECONOMICS
         ),
         TopicScreenPreviewState(
             isLoading = false,
-            newsList = persistentListOf(
-                NewsModel(
-                    title = "정치 뉴스",
-                    link = "https://sbs.co.kr/news/2",
-                    pubDate = Date()
-                )
-            ),
+            newsList = newsList,
             currentSection = SBSSection.POLITICS,
             selectedNewsModel = NewsModel(
                 title = "정치 뉴스",
-                link = "https://sbs.co.kr/news/2",
+                link = "https://placehold.co/300x200?text=No+Image",
                 pubDate = Date()
             ),
         ),
-        TopicScreenPreviewState(
-            isLoading = false,
-            newsList = persistentListOf(
-                NewsModel(
-                    title = "사회 뉴스",
-                    link = "https://sbs.co.kr/news/3",
-                    pubDate = Date()
-                )
-            ),
-            currentSection = SBSSection.SOCIAL,
-            selectedNewsModel = NewsModel(
-                title = "사회 뉴스",
-                link = "https://sbs.co.kr/news/3",
-                pubDate = Date()
-            ),
-        )
     )
 }
 
@@ -361,18 +357,12 @@ private fun TopicScreenPreview(
     LifeMashTheme {
         TopicLoadedScreen(
             newsList = state.newsList,
-            currentSection = state.currentSection,
-            searchText = state.searchText,
-            onSearchTextChange = {},
             lazyListState = rememberLazyListState(),
             scrapingUiState = ScrapingUiState.Idle,
-            onClickSection = {},
-            onSearchClick = {},
             onClickNews = {},
             selectedNewsModel = state.selectedNewsModel,
             onOverflowMenuClick = {},
             onScrapClick = {},
-            onClickScrapPage = {},
             onDismissBottomSheet = {}
         )
     }

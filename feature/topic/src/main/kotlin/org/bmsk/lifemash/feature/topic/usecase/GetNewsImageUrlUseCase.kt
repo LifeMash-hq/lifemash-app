@@ -12,7 +12,9 @@ internal interface GetNewsImageUrlUseCase {
 internal class GetNewsImageUrlUseCaseImpl @Inject constructor() : GetNewsImageUrlUseCase {
     override suspend fun invoke(link: String): String {
         return Dispatchers.IO {
-            Jsoup.connect(link).get().select("meta[property=og:image]").attr("content")
+            runCatching {
+                Jsoup.connect(link).get().select("meta[property=og:image]").attr("content")
+            }.getOrDefault("https://placehold.co/300x200?text=No+Image")
         }
     }
 }
