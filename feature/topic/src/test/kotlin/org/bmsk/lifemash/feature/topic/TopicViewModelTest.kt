@@ -1,6 +1,5 @@
 package org.bmsk.lifemash.feature.topic
 
-import io.kotest.core.spec.style.AnnotationSpec
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -112,7 +111,10 @@ class TopicViewModelTest {
         // Then
         val sectionState = viewModel.uiState.value.sectionStates.first { it.section == section }
         assert(sectionState.newsLoadUiState is NewsLoadUiState.Loaded)
-        assertEquals("img", (sectionState.newsLoadUiState as NewsLoadUiState.Loaded).newsModels.first().imageUrl)
+        assertEquals(
+            "img",
+            (sectionState.newsLoadUiState as NewsLoadUiState.Loaded).newsModels.first().imageUrl
+        )
     }
 
     @Test
@@ -187,6 +189,9 @@ class TopicViewModelTest {
 
         // Then
         assert(viewModel.uiState.value.scrapingUiState is ScrapingUiState.ScrapingError)
-        assertEquals(ex, (viewModel.uiState.value.scrapingUiState as ScrapingUiState.ScrapingError).throwable)
+        assertEquals(
+            ex,
+            (viewModel.uiState.value.scrapingUiState as ScrapingUiState.ScrapingError).throwable
+        )
     }
 }

@@ -129,7 +129,6 @@ internal fun TopicScreen(
                 )
             }
         }
-
     }
 }
 

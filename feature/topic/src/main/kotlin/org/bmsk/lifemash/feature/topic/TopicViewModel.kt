@@ -137,7 +137,6 @@ internal class TopicViewModel @Inject constructor(
             } else {
                 this.invokeOnCompletion { job.start() }
             }
-
         }
         lastAwaitJob = job
     }
