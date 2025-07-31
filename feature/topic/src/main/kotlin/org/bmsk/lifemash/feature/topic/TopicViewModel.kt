@@ -76,8 +76,7 @@ internal class TopicViewModel @Inject constructor(
                 }
             }.onFailure { t ->
                 val newsLoadUiState = NewsLoadUiState.Error(t)
-                val selectedSection = _uiState.value.selectedSection
-                _uiState.update { it.setNewsLoadUiState(selectedSection, newsLoadUiState) }
+                _uiState.update { it.setNewsLoadUiState(section, newsLoadUiState) }
             }
         }
     }
