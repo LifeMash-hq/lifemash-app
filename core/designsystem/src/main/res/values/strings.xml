@@ -2,4 +2,7 @@
 <resources>
     <string name="core_designsystem_error_occurrence">에러가 발생했습니다.</string>
     <string name="core_designsystem_retry">다시 시도해주세요.</string>
+
+    <string name="core_designsystem_app_name">LifeMash</string>
+    <string name="core_designsystem_loading">뉴스를 수집하는 중…</string>
 </resources>
