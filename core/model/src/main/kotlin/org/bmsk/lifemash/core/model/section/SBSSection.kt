@@ -4,8 +4,8 @@ enum class SBSSection(val id: String) {
     POLITICS("01"),
     ECONOMICS("02"),
     SOCIAL("03"),
-    LIFE_CULTURE("07"),
-    INTERNATIONAL_GLOBAL("08"),
+    INTERNATIONAL_GLOBAL("07"),
+    LIFE_CULTURE("08"),
     SPORT("09"),
     ENTERTAINMENT_BROADCAST("14"),
     ;
