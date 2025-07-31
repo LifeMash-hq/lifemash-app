@@ -107,8 +107,9 @@ internal class TopicViewModel @Inject constructor(
                 scrapNewsUseCase(newsModel)
             }.onFailure { t ->
                 _uiState.update { it.copy(scrapingUiState = ScrapingUiState.ScrapingError(t)) }
+            }.onSuccess {
+                _uiState.update { it.copy(scrapingUiState = ScrapingUiState.ScrapCompleted) }
             }
-            _uiState.update { it.copy(scrapingUiState = ScrapingUiState.ScrapCompleted) }
         }
     }
 
