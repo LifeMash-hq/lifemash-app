@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.collectLatest
 
 internal object ScrapRoute {
     const val ROUTE = "scrap"
@@ -20,9 +19,9 @@ internal object ScrapRoute {
 
         LaunchedEffect(scrapUiState) {
             when (scrapUiState) {
-                is ScrapUiState.Error -> {}
-                ScrapUiState.NewsEmpty -> {}
-                is ScrapUiState.NewsLoaded -> {}
+                is ScrapUiState.Error -> Unit
+                ScrapUiState.NewsEmpty -> Unit
+                is ScrapUiState.NewsLoaded -> Unit
                 ScrapUiState.NewsLoading -> {
                     viewModel.getScrapNews()
                 }

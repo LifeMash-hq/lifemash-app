@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -65,7 +64,6 @@ internal fun ScrapNewsLoadingScreen() {
         )
     }
 }
-
 
 @Composable
 internal fun ScrapNewsLoadedScreen(
@@ -220,7 +218,6 @@ private class ScrapUiStateProvider : PreviewParameterProvider<ScrapUiState> {
         ScrapUiState.Error(Throwable("프리뷰용 에러")),
     )
 }
-
 
 @Composable
 @Preview(showBackground = true, name = "ScrapNewsScreen All States")

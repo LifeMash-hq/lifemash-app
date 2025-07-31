@@ -39,7 +39,7 @@ class ScrapViewModelTest {
             override suspend fun invoke(): List<NewsModel> = emptyList()
         }
         val fakeDelete = object : DeleteScrapNewsUseCase {
-            override suspend fun invoke(newsModel: NewsModel) {}
+            override suspend fun invoke(newsModel: NewsModel) = Unit
         }
         val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 
@@ -61,7 +61,7 @@ class ScrapViewModelTest {
             override suspend fun invoke(): List<NewsModel> = newsList
         }
         val fakeDelete = object : DeleteScrapNewsUseCase {
-            override suspend fun invoke(newsModel: NewsModel) {}
+            override suspend fun invoke(newsModel: NewsModel) = Unit
         }
         val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 
@@ -85,7 +85,7 @@ class ScrapViewModelTest {
             override suspend fun invoke(): List<NewsModel> = throw error
         }
         val fakeDelete = object : DeleteScrapNewsUseCase {
-            override suspend fun invoke(newsModel: NewsModel) {}
+            override suspend fun invoke(newsModel: NewsModel) = Unit
         }
         val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 
