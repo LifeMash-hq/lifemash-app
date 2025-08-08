@@ -15,10 +15,9 @@ dependencies {
     implementation(libs.hilt.android)
 
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
-    implementation(libs.moshi)
 
     kapt(libs.tikxml.processor)
     implementation(libs.tikxml.annotation)

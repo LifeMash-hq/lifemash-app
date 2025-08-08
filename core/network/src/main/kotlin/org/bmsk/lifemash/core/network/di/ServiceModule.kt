@@ -1,10 +1,14 @@
 package org.bmsk.lifemash.core.network.di
 
+import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import org.bmsk.lifemash.core.network.BASE_URL_GOOGLE
+import org.bmsk.lifemash.core.network.BASE_URL_SBS
 import org.bmsk.lifemash.core.network.service.GoogleNewsService
 import org.bmsk.lifemash.core.network.service.NewsClient
 import org.bmsk.lifemash.core.network.service.NewsClientImpl
@@ -18,17 +22,29 @@ internal object ServiceModule {
     @Provides
     @Singleton
     fun providesGoogleNewsService(
-        @GoogleRetrofit retrofit: Retrofit,
+        okHttpClientBuilder: OkHttpClient.Builder,
+        tikXmlConverterFactory: TikXmlConverterFactory,
     ): GoogleNewsService {
-        return retrofit.create(GoogleNewsService::class.java)
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL_GOOGLE)
+            .client(okHttpClientBuilder.build())
+            .addConverterFactory(tikXmlConverterFactory)
+            .build()
+            .create(GoogleNewsService::class.java)
     }
 
     @Provides
     @Singleton
     fun providesSbsNewsService(
-        @SbsRetrofit retrofit: Retrofit,
+        okHttpClientBuilder: OkHttpClient.Builder,
+        tikXmlConverterFactory: TikXmlConverterFactory,
     ): SbsNewsService {
-        return retrofit.create(SbsNewsService::class.java)
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL_SBS)
+            .client(okHttpClientBuilder.build())
+            .addConverterFactory(tikXmlConverterFactory)
+            .build()
+            .create(SbsNewsService::class.java)
     }
 }
 
