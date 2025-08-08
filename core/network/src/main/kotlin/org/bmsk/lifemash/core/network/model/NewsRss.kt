@@ -6,24 +6,24 @@ import com.tickaroo.tikxml.annotation.Xml
 
 @Xml(name = "rss")
 data class NewsRss(
-    @Element(name = "channel")
+    @param:Element(name = "channel")
     val channel: RssChannel,
 )
 
 @Xml(name = "channel")
 data class RssChannel(
-    @PropertyElement(name = "title")
+    @param:PropertyElement(name = "title")
     val title: String,
-    @Element(name = "item")
+    @param:Element(name = "item")
     val items: List<NewsItem>? = null,
 )
 
 @Xml(name = "item")
 data class NewsItem(
-    @PropertyElement(name = "title")
+    @param:PropertyElement(name = "title")
     val title: String? = null,
-    @PropertyElement(name = "link")
+    @param:PropertyElement(name = "link")
     val link: String? = null,
-    @PropertyElement(name = "pubDate")
+    @param:PropertyElement(name = "pubDate")
     val pubDate: String? = null,
 )
