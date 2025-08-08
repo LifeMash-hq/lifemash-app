@@ -2,7 +2,6 @@ plugins {
     id("lifemash.android.library")
     id("lifemash.android.hilt")
     id("kotlinx-serialization")
-    alias(libs.plugins.ksp)
 }
 
 android {
