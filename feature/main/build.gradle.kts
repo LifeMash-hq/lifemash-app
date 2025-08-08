@@ -4,10 +4,6 @@ plugins {
 
 android {
     namespace = "org.bmsk.lifemash.feature.main"
-
-    buildFeatures {
-        dataBinding = true
-    }
 }
 
 dependencies {

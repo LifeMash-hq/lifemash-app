@@ -39,8 +39,6 @@ android {
 
 dependencies {
     implementation(projects.core.model)
-    implementation(projects.core.commonUi)
-
     implementation(projects.feature.main)
     implementation(projects.feature.mainNavGraph)
     implementation(projects.feature.scrap)
