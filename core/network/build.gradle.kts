@@ -3,10 +3,15 @@ plugins {
     id("lifemash.android.hilt")
     id("kotlinx-serialization")
     id("kotlin-kapt")
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "org.bmsk.lifemash.core.network"
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -20,4 +25,7 @@ dependencies {
     kapt(libs.tikxml.processor)
     implementation(libs.tikxml.annotation)
     implementation(libs.tikxml.retrofit)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
 }
