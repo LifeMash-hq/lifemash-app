@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.bmsk.lifemash.core.network.BuildConfig
 import org.bmsk.lifemash.core.network.TIMEOUT_CONNECT
 import org.bmsk.lifemash.core.network.TIMEOUT_READ
 import org.bmsk.lifemash.core.network.TIMEOUT_WRITE
@@ -33,7 +34,11 @@ internal object NetworkModule {
     fun providesHttpLogger(): HttpLoggingInterceptor {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BASIC
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
 
         return loggingInterceptor
