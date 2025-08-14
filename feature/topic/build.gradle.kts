@@ -13,9 +13,6 @@ dependencies {
     implementation(projects.core.repo.search.api)
     // jsoup
     implementation(libs.jsoup)
-    // lottie
-    implementation(libs.lottie)
-    implementation(libs.lottie.compose)
     // glide
     implementation(libs.glide)
 
