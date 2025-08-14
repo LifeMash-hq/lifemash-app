@@ -1,25 +1,51 @@
 package org.bmsk.lifemash.core.repo.search.impl
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
 import org.bmsk.lifemash.core.model.NewsModel
+import org.bmsk.lifemash.core.model.section.LifeMashSection
 import org.bmsk.lifemash.core.model.section.SBSSection
-import org.bmsk.lifemash.core.network.service.NewsClient
+import org.bmsk.lifemash.core.network.service.GoogleNewsService
+import org.bmsk.lifemash.core.network.service.LifeMashFirebaseService
+import org.bmsk.lifemash.core.network.service.SbsNewsService
 import org.bmsk.lifemash.core.repo.search.api.NewsRepository
 import javax.inject.Inject
 
 internal class NewsRepositoryImpl @Inject constructor(
-    private val newsClient: NewsClient,
+    private val sbsNewsService: SbsNewsService,
+    private val googleNewsService: GoogleNewsService,
+    private val lifeMashFirebaseService: LifeMashFirebaseService,
 ) : NewsRepository {
+
+    var count = 0
+
     override suspend fun getSbsNews(section: SBSSection): List<NewsModel> {
+        runCatching {
+            if (count == 0) {
+                lifeMashFirebaseService.getLatestNews().also {
+                    Log.e("NewsRepositoryImpl", it.toString())
+                    Log.e("NewsRepositoryImpl", it.size.toString())
+                }
+                count++
+            }
+        }.onFailure {
+            Log.e("NewsRepositoryImpl", it.stackTraceToString())
+        }
         return Dispatchers.IO {
-            newsClient.getSbsNews(section).channel.items?.asModel() ?: emptyList()
+            sbsNewsService.getNews(section.id).channel.items?.asModel() ?: emptyList()
         }
     }
 
     override suspend fun getGoogleNews(query: String): List<NewsModel> {
         return Dispatchers.IO {
-            newsClient.getGoogleNews(query).channel.items?.asModel() ?: emptyList()
+            googleNewsService.search(query).channel.items?.asModel() ?: emptyList()
+        }
+    }
+
+    override suspend fun getLifeMashNews(section: LifeMashSection): List<NewsModel> {
+        return Dispatchers.IO {
+            lifeMashFirebaseService.getLatestNews(section = section).asModel()
         }
     }
 }
