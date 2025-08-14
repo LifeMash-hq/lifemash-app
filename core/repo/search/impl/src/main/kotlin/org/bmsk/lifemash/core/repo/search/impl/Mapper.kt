@@ -2,7 +2,8 @@ package org.bmsk.lifemash.core.repo.search.impl
 
 import org.bmsk.lifemash.core.model.DateParser
 import org.bmsk.lifemash.core.model.NewsModel
-import org.bmsk.lifemash.core.network.model.NewsItem
+import org.bmsk.lifemash.core.network.response.LifeMashArticle
+import org.bmsk.lifemash.core.network.response.NewsItem
 import java.util.Date
 
 internal fun List<NewsItem>.asModel(): List<NewsModel> {
@@ -12,6 +13,17 @@ internal fun List<NewsItem>.asModel(): List<NewsModel> {
             link = it.link ?: "",
             pubDate = it.pubDate?.let(DateParser::parseDate) ?: Date(),
             imageUrl = null,
+        )
+    }
+}
+
+internal fun List<LifeMashArticle>.asModel(): List<NewsModel> {
+    return this.map {
+        NewsModel(
+            title = it.title,
+            link = it.url,
+            pubDate = it.published.let(DateParser::parseDate),
+            imageUrl = it.imageUrl
         )
     }
 }
