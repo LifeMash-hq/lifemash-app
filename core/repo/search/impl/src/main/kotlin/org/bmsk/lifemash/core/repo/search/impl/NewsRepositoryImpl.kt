@@ -6,10 +6,13 @@ import kotlinx.coroutines.invoke
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.LifeMashSection
 import org.bmsk.lifemash.core.model.section.SBSSection
+import org.bmsk.lifemash.core.network.response.LifeMashArticle
+import org.bmsk.lifemash.core.network.response.NewsItem
 import org.bmsk.lifemash.core.network.service.GoogleNewsService
 import org.bmsk.lifemash.core.network.service.LifeMashFirebaseService
 import org.bmsk.lifemash.core.network.service.SbsNewsService
 import org.bmsk.lifemash.core.repo.search.api.NewsRepository
+import org.bmsk.lifemash.core.repo.search.impl.transform.toModel
 import javax.inject.Inject
 
 internal class NewsRepositoryImpl @Inject constructor(
@@ -33,19 +36,25 @@ internal class NewsRepositoryImpl @Inject constructor(
             Log.e("NewsRepositoryImpl", it.stackTraceToString())
         }
         return Dispatchers.IO {
-            sbsNewsService.getNews(section.id).channel.items?.asModel() ?: emptyList()
+            sbsNewsService
+                .getNews(section.id).channel.items
+                ?.map(NewsItem::toModel)
+                ?: emptyList()
         }
     }
 
     override suspend fun getGoogleNews(query: String): List<NewsModel> {
         return Dispatchers.IO {
-            googleNewsService.search(query).channel.items?.asModel() ?: emptyList()
+            googleNewsService.search(query).channel.items
+                ?.map(NewsItem::toModel)
+                ?: emptyList()
         }
     }
 
     override suspend fun getLifeMashNews(section: LifeMashSection): List<NewsModel> {
         return Dispatchers.IO {
-            lifeMashFirebaseService.getLatestNews(section = section).asModel()
+            lifeMashFirebaseService.getLatestNews(section = section)
+                .map(LifeMashArticle::toModel)
         }
     }
 }

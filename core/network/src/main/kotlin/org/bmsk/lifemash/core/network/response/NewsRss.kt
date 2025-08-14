@@ -1,4 +1,4 @@
-package org.bmsk.lifemash.core.network.model
+package org.bmsk.lifemash.core.network.response
 
 import com.tickaroo.tikxml.annotation.Element
 import com.tickaroo.tikxml.annotation.PropertyElement
