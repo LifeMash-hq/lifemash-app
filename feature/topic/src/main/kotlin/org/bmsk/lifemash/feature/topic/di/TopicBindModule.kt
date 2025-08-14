@@ -12,6 +12,8 @@ import org.bmsk.lifemash.feature.topic.navigation.TopicNavControllerImpl
 import org.bmsk.lifemash.feature.topic.navigation.TopicNavGraphImpl
 import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCaseImpl
+import org.bmsk.lifemash.feature.topic.usecase.GetLifeMashNewsUseCase
+import org.bmsk.lifemash.feature.topic.usecase.GetLifeMashNewsUseCaseImpl
 import org.bmsk.lifemash.feature.topic.usecase.GetNewsImageUrlUseCase
 import org.bmsk.lifemash.feature.topic.usecase.GetNewsImageUrlUseCaseImpl
 import org.bmsk.lifemash.feature.topic.usecase.GetNewsWithImagesUseCase
@@ -27,12 +29,12 @@ internal abstract class TopicBindModule {
 
     @Binds
     abstract fun bindTopicNavController(
-        dataSource: TopicNavControllerImpl
+        impl: TopicNavControllerImpl
     ): TopicNavController
 
     @Binds
     abstract fun bindTopicNavGraph(
-        dataSource: TopicNavGraphImpl
+        impl: TopicNavGraphImpl
     ): TopicNavGraph
 }
 
@@ -42,30 +44,36 @@ internal abstract class UseCaseBindModule {
     @Binds
     @ViewModelScoped
     abstract fun scrapNewsUseCase(
-        dataSource: ScrapNewsUseCaseImpl
+        impl: ScrapNewsUseCaseImpl
     ): ScrapNewsUseCase
 
     @Binds
     @ViewModelScoped
     abstract fun getGoogleNewsUseCase(
-        dataSource: GetGoogleNewsUseCaseImpl
+        impl: GetGoogleNewsUseCaseImpl
     ): GetGoogleNewsUseCase
 
     @Binds
     @ViewModelScoped
     abstract fun getSBSNewsUseCase(
-        dataSource: GetSBSNewsUseCaseImpl
+        impl: GetSBSNewsUseCaseImpl
     ): GetSBSNewsUseCase
 
     @Binds
     @ViewModelScoped
     abstract fun getNewsImageUrlUseCase(
-        dataSource: GetNewsImageUrlUseCaseImpl
+        impl: GetNewsImageUrlUseCaseImpl
     ): GetNewsImageUrlUseCase
 
     @Binds
     @ViewModelScoped
     abstract fun getNewsWithImagesUseCase(
-        dataSource: GetNewsWithImagesUseCaseImpl
+        impl: GetNewsWithImagesUseCaseImpl
     ): GetNewsWithImagesUseCase
+
+    @Binds
+    @ViewModelScoped
+    abstract fun getLifeMashNewsUseCase(
+        impl: GetLifeMashNewsUseCaseImpl
+    ): GetLifeMashNewsUseCase
 }
