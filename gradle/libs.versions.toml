@@ -7,10 +7,12 @@ hilt = "2.57"
 kotlin = "2.2.0"
 coroutine = "1.10.2"
 ksp = "2.2.0-2.0.2"
+playServicesAuth = "20.7.0"
 retrofit = "3.0.0"
 okHttp = "5.1.0"
 glide = "4.16.0"
 tikxml = "0.8.13"
+firebaseBom = "34.1.0"
 jsoup = "1.21.1"
 lottie = "6.4.0"
 lottieCompose = "6.4.0"
@@ -55,6 +57,9 @@ detekt = "1.23.6"
 
 ossLicenses = "17.0.1"
 ossLicensesPlugin = "0.10.6"
+
+google-services = "4.4.3"
+firebaseCrashlytics = "3.0.6"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -123,9 +128,12 @@ tikxml-annotation = { module = "com.tickaroo.tikxml:annotation", version.ref = "
 tikxml-processor = { module = "com.tickaroo.tikxml:processor", version.ref = "tikxml" }
 tikxml-retrofit = { module = "com.tickaroo.tikxml:retrofit-converter", version.ref = "tikxml" }
 
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
-lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
-lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieCompose" }
 
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
@@ -158,3 +166,5 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 verify-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }

@@ -3,6 +3,8 @@ import org.bmsk.buildsrc.Configuration
 plugins {
     id("lifemash.android.application")
     id("com.google.android.gms.oss-licenses-plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -49,4 +51,8 @@ dependencies {
     implementation(projects.core.repo.search.impl)
 
     implementation(libs.androidx.appcompat)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 }
