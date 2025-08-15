@@ -16,6 +16,14 @@
     <string name="feature_topic_scrap">스크랩</string>
     <string name="feature_topic_scrap_do">스크랩하기</string>
     <string name="feature_topic_scrap_complete">스크랩 완료</string>
-    <string name="feature_topic_scrap_doing">스크랩 중...</string>
+    <string name="feature_topic_scrap_doing">스크랩 중…</string>
     <string name="feature_topic_scrap_error">스크랩 에러 발생</string>
+
+    <string name="feature_topic_category_business">비즈니스</string>
+    <string name="feature_topic_category_entertainment">엔터테인먼트</string>
+    <string name="feature_topic_category_general">일반</string>
+    <string name="feature_topic_category_health">건강</string>
+    <string name="feature_topic_category_science">과학</string>
+    <string name="feature_topic_category_sports">스포츠</string>
+    <string name="feature_topic_category_technology">기술</string>
 </resources>

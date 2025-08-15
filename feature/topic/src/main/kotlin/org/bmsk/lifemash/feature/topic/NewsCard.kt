@@ -56,6 +56,10 @@ internal fun NewsCard(
                     text = newsModel.title,
                     style = MaterialTheme.typography.titleMedium,
                 )
+                Text(
+                    text = newsModel.source ?: "",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -91,7 +95,7 @@ internal fun NewsCard(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 private fun NewsCardPreview() {
     val fakeNewsModel =
-        NewsModel(title = "News Card", link = "", pubDate = Date())
+        NewsModel(title = "News Card", link = "", source = "gdnet", pubDate = Date())
     LifeMashTheme {
         NewsCard(
             newsModel = fakeNewsModel,

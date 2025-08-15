@@ -19,7 +19,8 @@ internal fun LifeMashArticle.toModel(): NewsModel {
     return NewsModel(
         title = this.title,
         link = this.url,
-        pubDate = this.published.let(DateParser::parseDate),
+        pubDate = this.pubDate,
+        source = this.source,
         imageUrl = this.imageUrl
     )
 }

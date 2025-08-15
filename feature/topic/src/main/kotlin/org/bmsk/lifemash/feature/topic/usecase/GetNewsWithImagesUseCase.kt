@@ -18,8 +18,12 @@ internal class GetNewsWithImagesUseCaseImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             newsModels.map { news ->
                 async {
-                    val imageUrl = getNewsImageUrlUseCase(news.link)
-                    news.copy(imageUrl = imageUrl)
+                    if (news.imageUrl == null) {
+                        val imageUrl = getNewsImageUrlUseCase(news.link)
+                        news.copy(imageUrl = imageUrl)
+                    } else {
+                        news
+                    }
                 }
             }.awaitAll()
         }
