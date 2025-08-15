@@ -1,13 +1,16 @@
 package org.bmsk.lifemash.feature.topic
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.bmsk.lifemash.core.model.NewsModel
+import org.bmsk.lifemash.core.model.section.LifeMashCategory
 import org.bmsk.lifemash.core.model.section.SBSSection
 import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCase
+import org.bmsk.lifemash.feature.topic.usecase.GetLifeMashNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.GetNewsWithImagesUseCase
 import org.bmsk.lifemash.feature.topic.usecase.GetSBSNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
@@ -53,14 +56,26 @@ class TopicViewModelTest {
         override suspend fun invoke(newsModels: List<NewsModel>): List<NewsModel> = imageNewsList
     }
 
+    class FakeGetLifeMashNewsUseCase(
+        var newsList: List<NewsModel> = emptyList(),
+        var throwError: Throwable? = null
+    ) : GetLifeMashNewsUseCase {
+        override suspend fun invoke(category: LifeMashCategory): List<NewsModel> {
+            throwError?.let { throw it }
+            return newsList
+        }
+    }
+
     private lateinit var viewModel: TopicViewModel
     private lateinit var fakeGetSBSNewsUseCase: FakeGetSBSNewsUseCase
     private lateinit var fakeGetGoogleNewsUseCase: FakeGetGoogleNewsUseCase
     private lateinit var fakeScrapNewsUseCase: FakeScrapNewsUseCase
     private lateinit var fakeGetNewsWithImagesUseCase: FakeGetNewsWithImagesUseCase
+    private lateinit var fakeGetLifeMashNewsUseCase: FakeGetLifeMashNewsUseCase
 
     private val testDispatcher = StandardTestDispatcher()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
@@ -68,11 +83,13 @@ class TopicViewModelTest {
         fakeGetGoogleNewsUseCase = FakeGetGoogleNewsUseCase()
         fakeScrapNewsUseCase = FakeScrapNewsUseCase()
         fakeGetNewsWithImagesUseCase = FakeGetNewsWithImagesUseCase()
+        fakeGetLifeMashNewsUseCase = FakeGetLifeMashNewsUseCase()
         viewModel = TopicViewModel(
-            fakeGetSBSNewsUseCase,
-            fakeGetGoogleNewsUseCase,
-            fakeScrapNewsUseCase,
-            fakeGetNewsWithImagesUseCase
+            getSBSNewsUseCase = fakeGetSBSNewsUseCase,
+            getLifeMashNewsUseCase = fakeGetLifeMashNewsUseCase,
+            getGoogleNewsUseCase = fakeGetGoogleNewsUseCase,
+            scrapNewsUseCase = fakeScrapNewsUseCase,
+            getNewsWIthImagesUrlUseCase = fakeGetNewsWithImagesUseCase
         )
     }
 
