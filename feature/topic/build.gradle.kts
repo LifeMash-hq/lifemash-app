@@ -13,8 +13,6 @@ dependencies {
     implementation(projects.core.repo.search.api)
     // jsoup
     implementation(libs.jsoup)
-    // glide
-    implementation(libs.glide)
 
     implementation(libs.kotlinx.immutable)
 

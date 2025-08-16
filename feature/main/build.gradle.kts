@@ -13,6 +13,7 @@ dependencies {
     implementation(projects.feature.scrapApi)
     implementation(projects.feature.topicApi)
     implementation(projects.feature.webviewApi)
+    implementation(projects.feature.feedApi)
 
     // navigation
     implementation(libs.androidx.navigation.ui.ktx)

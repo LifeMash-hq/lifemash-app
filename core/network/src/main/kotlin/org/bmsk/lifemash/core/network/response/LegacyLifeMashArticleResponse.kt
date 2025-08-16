@@ -3,7 +3,7 @@ package org.bmsk.lifemash.core.network.response
 import org.bmsk.lifemash.core.model.section.LifeMashCategory
 import java.util.Date
 
-data class LifeMashArticle(
+data class LegacyLifeMashArticleResponse(
     val id: String,
     val title: String,
     val url: String,
