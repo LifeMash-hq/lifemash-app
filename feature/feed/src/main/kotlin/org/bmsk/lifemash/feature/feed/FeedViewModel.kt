@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class FeedViewModel @Inject constructor(
-    private val getArticlesUseCase: GetArticlesUseCase
+    private val getArticlesUseCase: GetArticlesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedUiState.Initial)
