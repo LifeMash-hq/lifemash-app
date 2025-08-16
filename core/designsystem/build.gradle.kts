@@ -8,6 +8,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.landscapist.bom)
     implementation(libs.landscapist.coil)
     implementation(libs.landscapist.placeholder)

@@ -14,8 +14,6 @@ import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.model.section.LifeMashCategory
 import org.bmsk.lifemash.feature.topic.usecase.GetGoogleNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.GetLifeMashNewsUseCase
-import org.bmsk.lifemash.feature.topic.usecase.GetNewsWithImagesUseCase
-import org.bmsk.lifemash.feature.topic.usecase.GetSBSNewsUseCase
 import org.bmsk.lifemash.feature.topic.usecase.ScrapNewsUseCase
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -23,11 +21,11 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 @HiltViewModel
 internal class TopicViewModel @Inject constructor(
-    private val getSBSNewsUseCase: GetSBSNewsUseCase,
+//    private val getSBSNewsUseCase: GetSBSNewsUseCase,
     private val getLifeMashNewsUseCase: GetLifeMashNewsUseCase,
     private val getGoogleNewsUseCase: GetGoogleNewsUseCase,
     private val scrapNewsUseCase: ScrapNewsUseCase,
-    private val getNewsWIthImagesUrlUseCase: GetNewsWithImagesUseCase
+//    private val getNewsWIthImagesUrlUseCase: GetNewsWithImagesUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TopicUiState())
     val uiState = _uiState.asStateFlow()

@@ -46,9 +46,11 @@ dependencies {
     implementation(projects.feature.scrap)
     implementation(projects.feature.topic)
     implementation(projects.feature.webview)
+    implementation(projects.feature.feed)
 
     implementation(projects.core.repo.scrap.impl)
     implementation(projects.core.repo.search.impl)
+    implementation(projects.core.repo.article)
 
     implementation(libs.androidx.appcompat)
     implementation(platform(libs.firebase.bom))

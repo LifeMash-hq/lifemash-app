@@ -24,7 +24,10 @@ internal data class TopicUiState(
         return categoryStates.first { it.category == category }.newsLoadUiState
     }
 
-    fun setNewsLoadUiState(category: LifeMashCategory, newsLoadUiState: NewsLoadUiState): TopicUiState {
+    fun setNewsLoadUiState(
+        category: LifeMashCategory,
+        newsLoadUiState: NewsLoadUiState
+    ): TopicUiState {
         return copy(
             categoryStates = categoryStates.map {
                 if (it.category == category) {
