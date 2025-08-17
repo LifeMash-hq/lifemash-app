@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.feature.feed.api.FeedNavGraph
+import org.bmsk.lifemash.feature.feed.api.FeedNavGraphInfo
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraphInfo
 import org.bmsk.lifemash.feature.topic.api.TopicNavGraph
@@ -66,7 +67,9 @@ internal fun MainScreen(
 
         feedNavGraph.buildNavGraph(
             navGraphBuilder = this,
-            navInfo = Unit,
+            navInfo = FeedNavGraphInfo {
+                navigator.navigateWebView(it)
+            },
         )
     }
 }
