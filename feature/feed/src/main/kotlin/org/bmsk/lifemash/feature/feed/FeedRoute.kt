@@ -12,6 +12,7 @@ internal object FeedRoute {
 
     @Composable
     operator fun invoke(
+        onArticleOpen: (String) -> Unit,
         viewModel: FeedViewModel = hiltViewModel()
     ) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -26,7 +27,7 @@ internal object FeedRoute {
             articles = uiState.visibleArticles,
             isSearchMode = uiState.isSearchMode,
             queryText = uiState.queryText,
-            onArticleOpen = {},
+            onArticleOpen = { onArticleOpen(it.link) },
             onQueryTextChange = viewModel::setQueryText,
             onQueryTextClear = { viewModel.setQueryText("") },
             onSearchModeChange = viewModel::setSearchMode,
