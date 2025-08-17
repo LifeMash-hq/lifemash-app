@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.feature.feed.api.FeedNavController
+import org.bmsk.lifemash.feature.feed.api.FeedNavGraph
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavController
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
 import org.bmsk.lifemash.feature.topic.api.TopicNavController
@@ -42,6 +44,12 @@ internal class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var webViewNavController: WebViewNavController
 
+    @Inject
+    lateinit var feedNavGraph: FeedNavGraph
+
+    @Inject
+    lateinit var feedNavController: FeedNavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(exitAppWhenBackButtonPressedTwiceCallback)
@@ -52,6 +60,7 @@ internal class MainActivity : AppCompatActivity() {
                     scrapNavController = scrapNavController,
                     topicNavController = topicNavController,
                     webViewNavController = webViewNavController,
+                    feedNavController = feedNavController,
                 )
 
                 MainScreen(
@@ -59,6 +68,7 @@ internal class MainActivity : AppCompatActivity() {
                     scrapNavGraph = scrapNavGraph,
                     topicNavGraph = topicNavGraph,
                     webViewNavGraph = webViewNavGraph,
+                    feedNavGraph = feedNavGraph,
                 )
             }
         }

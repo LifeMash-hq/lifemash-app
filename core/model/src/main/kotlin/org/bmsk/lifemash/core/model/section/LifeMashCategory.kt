@@ -1,6 +1,6 @@
 package org.bmsk.lifemash.core.model.section
 
-enum class LifeMashSection(val id: String) {
+enum class LifeMashCategory(val id: String) {
     BUSINESS("business"),
     ENTERTAINMENT("entertainment"),
     GENERAL("general"),
@@ -9,8 +9,8 @@ enum class LifeMashSection(val id: String) {
     SPORTS("sports"),
     TECHNOLOGY("technology");
 
-    companion object {
-        fun fromId(id: String): LifeMashSection = entries.first { entry ->
+    companion object Companion {
+        fun fromId(id: String): LifeMashCategory = entries.first { entry ->
             entry.id.equals(id, ignoreCase = true)
         }
     }

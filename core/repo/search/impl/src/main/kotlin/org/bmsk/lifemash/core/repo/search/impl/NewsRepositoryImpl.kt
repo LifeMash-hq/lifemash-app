@@ -4,9 +4,9 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
 import org.bmsk.lifemash.core.model.NewsModel
-import org.bmsk.lifemash.core.model.section.LifeMashSection
+import org.bmsk.lifemash.core.model.section.LifeMashCategory
 import org.bmsk.lifemash.core.model.section.SBSSection
-import org.bmsk.lifemash.core.network.response.LifeMashArticle
+import org.bmsk.lifemash.core.network.response.LegacyLifeMashArticleResponse
 import org.bmsk.lifemash.core.network.response.NewsItem
 import org.bmsk.lifemash.core.network.service.GoogleNewsService
 import org.bmsk.lifemash.core.network.service.LifeMashFirebaseService
@@ -51,10 +51,10 @@ internal class NewsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLifeMashNews(section: LifeMashSection): List<NewsModel> {
+    override suspend fun getLifeMashNews(category: LifeMashCategory): List<NewsModel> {
         return Dispatchers.IO {
-            lifeMashFirebaseService.getLatestNews(section = section)
-                .map(LifeMashArticle::toModel)
+            lifeMashFirebaseService.getLatestNews(category = category)
+                .map(LegacyLifeMashArticleResponse::toModel)
         }
     }
 }

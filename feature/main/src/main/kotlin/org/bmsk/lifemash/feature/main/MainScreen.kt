@@ -7,6 +7,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import kotlinx.coroutines.launch
+import org.bmsk.lifemash.feature.feed.api.FeedNavGraph
+import org.bmsk.lifemash.feature.feed.api.FeedNavGraphInfo
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraphInfo
 import org.bmsk.lifemash.feature.topic.api.TopicNavGraph
@@ -21,6 +23,7 @@ internal fun MainScreen(
     scrapNavGraph: ScrapNavGraph,
     topicNavGraph: TopicNavGraph,
     webViewNavGraph: WebViewNavGraph,
+    feedNavGraph: FeedNavGraph,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -60,6 +63,13 @@ internal fun MainScreen(
         webViewNavGraph.buildNavGraph(
             navGraphBuilder = this,
             navInfo = WebViewNavGraphInfo(onShowErrorSnackbar),
+        )
+
+        feedNavGraph.buildNavGraph(
+            navGraphBuilder = this,
+            navInfo = FeedNavGraphInfo {
+                navigator.navigateWebView(it)
+            },
         )
     }
 }

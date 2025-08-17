@@ -3,7 +3,7 @@ package org.bmsk.lifemash.core.repo.search.impl.transform
 import org.bmsk.lifemash.core.model.DateParser
 import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.core.network.response.NewsItem
-import org.bmsk.lifemash.core.network.response.LifeMashArticle
+import org.bmsk.lifemash.core.network.response.LegacyLifeMashArticleResponse
 import java.util.Date
 
 internal fun NewsItem.toModel(): NewsModel {
@@ -15,11 +15,12 @@ internal fun NewsItem.toModel(): NewsModel {
     )
 }
 
-internal fun LifeMashArticle.toModel(): NewsModel {
+internal fun LegacyLifeMashArticleResponse.toModel(): NewsModel {
     return NewsModel(
         title = this.title,
         link = this.url,
-        pubDate = this.published.let(DateParser::parseDate),
+        pubDate = this.pubDate,
+        source = this.source,
         imageUrl = this.imageUrl
     )
 }

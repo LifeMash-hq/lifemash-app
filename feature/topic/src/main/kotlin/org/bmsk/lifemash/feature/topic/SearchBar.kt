@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,9 +40,50 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.core.model.section.LifeMashCategory
 import org.bmsk.lifemash.core.model.section.SBSSection
+import org.bmsk.lifemash.feature.topic.mapper.stringResource
+
+@Composable
+internal fun SearchBar(
+    modifier: Modifier = Modifier,
+    currentCategory: LifeMashCategory,
+    queryText: String,
+    onQueryTextChange: (String) -> Unit,
+    onChipClick: (LifeMashCategory) -> Unit,
+    onSearchClick: (String) -> Unit,
+    onScrapPageClick: () -> Unit,
+) {
+    SearchBar(
+        modifier = modifier,
+        queryText = queryText,
+        onQueryTextChange = onQueryTextChange,
+        onSearchClick = onSearchClick,
+        onScrapPageClick = onScrapPageClick,
+        chipContent = {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                items(
+                    items = LifeMashCategory.entries,
+                    key = { it.name },
+                ) { category ->
+                    FilterChip(
+                        selected = category == currentCategory,
+                        onClick = { onChipClick(category) },
+                        label = { Text(text = category.stringResource()) },
+                        shape = RoundedCornerShape(50)
+                    )
+                }
+            }
+        }
+    )
+}
 
 @Composable
 internal fun SearchBar(
@@ -49,9 +91,45 @@ internal fun SearchBar(
     currentSection: SBSSection,
     queryText: String,
     onQueryTextChange: (String) -> Unit,
-    onClickChip: (SBSSection) -> Unit,
+    onChipClick: (SBSSection) -> Unit,
     onSearchClick: (String) -> Unit,
-    onClickScrapPage: () -> Unit,
+    onScrapPageClick: () -> Unit,
+) {
+    SearchBar(
+        modifier = modifier,
+        queryText = queryText,
+        onQueryTextChange = onQueryTextChange,
+        onSearchClick = onSearchClick,
+        onScrapPageClick = onScrapPageClick,
+        chipContent = {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                items(
+                    items = SectionChip.entries,
+                    key = { it.name },
+                ) { sectionChip ->
+                    FilterChip(
+                        selected = sectionChip.section == currentSection,
+                        onClick = { onChipClick(sectionChip.section) },
+                        label = { Text(text = stringResource(id = sectionChip.chipNameId)) },
+                        shape = RoundedCornerShape(50)
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Composable
+internal fun SearchBar(
+    modifier: Modifier = Modifier,
+    queryText: String,
+    onQueryTextChange: (String) -> Unit,
+    onSearchClick: (String) -> Unit,
+    onScrapPageClick: () -> Unit,
+    chipContent: @Composable ColumnScope.() -> Unit = {},
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -68,22 +146,10 @@ internal fun SearchBar(
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 14.dp)
         ) {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                items(
-                    items = SectionChip.entries,
-                    key = { it.name },
-                ) { sectionChip ->
-                    FilterChip(
-                        selected = sectionChip.section == currentSection,
-                        onClick = { onClickChip(sectionChip.section) },
-                        label = { Text(text = stringResource(id = sectionChip.chipNameId)) },
-                        shape = RoundedCornerShape(50)
-                    )
-                }
-            }
+            chipContent()
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -124,7 +190,7 @@ internal fun SearchBar(
                         )
                         .padding(8.dp),
                     isActive = true,
-                    onClick = onClickScrapPage
+                    onClick = onScrapPageClick
                 )
             }
         }
@@ -150,22 +216,69 @@ private fun ScrapStarIcon(
     }
 }
 
+private sealed interface SearchBarPreviewData {
+
+    data class SbsSearchBarPreviewData(
+        val queryText: String,
+        val selectedSection: SBSSection,
+        val isScrapActive: Boolean
+    ) : SearchBarPreviewData
+
+    data class LifeMashSearchBarPreviewData(
+        val queryText: String,
+        val selectedCategory: LifeMashCategory,
+        val isScrapActive: Boolean
+    ) : SearchBarPreviewData
+}
+
+private class SearchBarPreviewParameterProvider : PreviewParameterProvider<SearchBarPreviewData> {
+    override val values: Sequence<SearchBarPreviewData> = sequenceOf(
+        SearchBarPreviewData.SbsSearchBarPreviewData(
+            queryText = "예시 검색어",
+            selectedSection = SBSSection.entries.first(),
+            isScrapActive = false
+        ),
+        SearchBarPreviewData.LifeMashSearchBarPreviewData(
+            queryText = "예시 검색어",
+            selectedCategory = LifeMashCategory.entries.first(),
+            isScrapActive = true
+        )
+    )
+}
+
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-private fun SearchBarPreview() {
-    var searchText by remember { mutableStateOf("예시 검색어") }
-    var selectedSection by remember { mutableStateOf(SBSSection.values().first()) }
-
+private fun SearchBarPreview(
+    @PreviewParameter(SearchBarPreviewParameterProvider::class) previewData: SearchBarPreviewData
+) {
     LifeMashTheme {
-        SearchBar(
-            modifier = Modifier,
-            currentSection = selectedSection,
-            queryText = searchText,
-            onQueryTextChange = { searchText = it },
-            onClickChip = { selectedSection = it },
-            onSearchClick = {},
-            onClickScrapPage = {}
-        )
+        var queryText by remember { mutableStateOf("") }
+
+        when (previewData) {
+            is SearchBarPreviewData.LifeMashSearchBarPreviewData -> {
+                SearchBar(
+                    modifier = Modifier,
+                    currentCategory = previewData.selectedCategory,
+                    queryText = queryText,
+                    onQueryTextChange = { },
+                    onChipClick = { },
+                    onSearchClick = {},
+                    onScrapPageClick = {}
+                )
+            }
+
+            is SearchBarPreviewData.SbsSearchBarPreviewData -> {
+                SearchBar(
+                    modifier = Modifier,
+                    currentSection = previewData.selectedSection,
+                    queryText = queryText,
+                    onQueryTextChange = { queryText = it },
+                    onChipClick = {},
+                    onSearchClick = {},
+                    onScrapPageClick = {}
+                )
+            }
+        }
     }
 }

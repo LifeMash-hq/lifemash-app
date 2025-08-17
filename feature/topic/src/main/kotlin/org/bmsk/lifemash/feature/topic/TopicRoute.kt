@@ -18,14 +18,14 @@ internal object TopicRoute {
     ) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        LaunchedEffect(uiState.selectedSection) {
-            viewModel.getNews(uiState.selectedSection)
+        LaunchedEffect(uiState.selectedCategory) {
+            viewModel.getNews(uiState.selectedCategory)
         }
 
         TopicScreen(
             uiState = uiState,
             onQueryChange = viewModel::setQuery,
-            onSectionClick = viewModel::setSection,
+            onCategoryClick = viewModel::setCategory,
             onSearchClick = viewModel::getGoogleNews,
             onNewsClick = onNewsClick,
             onScrapNewsClick = viewModel::scrapNews,

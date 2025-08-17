@@ -53,14 +53,14 @@ import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.Loading
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.core.model.NewsModel
-import org.bmsk.lifemash.core.model.section.SBSSection
+import org.bmsk.lifemash.core.model.section.LifeMashCategory
 import java.util.Date
 
 @Composable
 internal fun TopicScreen(
     uiState: TopicUiState,
     onQueryChange: (String) -> Unit,
-    onSectionClick: (SBSSection) -> Unit,
+    onCategoryClick: (LifeMashCategory) -> Unit,
     onSearchClick: (String) -> Unit,
     onNewsClick: (String) -> Unit,
     onScrapNewsClick: (NewsModel) -> Unit,
@@ -69,8 +69,8 @@ internal fun TopicScreen(
     onDismissSelectedNews: () -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
-    val selectedSection = uiState.selectedSection
-    val selectedSectionUiState = uiState.getNewsLoadUiState(selectedSection)
+    val selectedCategory = uiState.selectedCategory
+    val selectedCategoryNewsLoadUiState = uiState.getNewsLoadUiState(category = selectedCategory)
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -82,14 +82,14 @@ internal fun TopicScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            when (selectedSectionUiState) {
+            when (selectedCategoryNewsLoadUiState) {
                 is NewsLoadUiState.Loading -> {
                     TopicLoadingScreen()
                 }
 
                 is NewsLoadUiState.Loaded -> {
                     TopicLoadedScreen(
-                        newsList = selectedSectionUiState.newsModels,
+                        newsList = selectedCategoryNewsLoadUiState.newsModels,
                         lazyListState = lazyListState,
                         scrapingUiState = uiState.scrapingUiState,
                         onClickNews = onNewsClick,
@@ -117,15 +117,15 @@ internal fun TopicScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter),
-                    currentSection = uiState.selectedSection,
-                    onClickChip = {
+                    currentCategory = uiState.selectedCategory,
+                    onChipClick = {
                         coroutineScope.launch { lazyListState.scrollToItem(0) }
-                        onSectionClick(it)
+                        onCategoryClick(it)
                     },
                     queryText = uiState.query,
                     onQueryTextChange = onQueryChange,
                     onSearchClick = onSearchClick,
-                    onClickScrapPage = onScrapPageClick,
+                    onScrapPageClick = onScrapPageClick,
                 )
             }
         }
@@ -284,7 +284,7 @@ private fun NewsContent(
 private data class TopicScreenPreviewState(
     val isLoading: Boolean,
     val newsList: PersistentList<NewsModel>,
-    val currentSection: SBSSection,
+    val currentCategory: LifeMashCategory,
     val searchText: String = "",
     val selectedNewsModel: NewsModel? = null,
 )
@@ -327,17 +327,17 @@ private class TopicScreenPreviewProvider : PreviewParameterProvider<TopicScreenP
         TopicScreenPreviewState(
             isLoading = true,
             newsList = persistentListOf(),
-            currentSection = SBSSection.ECONOMICS
+            currentCategory = LifeMashCategory.BUSINESS
         ),
         TopicScreenPreviewState(
             isLoading = false,
             newsList = newsList,
-            currentSection = SBSSection.ECONOMICS
+            currentCategory = LifeMashCategory.BUSINESS
         ),
         TopicScreenPreviewState(
             isLoading = false,
             newsList = newsList,
-            currentSection = SBSSection.POLITICS,
+            currentCategory = LifeMashCategory.GENERAL,
             selectedNewsModel = NewsModel(
                 title = "정치 뉴스",
                 link = "https://placehold.co/300x200?text=No+Image",
