@@ -2,7 +2,24 @@ package org.bmsk.lifemash.feature.feed
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
+import androidx.compose.material.icons.outlined.DynamicFeed
+import androidx.compose.material.icons.outlined.EmojiEmotions
+import androidx.compose.material.icons.outlined.FormatQuote
+import androidx.compose.material.icons.outlined.Gavel
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.HealthAndSafety
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.MedicalServices
+import androidx.compose.material.icons.outlined.Memory
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Public
+import androidx.compose.material.icons.outlined.Science
+import androidx.compose.material.icons.outlined.SportsSoccer
+import androidx.compose.material.icons.outlined.TrendingUp
+import androidx.compose.material.icons.outlined.Woman
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.collections.immutable.PersistentList
@@ -127,96 +144,93 @@ internal data class CategoryStyle(
     val color: Color
 )
 
-// 불변 맵으로 정의 (컴파일 타임 레벨에서 거의 상수처럼 사용)
 private val CATEGORY_STYLES: PersistentMap<ArticleCategory, CategoryStyle> = persistentMapOf(
     ArticleCategory.ALL to CategoryStyle(
         R.string.feature_feed_cat_all,
-        Icons.Outlined.Home,
+        Icons.Outlined.DynamicFeed,   // 전체: 동적 피드
         Color(0xFF9E9E9E)
     ),
     ArticleCategory.POLITICS to CategoryStyle(
         R.string.feature_feed_cat_politics,
-        Icons.Outlined.Home,
+        Icons.Outlined.Gavel,         // 정치: 판사봉
         Color(0xFFEF5350)
     ),
     ArticleCategory.ECONOMY to CategoryStyle(
         R.string.feature_feed_cat_economy,
-        Icons.Outlined.Home,
+        Icons.AutoMirrored.Outlined.TrendingUp,    // 경제: 상승 차트
         Color(0xFFFFB300)
     ),
     ArticleCategory.SOCIETY to CategoryStyle(
         R.string.feature_feed_cat_society,
-        Icons.Outlined.Home,
+        Icons.Outlined.Groups,        // 사회: 사람들
         Color(0xFF42A5F5)
     ),
     ArticleCategory.INTERNATIONAL to CategoryStyle(
         R.string.feature_feed_cat_international,
-        Icons.Outlined.Home,
+        Icons.Outlined.Public,        // 국제: 지구본
         Color(0xFF66BB6A)
     ),
     ArticleCategory.SPORTS to CategoryStyle(
         R.string.feature_feed_cat_sports,
-        Icons.Outlined.Home,
+        Icons.Outlined.SportsSoccer,  // 스포츠: 축구공 (원하면 다른 종목으로 교체)
         Color(0xFFAB47BC)
     ),
     ArticleCategory.CULTURE to CategoryStyle(
         R.string.feature_feed_cat_culture,
-        Icons.Outlined.Home,
+        Icons.Outlined.Palette,       // 문화: 팔레트
         Color(0xFF5C6BC0)
     ),
     ArticleCategory.ENTERTAINMENT to CategoryStyle(
         R.string.feature_feed_cat_entertainment,
-        Icons.Outlined.Home,
+        Icons.Outlined.Movie,         // 연예/엔터: 영화
         Color(0xFFFF7043)
     ),
     ArticleCategory.TECH to CategoryStyle(
         R.string.feature_feed_cat_tech,
-        Icons.Outlined.Home,
+        Icons.Outlined.Memory,        // 기술: 메모리/칩
         Color(0xFF26C6DA)
     ),
     ArticleCategory.SCIENCE to CategoryStyle(
         R.string.feature_feed_cat_science,
-        Icons.Outlined.Home,
+        Icons.Outlined.Science,       // 과학: 플라스크
         Color(0xFF26C6DA)
     ),
     ArticleCategory.COLUMN to CategoryStyle(
         R.string.feature_feed_cat_column,
-        Icons.Outlined.Home,
+        Icons.Outlined.FormatQuote,   // 칼럼/오피니언: 인용구
         Color(0xFF8D6E63)
     ),
     ArticleCategory.PEOPLE to CategoryStyle(
         R.string.feature_feed_cat_people,
-        Icons.Outlined.Home,
+        Icons.Outlined.Person,        // 인물: 사람
         Color(0xFF7E57C2)
     ),
     ArticleCategory.HEALTH to CategoryStyle(
         R.string.feature_feed_cat_health,
-        Icons.Outlined.Home,
+        Icons.Outlined.HealthAndSafety, // 건강: 방패+십자
         Color(0xFF26A69A)
     ),
     ArticleCategory.MEDICAL to CategoryStyle(
         R.string.feature_feed_cat_medical,
-        Icons.Outlined.Home,
+        Icons.Outlined.MedicalServices, // 의료: 메디컬 서비스
         Color(0xFF26A69A)
     ),
     ArticleCategory.WOMEN to CategoryStyle(
         R.string.feature_feed_cat_women,
-        Icons.Outlined.Home,
+        Icons.Outlined.Woman,         // 여성: 여성 아이콘
         Color(0xFFEC407A)
     ),
     ArticleCategory.CARTOON to CategoryStyle(
         R.string.feature_feed_cat_cartoon,
-        Icons.Outlined.Home,
+        Icons.Outlined.EmojiEmotions, // 만평/카툰: 이모지
         Color(0xFF009688)
     ),
 ).also { map ->
-    // 방어 코드: enum 추가/삭제 시 누락을 조기에 감지
     check(map.size == ArticleCategory.entries.size) {
         "CATEGORY_STYLES size=${map.size} mismatches ArticleCategory size=${ArticleCategory.entries.size}"
     }
 }
 
-// 3) 확장 프로퍼티: !! 제거, 누락 시 명확한 에러
 internal val ArticleCategory.style: CategoryStyle
     get() = CATEGORY_STYLES[this]
         ?: error("Missing CategoryStyle for $this. Did you update CATEGORY_STYLES?")

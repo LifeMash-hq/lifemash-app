@@ -3,7 +3,6 @@ plugins {
     id("lifemash.android.hilt")
     id("kotlinx-serialization")
     id("kotlin-kapt")
-    id("com.google.gms.google-services")
 }
 
 android {
