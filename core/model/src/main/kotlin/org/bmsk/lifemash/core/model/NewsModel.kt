@@ -6,5 +6,6 @@ data class NewsModel(
     val title: String,
     val link: String,
     val pubDate: Date,
+    val source: String? = null,
     val imageUrl: String? = null,
 )

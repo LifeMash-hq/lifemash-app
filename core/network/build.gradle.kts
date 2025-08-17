@@ -3,11 +3,14 @@ plugins {
     id("lifemash.android.hilt")
     id("kotlinx-serialization")
     id("kotlin-kapt")
-    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "org.bmsk.lifemash.core.network"
+
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 
     buildFeatures {
         buildConfig = true
@@ -28,4 +31,10 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.coroutines.test)
 }

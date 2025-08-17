@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_feed_cat_all">전체</string>
+    <string name="feature_feed_cat_politics">정치</string>
+    <string name="feature_feed_cat_economy">경제</string>
+    <string name="feature_feed_cat_society">사회</string>
+    <string name="feature_feed_cat_international">국제</string>
+    <string name="feature_feed_cat_sports">스포츠</string>
+    <string name="feature_feed_cat_culture">문화</string>
+    <string name="feature_feed_cat_entertainment">연예</string>
+    <string name="feature_feed_cat_tech">IT</string>
+    <string name="feature_feed_cat_science">과학</string>
+    <string name="feature_feed_cat_column">칼럼</string>
+    <string name="feature_feed_cat_people">인물</string>
+    <string name="feature_feed_cat_health">건강</string>
+    <string name="feature_feed_cat_medical">의학</string>
+    <string name="feature_feed_cat_women">여성</string>
+    <string name="feature_feed_cat_cartoon">만화</string>
+
+    <string name="feature_feed_search_placeholder">검색어를 입력하세요</string>
+    <string name="feature_feed_search">검색</string>
+    <string name="feature_feed_back">뒤로</string>
+    <string name="feature_feed_clear">지우기</string>
+    <string name="feature_feed_search_mode">검색 모드로 전환</string>
+</resources>

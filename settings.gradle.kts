@@ -27,6 +27,8 @@ include(
     ":core:network",
     ":core:common-ui",
 
+    ":core:repo:article",
+    ":core:repo:article-api",
     ":core:repo:scrap:api",
     ":core:repo:scrap:impl",
     ":core:repo:search:api",
@@ -35,6 +37,8 @@ include(
     ":feature:main-nav-graph",
 
     ":feature:main",
+    ":feature:feed",
+    ":feature:feed-api",
     ":feature:topic",
     ":feature:topic-api",
 

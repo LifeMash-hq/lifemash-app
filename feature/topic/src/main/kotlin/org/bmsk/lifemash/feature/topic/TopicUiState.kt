@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.feature.topic
 
 import org.bmsk.lifemash.core.model.NewsModel
+import org.bmsk.lifemash.core.model.section.LifeMashCategory
 import org.bmsk.lifemash.core.model.section.SBSSection
 
 internal data class TopicUiState(
@@ -8,9 +9,9 @@ internal data class TopicUiState(
     val scrapingUiState: ScrapingUiState = ScrapingUiState.Idle,
     val selectedOverflowMenuNews: NewsModel? = null,
     val googleNewsModels: List<NewsModel> = emptyList(),
-    val selectedSection: SBSSection = SBSSection.ECONOMICS,
-    val sectionStates: List<SectionUiState> = SBSSection.entries.map {
-        SectionUiState(
+    val selectedCategory: LifeMashCategory = LifeMashCategory.BUSINESS,
+    val categoryStates: List<CategoryUiState> = LifeMashCategory.entries.map {
+        CategoryUiState(
             it,
             NewsLoadUiState.Loading
         )
@@ -18,14 +19,18 @@ internal data class TopicUiState(
     val searchErrorEvent: Throwable? = null,
     val scrapErrorEvent: Throwable? = null,
 ) {
-    fun getNewsLoadUiState(section: SBSSection): NewsLoadUiState {
-        return sectionStates.first { it.section == section }.newsLoadUiState
+
+    fun getNewsLoadUiState(category: LifeMashCategory): NewsLoadUiState {
+        return categoryStates.first { it.category == category }.newsLoadUiState
     }
 
-    fun setNewsLoadUiState(section: SBSSection, newsLoadUiState: NewsLoadUiState): TopicUiState {
+    fun setNewsLoadUiState(
+        category: LifeMashCategory,
+        newsLoadUiState: NewsLoadUiState
+    ): TopicUiState {
         return copy(
-            sectionStates = sectionStates.map {
-                if (it.section == section) {
+            categoryStates = categoryStates.map {
+                if (it.category == category) {
                     it.copy(newsLoadUiState = newsLoadUiState)
                 } else {
                     it
@@ -37,6 +42,11 @@ internal data class TopicUiState(
 
 internal data class SectionUiState(
     val section: SBSSection,
+    val newsLoadUiState: NewsLoadUiState
+)
+
+internal data class CategoryUiState(
+    val category: LifeMashCategory,
     val newsLoadUiState: NewsLoadUiState
 )
 
