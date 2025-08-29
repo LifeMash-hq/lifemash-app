@@ -11,7 +11,6 @@ dependencies {
 
     implementation(projects.feature.mainNavGraph)
     implementation(projects.feature.scrapApi)
-    implementation(projects.feature.topicApi)
     implementation(projects.feature.webviewApi)
     implementation(projects.feature.feedApi)
 

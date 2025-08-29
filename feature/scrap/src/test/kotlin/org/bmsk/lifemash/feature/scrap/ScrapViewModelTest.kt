@@ -109,7 +109,9 @@ class ScrapViewModelTest {
             override suspend fun invoke(): List<NewsModel> = emptyList()
         }
         val fakeDelete = object : DeleteScrapNewsUseCase {
-            override suspend fun invoke(newsModel: NewsModel) { throw error }
+            override suspend fun invoke(newsModel: NewsModel) {
+                throw error
+            }
         }
         val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 

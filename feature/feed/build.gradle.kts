@@ -7,10 +7,10 @@ android {
 }
 
 dependencies {
+    implementation(projects.domain.core)
+    implementation(projects.domain.featureFeed)
     implementation(projects.feature.feedApi)
     implementation(projects.feature.mainNavGraph)
-    implementation(projects.core.repo.scrap.api)
-    implementation(projects.core.repo.articleApi)
 
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

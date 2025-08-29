@@ -11,8 +11,6 @@ import org.bmsk.lifemash.feature.feed.api.FeedNavGraph
 import org.bmsk.lifemash.feature.feed.api.FeedNavGraphInfo
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraphInfo
-import org.bmsk.lifemash.feature.topic.api.TopicNavGraph
-import org.bmsk.lifemash.feature.topic.api.TopicNavGraphInfo
 import org.bmsk.lifemash.feature.topic.api.WebViewNavGraph
 import org.bmsk.lifemash.feature.topic.api.WebViewNavGraphInfo
 import java.net.UnknownHostException
@@ -21,7 +19,6 @@ import java.net.UnknownHostException
 internal fun MainScreen(
     navigator: MainNavigator,
     scrapNavGraph: ScrapNavGraph,
-    topicNavGraph: TopicNavGraph,
     webViewNavGraph: WebViewNavGraph,
     feedNavGraph: FeedNavGraph,
 ) {
@@ -43,15 +40,6 @@ internal fun MainScreen(
         navController = navigator.navController,
         startDestination = navigator.startDestination,
     ) {
-        topicNavGraph.buildNavGraph(
-            navGraphBuilder = this,
-            navInfo = TopicNavGraphInfo(
-                onClickNews = { navigator.navigateWebView(it) },
-                onClickScrapPage = { navigator.navigateScrap() },
-                onShowErrorSnackbar = onShowErrorSnackbar,
-            )
-        )
-
         scrapNavGraph.buildNavGraph(
             navGraphBuilder = this,
             navInfo = ScrapNavGraphInfo(
