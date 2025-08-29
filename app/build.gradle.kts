@@ -44,13 +44,13 @@ dependencies {
     implementation(projects.feature.main)
     implementation(projects.feature.mainNavGraph)
     implementation(projects.feature.scrap)
-    implementation(projects.feature.topic)
     implementation(projects.feature.webview)
     implementation(projects.feature.feed)
 
-    implementation(projects.core.repo.scrap.impl)
-    implementation(projects.core.repo.search.impl)
-    implementation(projects.core.repo.article)
+    implementation(projects.data.core)
+    implementation(projects.data.article)
+    implementation(projects.data.scrap)
+    implementation(projects.data.search)
 
     implementation(libs.androidx.appcompat)
     implementation(platform(libs.firebase.bom))

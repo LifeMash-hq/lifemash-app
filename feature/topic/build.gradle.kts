@@ -9,7 +9,6 @@ android {
 dependencies {
     implementation(projects.feature.topicApi)
     implementation(projects.feature.mainNavGraph)
-    implementation(projects.core.repo.scrap.api)
     implementation(projects.core.repo.search.api)
     // jsoup
     implementation(libs.jsoup)

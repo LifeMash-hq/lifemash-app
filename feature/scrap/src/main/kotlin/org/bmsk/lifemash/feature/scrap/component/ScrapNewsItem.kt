@@ -34,15 +34,14 @@ import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.NetworkImage
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
-import org.bmsk.lifemash.core.model.DateParser
-import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.feature.scrap.R
+import org.bmsk.lifemash.feature.scrap.ScrapUiModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ScrapNewsItem(
     modifier: Modifier = Modifier,
-    newsModel: NewsModel,
+    scrap: ScrapUiModel,
     state: ScrapNewsItemState,
     onClick: () -> Unit,
     onClickDelete: () -> Unit,
@@ -65,7 +64,7 @@ internal fun ScrapNewsItem(
                 modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(1 / 1f),
-                imageUrl = newsModel.imageUrl,
+                imageUrl = scrap.imageUrl,
             )
             Column(
                 modifier = Modifier
@@ -75,7 +74,7 @@ internal fun ScrapNewsItem(
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = newsModel.title,
+                    text = scrap.title,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
@@ -86,7 +85,7 @@ internal fun ScrapNewsItem(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = DateParser.formatDate(newsModel.pubDate),
+                        text = scrap.publishedAtRelative,
                     )
                 }
             }
@@ -142,20 +141,22 @@ internal fun rememberScrapNewsItemState(initialIsLongClicked: Boolean = false): 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 private fun ScrapNewsItemPreview() {
-    val fakeNews =
-        NewsModel(
+    val fakeScrap =
+        ScrapUiModel(
+            id = "1",
             title =
                 "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews" +
                         "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
+            publisher = "Publisher",
+            publishedAtRelative = "3 hours ago",
             link = "",
-            pubDate = DateParser.parseDate("Wed, 21 Jun 2023 12:34:56 GMT"),
             imageUrl = "",
         )
 
     LifeMashTheme {
         ScrapNewsItem(
             modifier = Modifier,
-            newsModel = fakeNews,
+            scrap = fakeScrap,
             state = rememberScrapNewsItemState(),
             onClick = {},
             onClickDelete = {},

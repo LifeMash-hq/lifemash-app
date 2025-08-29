@@ -22,25 +22,30 @@ rootProject.name = "LifeMash"
 include(
     ":app",
 
+    ":domain:core",
+    ":domain:feature-feed",
+    ":domain:feature-scrap",
+
+    ":domain:feature-search",
+
+    ":data:core",
+    ":data:article",
+    ":data:scrap",
+
+    ":data:search",
+
     ":core:designsystem",
     ":core:model",
     ":core:network",
     ":core:common-ui",
 
-    ":core:repo:article",
-    ":core:repo:article-api",
-    ":core:repo:scrap:api",
-    ":core:repo:scrap:impl",
-    ":core:repo:search:api",
-    ":core:repo:search:impl",
+    
 
     ":feature:main-nav-graph",
 
     ":feature:main",
     ":feature:feed",
     ":feature:feed-api",
-    ":feature:topic",
-    ":feature:topic-api",
 
     ":feature:all",
 
@@ -49,4 +54,7 @@ include(
 
     ":feature:webview-api",
     ":feature:webview",
+
+    //    ":feature:topic",
+    //    ":feature:topic-api",
 )

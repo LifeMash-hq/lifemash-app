@@ -31,8 +31,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
-import org.bmsk.lifemash.core.model.DateParser
-import org.bmsk.lifemash.core.model.NewsModel
 import org.bmsk.lifemash.feature.scrap.component.ScrapNewsItem
 import org.bmsk.lifemash.feature.scrap.component.rememberScrapNewsItemState
 
@@ -40,7 +38,7 @@ import org.bmsk.lifemash.feature.scrap.component.rememberScrapNewsItemState
 internal fun ScrapNewsScreen(
     scrapUiState: ScrapUiState,
     onClickNews: (url: String) -> Unit,
-    deleteScrapNews: (NewsModel) -> Unit,
+    deleteScrapNews: (ScrapUiModel) -> Unit,
 ) {
     when (scrapUiState) {
         is ScrapUiState.NewsLoading -> ScrapNewsLoadingScreen()
@@ -68,8 +66,8 @@ internal fun ScrapNewsLoadingScreen() {
 @Composable
 internal fun ScrapNewsLoadedScreen(
     onClickNews: (url: String) -> Unit,
-    scrapNewsList: PersistentList<NewsModel>,
-    deleteScrapNews: (NewsModel) -> Unit,
+    scrapNewsList: PersistentList<ScrapUiModel>,
+    deleteScrapNews: (ScrapUiModel) -> Unit,
 ) {
     val scrapNewsItemState = rememberScrapNewsItemState()
 
@@ -114,12 +112,12 @@ internal fun ScrapNewsLoadedScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = 36.dp)
         ) {
-            items(scrapNewsList) { news ->
+            items(scrapNewsList) { scrap ->
                 ScrapNewsItem(
-                    newsModel = news,
+                    scrap = scrap,
                     state = scrapNewsItemState,
-                    onClick = { onClickNews(news.link) },
-                    onClickDelete = { deleteScrapNews(news) },
+                    onClick = { onClickNews(scrap.link) },
+                    onClickDelete = { deleteScrapNews(scrap) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
@@ -200,21 +198,25 @@ private class ScrapUiStateProvider : PreviewParameterProvider<ScrapUiState> {
         ScrapUiState.NewsLoading,
         ScrapUiState.NewsLoaded(
             persistentListOf(
-                NewsModel(
+                ScrapUiModel(
+                    id = "1",
                     title = "프리뷰 뉴스 제목",
+                    publisher = "Publisher",
+                    publishedAtRelative = "1 day ago",
                     link = "",
-                    pubDate = DateParser.parseDate("Tue, 20 Jun 2023 02:57:43 GMT"),
                     imageUrl = ""
                 ),
-                NewsModel(
+                ScrapUiModel(
+                    id = "2",
                     title = "또 다른 뉴스 제목",
+                    publisher = "Publisher 2",
+                    publishedAtRelative = "2 days ago",
                     link = "",
-                    pubDate = DateParser.parseDate("Tue, 21 Jun 2023 02:57:43 GMT"),
                     imageUrl = ""
                 )
             )
         ),
-        ScrapUiState.NewsEmpty, // 만약 Empty 상태도 있다면
+        ScrapUiState.NewsEmpty,
         ScrapUiState.Error(Throwable("프리뷰용 에러")),
     )
 }
