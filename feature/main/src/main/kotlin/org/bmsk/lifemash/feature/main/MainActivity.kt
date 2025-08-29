@@ -12,8 +12,6 @@ import org.bmsk.lifemash.feature.feed.api.FeedNavController
 import org.bmsk.lifemash.feature.feed.api.FeedNavGraph
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavController
 import org.bmsk.lifemash.feature.scrap.api.ScrapNavGraph
-import org.bmsk.lifemash.feature.topic.api.TopicNavController
-import org.bmsk.lifemash.feature.topic.api.TopicNavGraph
 import org.bmsk.lifemash.feature.topic.api.WebViewNavController
 import org.bmsk.lifemash.feature.topic.api.WebViewNavGraph
 import javax.inject.Inject
@@ -31,12 +29,6 @@ internal class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var scrapNavController: ScrapNavController
-
-    @Inject
-    lateinit var topicNavGraph: TopicNavGraph
-
-    @Inject
-    lateinit var topicNavController: TopicNavController
 
     @Inject
     lateinit var webViewNavGraph: WebViewNavGraph
@@ -58,7 +50,6 @@ internal class MainActivity : AppCompatActivity() {
             LifeMashTheme {
                 val navigator = rememberMainNavigator(
                     scrapNavController = scrapNavController,
-                    topicNavController = topicNavController,
                     webViewNavController = webViewNavController,
                     feedNavController = feedNavController,
                 )
@@ -66,7 +57,6 @@ internal class MainActivity : AppCompatActivity() {
                 MainScreen(
                     navigator = navigator,
                     scrapNavGraph = scrapNavGraph,
-                    topicNavGraph = topicNavGraph,
                     webViewNavGraph = webViewNavGraph,
                     feedNavGraph = feedNavGraph,
                 )
