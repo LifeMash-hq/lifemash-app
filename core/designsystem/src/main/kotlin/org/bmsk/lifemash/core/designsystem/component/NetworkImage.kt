@@ -6,10 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil.CoilImage
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
+import coil3.compose.AsyncImage
 
 @Composable
 fun NetworkImage(
@@ -19,18 +16,14 @@ fun NetworkImage(
     contentScale: ContentScale = ContentScale.Crop,
     contentDescription: String? = null,
 ) {
-    CoilImage(
-        imageModel = { imageUrl },
+    AsyncImage(
+        model = imageUrl,
+        contentDescription = contentDescription,
         modifier = modifier,
-        component = rememberImageComponent {
-            +PlaceholderPlugin.Loading(placeholder)
-            +PlaceholderPlugin.Failure(placeholder)
-        },
-        imageOptions = ImageOptions(
-            contentScale = contentScale,
-            alignment = Alignment.Center,
-            contentDescription = contentDescription,
-        ),
+        contentScale = contentScale,
+        alignment = Alignment.Center,
+        placeholder = placeholder,
+        error = placeholder,
     )
 }
 

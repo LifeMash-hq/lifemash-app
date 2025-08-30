@@ -12,6 +12,16 @@ configureKotlinAndroid()
 configureHiltAndroid()
 configureKotestAndroid()
 
+android {
+    namespace = "org.bmsk.lifemash"
+
+    defaultConfig {
+        applicationId = "org.bmsk.lifemash"
+        versionCode = 1
+        versionName = "1.3.0"
+    }
+}
+
 dependencies {
     val libs = project.extensions.libs
     implementation(libs.findLibrary("androidx.compose.navigation").get())

@@ -8,8 +8,9 @@ android {
 
 dependencies {
     implementation(projects.feature.scrapApi)
+    implementation(projects.domain.featureScrap)
+    implementation(projects.domain.core)
     implementation(projects.feature.mainNavGraph)
-    implementation(projects.core.repo.scrap.api)
 
     implementation(libs.kotlinx.immutable)
 }
