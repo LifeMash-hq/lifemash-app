@@ -8,7 +8,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 
-
 @Composable
 fun NetworkImage(
     imageUrl: String?,
