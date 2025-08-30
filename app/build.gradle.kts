@@ -13,6 +13,9 @@ dependencies {
     implementation(projects.feature.webview)
     implementation(projects.feature.feed)
 
+    implementation(projects.domain.featureFeed)
+    implementation(projects.domain.featureScrap)
+
     implementation(projects.data.core)
     implementation(projects.data.article)
     implementation(projects.data.scrap)

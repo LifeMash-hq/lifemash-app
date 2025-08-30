@@ -19,5 +19,9 @@ gradlePlugin {
             id = "lifemash.kotlin.hilt"
             implementationClass = "org.bmsk.lifemash.HiltKotlinPlugin"
         }
+        register("dagger") {
+            id = "lifemash.dagger"
+            implementationClass = "org.bmsk.lifemash.DaggerPlugin"
+        }
     }
 }
