@@ -1,5 +1,5 @@
 plugins {
-    id("lifemash.kotlin.domain")
+    id("lifemash.kotlin.library")
     id("kotlinx-serialization")
 }
 
