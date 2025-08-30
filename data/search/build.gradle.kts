@@ -1,6 +1,5 @@
 plugins {
-    id("lifemash.android.library")
-    id("lifemash.android.hilt")
+    id("lifemash.android.data")
 }
 
 android {
@@ -8,9 +7,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.data.core)
     implementation(projects.core.model)
     implementation(projects.core.network)
     implementation(projects.domain.featureSearch)
-    implementation(projects.domain.core)
 }
