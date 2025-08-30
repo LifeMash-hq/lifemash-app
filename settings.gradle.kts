@@ -15,46 +15,39 @@ dependencyResolutionManagement {
     }
 }
 
-gradle.startParameter.excludedTaskNames.addAll(listOf(":buildSrc:testClasses"))
 gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:testClasses"))
 
 rootProject.name = "LifeMash"
-include(
-    ":app",
+include(":app")
 
+include(
     ":domain:core",
     ":domain:feature-feed",
     ":domain:feature-scrap",
-
     ":domain:feature-search",
+)
 
+include(
     ":data:core",
     ":data:article",
     ":data:scrap",
-
     ":data:search",
+)
 
+include(
     ":core:designsystem",
     ":core:model",
     ":core:network",
-    ":core:common-ui",
+)
 
-    
-
+include(
     ":feature:main-nav-graph",
-
     ":feature:main",
     ":feature:feed",
     ":feature:feed-api",
-
     ":feature:all",
-
     ":feature:scrap-api",
     ":feature:scrap",
-
     ":feature:webview-api",
     ":feature:webview",
-
-    //    ":feature:topic",
-    //    ":feature:topic-api",
 )
