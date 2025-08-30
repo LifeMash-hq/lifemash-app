@@ -6,8 +6,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import org.bmsk.lifemash.core.model.section.LifeMashCategory
-import org.bmsk.lifemash.core.network.response.LifeMashArticleCategory
 import org.bmsk.lifemash.core.network.response.LegacyLifeMashArticleResponse
+import org.bmsk.lifemash.core.network.response.LifeMashArticleCategory
 import org.bmsk.lifemash.core.network.response.LifeMashArticleResponse
 import javax.inject.Inject
 

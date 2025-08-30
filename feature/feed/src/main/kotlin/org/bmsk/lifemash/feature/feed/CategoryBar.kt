@@ -41,7 +41,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
-import org.bmsk.lifemash.core.repo.article.api.ArticleCategory
+import org.bmsk.lifemash.domain.core.model.ArticleCategory
 
 @Composable
 internal fun CategoryBar(
