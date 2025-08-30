@@ -1,7 +1,5 @@
 plugins {
-    id("lifemash.android.library")
-    id("lifemash.android.hilt")
-    id("kotlinx-serialization")
+    id("lifemash.android.data")
     id("com.google.devtools.ksp")
 }
 
@@ -10,9 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.data.core)
     implementation(projects.domain.featureScrap)
-    implementation(projects.domain.core) // For ArticleId
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
