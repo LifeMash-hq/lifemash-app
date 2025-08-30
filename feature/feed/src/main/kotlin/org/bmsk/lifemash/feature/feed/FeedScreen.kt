@@ -54,7 +54,7 @@ import coil3.compose.rememberAsyncImagePainter
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import org.bmsk.lifemash.core.designsystem.component.HSpacer
+import org.bmsk.lifemash.core.designsystem.component.SpacerH
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
 import java.time.Instant
@@ -102,7 +102,7 @@ internal fun FeedScreen(
                     }
                 }
 
-                item { HSpacer(80.dp) }
+                item { SpacerH(80.dp) }
             }
 
             // Floating gradient bar hint
