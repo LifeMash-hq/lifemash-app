@@ -16,7 +16,6 @@ configureHiltAndroid()
 
 dependencies {
     implementation(project(":core:designsystem"))
-    implementation(project(":core:common-ui"))
     implementation(project(":core:model"))
 
     val libs = project.extensions.libs
