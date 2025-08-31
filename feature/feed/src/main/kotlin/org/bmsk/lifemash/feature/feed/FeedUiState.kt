@@ -27,6 +27,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentList
 import org.bmsk.lifemash.domain.core.model.Article
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
+import org.bmsk.lifemash.domain.core.model.ArticleId
 import java.net.URI
 import java.time.Instant
 import java.time.ZoneId
@@ -41,8 +42,8 @@ internal sealed interface LoadState {
 
 internal data class FeedUiState(
     val selectedCategory: ArticleCategory,
-    val articlesById: PersistentMap<String, ArticleUi>,
-    val idsByCategory: PersistentMap<ArticleCategory, PersistentList<String>>,
+    val articlesById: PersistentMap<ArticleId, ArticleUi>,
+    val idsByCategory: PersistentMap<ArticleCategory, PersistentList<ArticleId>>,
     val loadStateByCategory: PersistentMap<ArticleCategory, LoadState>,
     val visibleArticles: PersistentList<ArticleUi> = persistentListOf(),
     val isSearchMode: Boolean = false,
@@ -61,7 +62,7 @@ internal data class FeedUiState(
 }
 
 internal data class ArticleUi(
-    val id: String,
+    val id: ArticleId,
     val publisher: String,
     val title: String,
     val summary: String,
@@ -79,7 +80,7 @@ internal data class ArticleUi(
 
         fun from(article: Article, isScrapped: Boolean): ArticleUi {
             return ArticleUi(
-                id = article.id.value,
+                id = article.id,
                 publisher = article.publisher.name,
                 title = article.title,
                 summary = article.summary,
