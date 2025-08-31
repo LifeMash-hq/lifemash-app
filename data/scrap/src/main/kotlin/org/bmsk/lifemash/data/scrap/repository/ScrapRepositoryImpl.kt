@@ -1,6 +1,8 @@
 package org.bmsk.lifemash.data.scrap.repository
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.bmsk.lifemash.data.scrap.dao.ScrapNewsDao
 import org.bmsk.lifemash.data.scrap.model.fromDomain
@@ -14,9 +16,9 @@ internal class ScrapRepositoryImpl @Inject constructor(
     private val scrapNewsDao: ScrapNewsDao
 ) : ScrapRepository {
 
-    override suspend fun getScrappedArticles(): List<Article> {
-        return withContext(Dispatchers.IO) {
-            scrapNewsDao.getAllNews().map { it.toDomain() }
+    override fun getScrappedArticles(): Flow<List<Article>> {
+        return scrapNewsDao.getAllNews().map { entities ->
+            entities.map { it.toDomain() }
         }
     }
 
