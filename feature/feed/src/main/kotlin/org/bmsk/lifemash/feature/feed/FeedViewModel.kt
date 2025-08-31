@@ -1,6 +1,5 @@
 package org.bmsk.lifemash.feature.feed
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,19 +31,40 @@ internal class FeedViewModel @Inject constructor(
     private val deleteScrappedArticleUseCase: DeleteScrappedArticleUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(FeedUiState.Initial)
+    // region State
+
+    /**
+     * ViewModel의 내부 상태를 관리하는 private MutableStateFlow입니다.
+     * 주로 기사 목록, 카테고리별 로드 상태 등 UI와 직접 관련 없는 데이터를 다룹니다.
+     */
+    private val _internalState = MutableStateFlow(FeedUiState.Initial)
+
+    /**
+     * 스크랩 추가/삭제 시 UseCase에 전달할 원본 Article 도메인 모델을 저장하는 Map입니다.
+     * UI 모델인 ArticleUi만으로는 도메인 로직을 처리할 수 없기 때문에 필요합니다.
+     */
     private val originalArticles = mutableMapOf<ArticleId, Article>()
 
+    /**
+     * 스크랩된 모든 기사의 ID를 실시간으로 관찰하는 StateFlow입니다.
+     * 데이터베이스가 변경되면 이 Flow가 새로운 ID Set을 발행합니다.
+     */
     private val scrappedArticleIds: StateFlow<Set<ArticleId>> = getScrappedArticleIdsUseCase()
-        .onEach { Log.e("FeedViewModel", "scrappedArticleIds: $it") }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptySet()
         )
 
+    /**
+     * UI에 최종적으로 노출되는 StateFlow입니다.
+     * ViewModel의 내부 상태(_internalState)와 스크랩된 기사 ID 목록(scrappedArticleIds)을
+     * 결합(combine)하여 최종 UI 상태를 생성합니다.
+     *
+     * 스크랩 상태가 변경되면, 이 Flow가 자동으로 새로운 UI 상태를 발행하여 UI를 업데이트합니다.
+     */
     val uiState: StateFlow<FeedUiState> = combine(
-        _uiState,
+        _internalState,
         scrappedArticleIds
     ) { state, scrappedIds ->
         val updatedArticlesById = state.articlesById
@@ -59,34 +78,21 @@ internal class FeedViewModel @Inject constructor(
         val newState = state.copy(articlesById = updatedArticlesById)
         newState.copy(visibleArticles = recalculateVisibleArticles(newState))
     }
-        .onEach { s ->
-            val idsInState = s.articlesById.keys
-            val inter = idsInState.intersect(scrappedArticleIds.value)
-            Log.e("FeedViewModel", "idsInState=${idsInState.size}, scrapped=${scrappedArticleIds.value.size}, inter=${inter.size}")
-
-            // 샘플 몇 개 비교해서 차이 확인
-            idsInState.take(5).forEach { id ->
-                val hit = scrappedArticleIds.value.contains(id)
-                if (!hit) {
-                    Log.e("FeedViewModel", "mismatch sample: stateId=${id.value}")
-                }
-            }
-        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = FeedUiState.Initial
         )
 
+    /**
+     * 특정 카테고리의 기사를 가져옵니다.
+     * UseCase를 통해 기사를 가져온 후, 스크랩 상태를 반영하여 UI 모델로 변환하고 내부 상태를 업데이트합니다.
+     */
     fun getArticles(category: ArticleCategory) {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    loadStateByCategory = it.loadStateByCategory.put(
-                        category,
-                        LoadState.Loading
-                    )
-                )
+            _internalState.update { currentState ->
+                val loadStateByCategory = currentState.loadStateByCategory.put(category, LoadState.Loading)
+                currentState.copy(loadStateByCategory = loadStateByCategory)
             }
 
             runCatching {
@@ -98,7 +104,7 @@ internal class FeedViewModel @Inject constructor(
                     .map { ArticleUi.from(it, isScrapped = it.id in scrappedArticleIds.value) }
                     .toPersistentList()
 
-                _uiState.update { currentState ->
+                _internalState.update { currentState ->
                     val mergedArticlesById = currentState
                         .articlesById
                         .putAll(
@@ -118,7 +124,7 @@ internal class FeedViewModel @Inject constructor(
                     )
                 }
             }.onFailure { throwable ->
-                _uiState.update {
+                _internalState.update {
                     it.copy(
                         loadStateByCategory = it.loadStateByCategory.put(
                             category,
@@ -130,6 +136,10 @@ internal class FeedViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 사용자가 스크랩 버튼을 클릭했을 때 호출됩니다.
+     * 기사의 현재 스크랩 상태에 따라 add 또는 delete UseCase를 실행합니다.
+     */
     fun scrapArticle(article: ArticleUi) {
         val originalArticle = originalArticles[article.id] ?: return
 
@@ -143,20 +153,20 @@ internal class FeedViewModel @Inject constructor(
     }
 
     fun setQueryText(queryText: String) {
-        _uiState.update { it.copy(queryText = queryText) }
+        _internalState.update { it.copy(queryText = queryText) }
     }
 
     fun setSearchMode(isSearchMode: Boolean) {
-        _uiState.update { it.copy(isSearchMode = isSearchMode) }
+        _internalState.update { it.copy(isSearchMode = isSearchMode) }
     }
 
     fun setCategory(category: ArticleCategory) {
-        _uiState.update { currentState ->
-            val newState = currentState.copy(selectedCategory = category)
-            newState.copy(visibleArticles = recalculateVisibleArticles(newState))
-        }
+        _internalState.update { it.copy(selectedCategory = category) }
     }
 
+    /**
+     * 현재 선택된 카테고리에 따라 화면에 표시될 기사 목록을 계산
+     */
     private fun recalculateVisibleArticles(state: FeedUiState): PersistentList<ArticleUi> {
         val articles = if (state.selectedCategory == ArticleCategory.ALL) {
             ArticleCategory.entries.asSequence()
