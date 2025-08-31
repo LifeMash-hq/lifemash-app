@@ -2,6 +2,10 @@ package org.bmsk.lifemash.feature.scrap
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -17,47 +21,68 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ScrapViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
-    fun before() {
+    fun setUp() {
         Dispatchers.setMain(testDispatcher)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @AfterEach
-    fun after() {
+    fun tearDown() {
         Dispatchers.resetMain()
     }
 
     @Test
-    fun `뉴스가 비어있으면 NewsEmpty`() = runTest {
-        // Given: 빈 뉴스 리스트를 반환하는 Fake UseCase 세팅
-        val fakeGet = object : GetScrappedArticlesUseCase {
-            override suspend fun invoke(): List<Article> = emptyList()
+    @DisplayName("Given UseCase가 빈 목록을 반환할 때, When ViewModel이 초기화되면, Then uiState는 초기에 NewsLoading 상태를 가진다")
+    fun `Given empty list from UseCase, When ViewModel is initialized, Then uiState is initially NewsLoading`() = runTest {
+        // Given
+        val getScrappedArticlesUseCase = object : GetScrappedArticlesUseCase {
+            override fun invoke() = flowOf(emptyList<Article>())
         }
-        val fakeDelete = object : DeleteScrappedArticleUseCase {
+        val deleteScrappedArticleUseCase = object : DeleteScrappedArticleUseCase {
             override suspend fun invoke(articleId: ArticleId) = Unit
         }
-        val viewModel = ScrapViewModel(fakeGet, fakeDelete)
 
-        // When: 뉴스 조회 호출
-        viewModel.getScrapNews()
-        testDispatcher.scheduler.advanceUntilIdle()
+        // When
+        val viewModel = ScrapViewModel(getScrappedArticlesUseCase, deleteScrappedArticleUseCase)
 
-        // Then: UI 상태가 NewsEmpty 인지 검증
-        assertTrue(viewModel.uiState.value is ScrapUiState.NewsEmpty)
+        // Then
+        assertEquals(ScrapUiState.NewsLoading, viewModel.uiState.value)
     }
 
     @Test
-    fun `뉴스가 있으면 NewsLoaded`() = runTest {
-        // Given: 뉴스 1개를 반환하는 Fake UseCase 세팅
+    @DisplayName("Given UseCase가 빈 목록을 반환할 때, When ViewModel이 초기화되면, Then uiState는 NewsEmpty가 된다")
+    fun `Given empty list from UseCase, When ViewModel is initialized, Then uiState becomes NewsEmpty`() = runTest {
+        // Given
+        val getScrappedArticlesUseCase = object : GetScrappedArticlesUseCase {
+            override fun invoke() = flowOf(emptyList<Article>())
+        }
+        val deleteScrappedArticleUseCase = object : DeleteScrappedArticleUseCase {
+            override suspend fun invoke(articleId: ArticleId) = Unit
+        }
+        val viewModel = ScrapViewModel(getScrappedArticlesUseCase, deleteScrappedArticleUseCase)
+
+        // When
+        val emissions = viewModel.uiState.take(2).toList(mutableListOf())
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then
+        assertEquals(ScrapUiState.NewsLoading, emissions[0])
+        assertTrue(emissions[1] is ScrapUiState.NewsEmpty)
+    }
+
+    @Test
+    @DisplayName("Given UseCase가 뉴스 목록을 반환할 때, When ViewModel이 초기화되면, Then uiState는 NewsLoaded가 된다")
+    fun `Given a news list from UseCase, When ViewModel is initialized, Then uiState becomes NewsLoaded`() = runTest {
+        // Given
         val newsList = listOf(
             Article(
                 id = ArticleId("1"),
@@ -70,79 +95,76 @@ class ScrapViewModelTest {
                 categories = listOf(ArticleCategory.CARTOON)
             )
         )
-        val fakeGet = object : GetScrappedArticlesUseCase {
-            override suspend fun invoke(): List<Article> = newsList
+        val getScrappedArticlesUseCase = object : GetScrappedArticlesUseCase {
+            override fun invoke() = flowOf(newsList)
         }
-        val fakeDelete = object : DeleteScrappedArticleUseCase {
+        val deleteScrappedArticleUseCase = object : DeleteScrappedArticleUseCase {
             override suspend fun invoke(articleId: ArticleId) = Unit
         }
-        val viewModel = ScrapViewModel(fakeGet, fakeDelete)
+        val viewModel = ScrapViewModel(getScrappedArticlesUseCase, deleteScrappedArticleUseCase)
 
-        // When: 뉴스 조회 호출
-        viewModel.getScrapNews()
+        // When
+        val emissions = viewModel.uiState.take(2).toList(mutableListOf())
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // Then: UI 상태가 NewsLoaded이고, 내용이 맞는지 검증
-        val uiState = viewModel.uiState.value
-        assertTrue(uiState is ScrapUiState.NewsLoaded)
-        val loaded = uiState as ScrapUiState.NewsLoaded
-        assertTrue(loaded.scraps.size == 1)
-        assertEquals("title", loaded.scraps.first().title)
+        // Then
+        assertEquals(ScrapUiState.NewsLoading, emissions[0])
+        val loadedState = emissions[1] as ScrapUiState.NewsLoaded
+        assertEquals(1, loadedState.scraps.size)
+        assertEquals("title", loadedState.scraps.first().title)
     }
 
     @Test
-    fun `뉴스 조회 중 예외 발생하면 Error`() = runTest {
-        // Given: 예외를 발생시키는 Fake UseCase 세팅
-        val error = RuntimeException("DB Error")
-        val fakeGet = object : GetScrappedArticlesUseCase {
-            override suspend fun invoke(): List<Article> = throw error
+    @DisplayName("Given UseCase가 예외를 발생시킬 때, When ViewModel이 초기화되면, Then uiState는 Error가 된다")
+    fun `Given an exception from UseCase, When ViewModel is initialized, Then uiState becomes Error`() = runTest {
+        // Given
+        val exception = RuntimeException("Test exception")
+        val getScrappedArticlesUseCase = object : GetScrappedArticlesUseCase {
+            override fun invoke() = flow<List<Article>> { throw exception }
         }
-        val fakeDelete = object : DeleteScrappedArticleUseCase {
+        val deleteScrappedArticleUseCase = object : DeleteScrappedArticleUseCase {
             override suspend fun invoke(articleId: ArticleId) = Unit
         }
-        val viewModel = ScrapViewModel(fakeGet, fakeDelete)
+        val viewModel = ScrapViewModel(getScrappedArticlesUseCase, deleteScrappedArticleUseCase)
 
-        // When: 뉴스 조회 호출
-        viewModel.getScrapNews()
+        // When
+        val emissions = viewModel.uiState.take(2).toList(mutableListOf())
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // Then: UI 상태가 Error이고, 예외가 맞는지 검증
-        val uiState = viewModel.uiState.value
-        assertTrue(uiState is ScrapUiState.Error)
-        val err = uiState as ScrapUiState.Error
-        assertEquals(error, err.throwable)
+        // Then
+        assertEquals(ScrapUiState.NewsLoading, emissions[0])
+        val errorState = emissions[1] as ScrapUiState.Error
+        assertEquals(exception, errorState.throwable)
     }
 
     @Test
-    fun `뉴스 삭제 중 예외 발생하면 Error`() = runTest {
-        // Given: 삭제에서 예외를 발생시키는 Fake UseCase 세팅
-        val news = ScrapUiModel(
+    @DisplayName("Given 특정 뉴스가 있을 때, When 뉴스 삭제를 호출하면, Then deleteScrappedArticleUseCase가 호출된다")
+    fun `Given a news, When deleteScrapNews is called, Then deleteScrappedArticleUseCase is called`() = runTest {
+        // Given
+        val scrap = ScrapUiModel(
             id = "1",
             title = "title",
-            publisher = "라이프매쉬",
-            publishedAtRelative = "조금 전",
+            publisher = "publisher",
+            publishedAtRelative = "1 day ago",
             link = "link",
             imageUrl = null
         )
-        val error = IllegalStateException("삭제 실패")
-        val fakeGet = object : GetScrappedArticlesUseCase {
-            override suspend fun invoke(): List<Article> = emptyList()
+        val getScrappedArticlesUseCase = object : GetScrappedArticlesUseCase {
+            override fun invoke() = flowOf(emptyList<Article>())
         }
-        val fakeDelete = object : DeleteScrappedArticleUseCase {
+        var wasCalled = false
+        val deleteScrappedArticleUseCase = object : DeleteScrappedArticleUseCase {
             override suspend fun invoke(articleId: ArticleId) {
-                throw error
+                wasCalled = true
             }
         }
-        val viewModel = ScrapViewModel(fakeGet, fakeDelete)
+        val viewModel = ScrapViewModel(getScrappedArticlesUseCase, deleteScrappedArticleUseCase)
 
-        // When: 뉴스 삭제 호출
-        viewModel.deleteScrapNews(news)
+        // When
+        viewModel.deleteScrapNews(scrap)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // Then: UI 상태가 Error이고, 예외가 맞는지 검증
-        val uiState = viewModel.uiState.value
-        assertTrue(uiState is ScrapUiState.Error)
-        val err = uiState as ScrapUiState.Error
-        assertEquals(error, err.throwable)
+        // Then
+        assertTrue(wasCalled)
     }
 }

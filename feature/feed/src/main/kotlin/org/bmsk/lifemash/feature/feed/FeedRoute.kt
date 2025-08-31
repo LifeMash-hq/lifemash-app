@@ -28,6 +28,7 @@ internal object FeedRoute {
             isSearchMode = uiState.isSearchMode,
             queryText = uiState.queryText,
             onArticleOpen = { onArticleOpen(it.link) },
+            onScrapClick = viewModel::scrapArticle,
             onQueryTextChange = viewModel::setQueryText,
             onQueryTextClear = { viewModel.setQueryText("") },
             onSearchModeChange = viewModel::setSearchMode,

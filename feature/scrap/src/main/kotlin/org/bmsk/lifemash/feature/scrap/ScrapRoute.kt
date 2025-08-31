@@ -1,7 +1,6 @@
 package org.bmsk.lifemash.feature.scrap
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,16 +16,6 @@ internal object ScrapRoute {
     ) {
         val scrapUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        LaunchedEffect(scrapUiState) {
-            when (scrapUiState) {
-                is ScrapUiState.Error -> Unit
-                ScrapUiState.NewsEmpty -> Unit
-                is ScrapUiState.NewsLoaded -> Unit
-                ScrapUiState.NewsLoading -> {
-                    viewModel.getScrapNews()
-                }
-            }
-        }
         ScrapNewsScreen(
             scrapUiState = scrapUiState,
             onClickNews = onClickNews,

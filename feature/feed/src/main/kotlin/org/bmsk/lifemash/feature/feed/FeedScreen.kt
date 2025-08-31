@@ -25,12 +25,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,9 +56,11 @@ import coil3.compose.rememberAsyncImagePainter
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import org.bmsk.lifemash.core.designsystem.component.ScrapButton
 import org.bmsk.lifemash.core.designsystem.component.SpacerH
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
+import org.bmsk.lifemash.domain.core.model.ArticleId
 import java.time.Instant
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -69,6 +73,7 @@ internal fun FeedScreen(
     isSearchMode: Boolean = false,
     queryText: String = "",
     onArticleOpen: (ArticleUi) -> Unit = {},
+    onScrapClick: (ArticleUi) -> Unit = {},
     onQueryTextChange: (String) -> Unit = {},
     onQueryTextClear: () -> Unit = {},
     onSearchModeChange: (Boolean) -> Unit = {},
@@ -80,10 +85,10 @@ internal fun FeedScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets.systemBars,
-    ) {
+    ) { paddingValues ->
         Box(
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .fillMaxSize()
         ) {
             LazyColumn(
@@ -96,9 +101,13 @@ internal fun FeedScreen(
                 } else {
                     items(
                         items = articles,
-                        key = { it.id }
+                        key = { it.id.value }
                     ) { article ->
-                        ArticleCard(article, onArticleOpen)
+                        ArticleCard(
+                            article = article,
+                            onOpen = onArticleOpen,
+                            onScrapClick = { onScrapClick(article) }
+                        )
                     }
                 }
 
@@ -130,10 +139,12 @@ internal fun FeedScreen(
 @Composable
 internal fun ArticleCard(
     article: ArticleUi,
-    onOpen: (ArticleUi) -> Unit
+    onOpen: (ArticleUi) -> Unit,
+    onScrapClick: () -> Unit,
 ) {
     val mainCat = article.categories.firstOrNull() ?: ArticleCategory.ALL
     val style = remember(mainCat) { mainCat.style }
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
 
     Card(
         onClick = { onOpen(article) },
@@ -143,50 +154,77 @@ internal fun ArticleCard(
             .shadow(1.dp, RoundedCornerShape(22.dp)),
         shape = RoundedCornerShape(22.dp)
     ) {
-        Column(Modifier.fillMaxWidth()) {
-            ArticleImage(url = article.image)
-            Column(Modifier.padding(14.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        style.icon,
-                        contentDescription = null,
-                        tint = style.color,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
+        Box(Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth()) {
+                // 이미지
+                ArticleImage(url = article.image)
+                // 본문
+                Column(Modifier.padding(14.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            style.icon,
+                            contentDescription = null,
+                            tint = style.color,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            article.publisher,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = style.color
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "· ${article.host}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            article.publishedAtRelative,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                    Spacer(Modifier.height(6.dp))
                     Text(
-                        article.publisher,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = style.color
+                        article.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.height(4.dp))
                     Text(
-                        "· ${article.host}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline
+                        article.summary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 3,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        article.publishedAtRelative,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline
+                    Spacer(Modifier.height(8.dp))
+                }
+            }
+
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp),
+                shape = CircleShape,
+                // 라이트에선 좀 더 불투명, 다크에선 살짝 얇게
+                color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.55f else 0.72f),
+                tonalElevation = 2.dp // 살짝 떠 보이게
+            ) {
+                // IconButton의 터치타겟(48dp)을 보장해 주는 래퍼
+                Box(
+                    modifier = Modifier
+                        .size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ScrapButton(
+                        isScrapped = article.isScrapped,
+                        onClick = onScrapClick,
+                        modifier = Modifier.size(24.dp) // 아이콘 크기
                     )
                 }
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    article.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    article.summary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 3,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(Modifier.height(8.dp))
             }
         }
     }
@@ -271,46 +309,49 @@ private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi
     override val values = sequenceOf(
         listOf(
             ArticleUi(
-                id = "02f9f94fd7c7f804fd8f57e7cabebbf3a5272e7c",
+                id = ArticleId("02f9f94fd7c7f804fd8f57e7cabebbf3a5272e7c"),
                 publisher = "뉴시스",
                 title = "대구 수성구서 60㎝ 땅 꺼짐 사고…\"상수도관 누수 탓\"",
-                summary = "[대구=뉴시스]정재익 기자 = 대구 수성구의 한 주차장 진입로에서 땅 꺼짐 사고가 발생했다...",
+                summary = "[대구=뉴시스]정재익 기자 = 대구 수성구의 한 주차장 진입로에서 땅 꺼짐 사고가 발생했다…",
                 link = "https://www.newsis.com/view/NISX20250816_0003292356",
                 image = "https://image.newsis.com/2025/07/30/NISI20250730_0001906581_web.jpg?rnd=20250730132651",
                 publishedAtRelative = "2025-08-16 13:03",
                 publishedAtInstant = Instant.now(),
                 host = "www.newsis.com",
-                categories = persistentListOf(ArticleCategory.SOCIETY)
+                categories = persistentListOf(ArticleCategory.SOCIETY),
+                isScrapped = true
             ),
             ArticleUi(
-                id = "14d3e90c4710c203bd999c487c333ad00da89f81",
+                id = ArticleId("14d3e90c4710c203bd999c487c333ad00da89f81"),
                 publisher = "동아일보",
                 title = "장동혁, 특검 앞 1인 시위…\"정치특검 광기 도 넘어\"",
-                summary = "장동혁 국민의힘 당대표 후보는 16일 특검팀 사무실 앞에 나와 1인 시위를 진행하면서 \"정치특검의 광기가 도를 넘었다\"고 밝혔다...",
+                summary = "장동혁 국민의힘 당대표 후보는 16일 특검팀 사무실 앞에 나와 1인 시위를 진행하면서 \"정치특검의 광기가 도를 넘었다\"고 밝혔다…",
                 link = "https://www.donga.com/news/Politics/article/all/20250816/132196672/1",
                 image = "https://dimg.donga.com/i/150/150/90/wps/NEWS/IMAGE/2025/08/16/132196673.1.jpg",
                 publishedAtRelative = "2025-08-16 12:50",
                 publishedAtInstant = Instant.now().minusSeconds(60),
                 host = "www.donga.com",
-                categories = persistentListOf(ArticleCategory.ALL, ArticleCategory.POLITICS)
+                categories = persistentListOf(ArticleCategory.ALL, ArticleCategory.POLITICS),
+                isScrapped = false
             ),
             ArticleUi(
-                id = "263debf456846f254361214548a784e280fdc29b",
+                id = ArticleId("263debf456846f254361214548a784e280fdc29b"),
                 publisher = "동아일보",
-                title = "\"삼성전자 제쳤다…\"4대금융 상반기 급여 1억",
-                summary = "올해 상반기 우리나라 주요 시중은행 직원들의 평균 급여가 역대 최고 수준을 기록했다...",
+                title = "삼성전자 제쳤다…\"4대금융 상반기 급여 1억",
+                summary = "올해 상반기 우리나라 주요 시중은행 직원들의 평균 급여가 역대 최고 수준을 기록했다…",
                 link = "https://www.donga.com/news/Economy/article/all/20250816/132196667/1",
                 image = "https://dimg.donga.com/i/150/150/90/wps/NEWS/IMAGE/2025/08/16/132196668.1.jpg",
                 publishedAtRelative = "2025-08-16 12:44",
                 publishedAtInstant = Instant.now().minusSeconds(120),
                 host = "www.donga.com",
-                categories = persistentListOf(ArticleCategory.ECONOMY, ArticleCategory.ALL)
+                categories = persistentListOf(ArticleCategory.ECONOMY, ArticleCategory.ALL),
+                isScrapped = true
             ),
             ArticleUi(
-                id = "88a8bd2298442d107b38fafb8734f3a501fe735f",
+                id = ArticleId("88a8bd2298442d107b38fafb8734f3a501fe735f"),
                 publisher = "뉴시스",
                 title = "日, 한국 조사선 독도 주변 해양조사 활동에 강력 항의",
-                summary = "[서울=뉴시스]박지혁 기자 = 일본 정부가 한국 조사선이 독도 주변에서 해양조사 활동을 한 것을 두고 항의했다...",
+                summary = "[서울=뉴시스]박지혁 기자 = 일본 정부가 한국 조사선이 독도 주변에서 해양조사 활동을 한 것을 두고 항의했다…",
                 link = "https://www.newsis.com/view/NISX20250816_0003292350",
                 image = "https://image.newsis.com/2025/04/09/NISI20250409_0001812899_web.jpg?rnd=20250409092704",
                 publishedAtRelative = "2025-08-16 12:24",
@@ -319,19 +360,21 @@ private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi
                 categories = persistentListOf(
                     ArticleCategory.INTERNATIONAL,
                     ArticleCategory.POLITICS
-                )
+                ),
+                isScrapped = false
             ),
             ArticleUi(
-                id = "1e13ce051109b29bd8cd4b3f5d1a6d31f341651c",
+                id = ArticleId("1e13ce051109b29bd8cd4b3f5d1a6d31f341651c"),
                 publisher = "서울신문",
                 title = "[속보] 열흘 ‘황금연휴’ 무산…정부 \"10월 10일 임시공휴일 검토 안해\"",
-                summary = "오는 10월 10일 임시공휴일 지정 시 열흘간의 황금연휴가 가능해 기대감이 커지고 있는 가운데 정부가 '이를 검토하지 않는다'고 선을 그었다...",
+                summary = "오는 10월 10일 임시공휴일 지정 시 열흘간의 황금연휴가 가능해 기대감이 커지고 있는 가운데 정부가 '이를 검토하지 않는다'고 선을 그었다…",
                 link = "https://www.seoul.co.kr/news/newsView.php?id=20250816500031",
                 image = "https://img.seoul.co.kr/img/upload/2025/08/11/SSC_20250811070507_V.jpg",
                 publishedAtRelative = "2025-08-16 12:13",
                 publishedAtInstant = Instant.now().minusSeconds(240),
                 host = "www.seoul.co.kr",
-                categories = persistentListOf(ArticleCategory.SOCIETY)
+                categories = persistentListOf(ArticleCategory.SOCIETY),
+                isScrapped = true
             )
         )
     )
@@ -349,7 +392,13 @@ private fun Preview_ArticleList(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            articles.forEach { ArticleCard(article = it, onOpen = {}) }
+            articles.forEach {
+                ArticleCard(
+                    article = it,
+                    onOpen = {},
+                    onScrapClick = {}
+                )
+            }
         }
     }
 }
