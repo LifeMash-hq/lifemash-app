@@ -1,16 +1,17 @@
 package org.bmsk.lifemash.domain.scrap.usecase
 
+import kotlinx.coroutines.flow.Flow
 import org.bmsk.lifemash.domain.core.model.Article
 import org.bmsk.lifemash.domain.scrap.repository.ScrapRepository
 
 interface GetScrappedArticlesUseCase {
-    suspend operator fun invoke(): List<Article>
+    operator fun invoke(): Flow<List<Article>>
 }
 
 internal class GetScrappedArticlesUseCaseImpl(
     private val scrapRepository: ScrapRepository
 ) : GetScrappedArticlesUseCase {
-    override suspend operator fun invoke(): List<Article> {
+    override operator fun invoke(): Flow<List<Article>> {
         return scrapRepository.getScrappedArticles()
     }
 }

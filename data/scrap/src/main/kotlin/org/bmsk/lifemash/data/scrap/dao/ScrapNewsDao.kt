@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import org.bmsk.lifemash.data.scrap.entity.NewsEntity
 import java.util.Date
 
@@ -18,7 +19,7 @@ interface ScrapNewsDao {
     fun insertAllNews(newsList: List<NewsEntity>)
 
     @Query("SELECT * FROM scrap_news")
-    fun getAllNews(): List<NewsEntity>
+    fun getAllNews(): Flow<List<NewsEntity>>
 
     @Query("DELETE FROM scrap_news WHERE link = :link")
     fun deleteNewsByLink(link: String)
