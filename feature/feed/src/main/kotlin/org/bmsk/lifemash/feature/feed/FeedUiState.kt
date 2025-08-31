@@ -70,13 +70,14 @@ internal data class ArticleUi(
     val publishedAtRelative: String,
     val publishedAtInstant: Instant,
     val host: String,
-    val categories: PersistentList<ArticleCategory>
+    val categories: PersistentList<ArticleCategory>,
+    val isScrapped: Boolean,
 ) {
     companion object {
         private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             .withZone(ZoneId.systemDefault())
 
-        fun from(article: Article): ArticleUi {
+        fun from(article: Article, isScrapped: Boolean): ArticleUi {
             return ArticleUi(
                 id = article.id.value,
                 publisher = article.publisher.name,
@@ -87,7 +88,8 @@ internal data class ArticleUi(
                 publishedAtRelative = formatter.format(article.publishedAt),
                 publishedAtInstant = article.publishedAt,
                 host = URI(article.link.value).host ?: article.link.value,
-                categories = article.categories.toPersistentList()
+                categories = article.categories.toPersistentList(),
+                isScrapped = isScrapped,
             )
         }
     }
