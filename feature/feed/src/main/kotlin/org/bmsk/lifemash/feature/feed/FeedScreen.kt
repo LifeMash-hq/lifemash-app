@@ -60,6 +60,7 @@ import org.bmsk.lifemash.core.designsystem.component.ScrapButton
 import org.bmsk.lifemash.core.designsystem.component.SpacerH
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
+import org.bmsk.lifemash.domain.core.model.ArticleId
 import java.time.Instant
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -100,7 +101,7 @@ internal fun FeedScreen(
                 } else {
                     items(
                         items = articles,
-                        key = ArticleUi::id
+                        key = { it.id.value }
                     ) { article ->
                         ArticleCard(
                             article = article,
@@ -308,7 +309,7 @@ private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi
     override val values = sequenceOf(
         listOf(
             ArticleUi(
-                id = "02f9f94fd7c7f804fd8f57e7cabebbf3a5272e7c",
+                id = ArticleId("02f9f94fd7c7f804fd8f57e7cabebbf3a5272e7c"),
                 publisher = "뉴시스",
                 title = "대구 수성구서 60㎝ 땅 꺼짐 사고…\"상수도관 누수 탓\"",
                 summary = "[대구=뉴시스]정재익 기자 = 대구 수성구의 한 주차장 진입로에서 땅 꺼짐 사고가 발생했다…",
@@ -321,7 +322,7 @@ private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi
                 isScrapped = true
             ),
             ArticleUi(
-                id = "14d3e90c4710c203bd999c487c333ad00da89f81",
+                id = ArticleId("14d3e90c4710c203bd999c487c333ad00da89f81"),
                 publisher = "동아일보",
                 title = "장동혁, 특검 앞 1인 시위…\"정치특검 광기 도 넘어\"",
                 summary = "장동혁 국민의힘 당대표 후보는 16일 특검팀 사무실 앞에 나와 1인 시위를 진행하면서 \"정치특검의 광기가 도를 넘었다\"고 밝혔다…",
@@ -334,7 +335,7 @@ private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi
                 isScrapped = false
             ),
             ArticleUi(
-                id = "263debf456846f254361214548a784e280fdc29b",
+                id = ArticleId("263debf456846f254361214548a784e280fdc29b"),
                 publisher = "동아일보",
                 title = "삼성전자 제쳤다…\"4대금융 상반기 급여 1억",
                 summary = "올해 상반기 우리나라 주요 시중은행 직원들의 평균 급여가 역대 최고 수준을 기록했다…",
@@ -347,7 +348,7 @@ private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi
                 isScrapped = true
             ),
             ArticleUi(
-                id = "88a8bd2298442d107b38fafb8734f3a501fe735f",
+                id = ArticleId("88a8bd2298442d107b38fafb8734f3a501fe735f"),
                 publisher = "뉴시스",
                 title = "日, 한국 조사선 독도 주변 해양조사 활동에 강력 항의",
                 summary = "[서울=뉴시스]박지혁 기자 = 일본 정부가 한국 조사선이 독도 주변에서 해양조사 활동을 한 것을 두고 항의했다…",
@@ -363,7 +364,7 @@ private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi
                 isScrapped = false
             ),
             ArticleUi(
-                id = "1e13ce051109b29bd8cd4b3f5d1a6d31f341651c",
+                id = ArticleId("1e13ce051109b29bd8cd4b3f5d1a6d31f341651c"),
                 publisher = "서울신문",
                 title = "[속보] 열흘 ‘황금연휴’ 무산…정부 \"10월 10일 임시공휴일 검토 안해\"",
                 summary = "오는 10월 10일 임시공휴일 지정 시 열흘간의 황금연휴가 가능해 기대감이 커지고 있는 가운데 정부가 '이를 검토하지 않는다'고 선을 그었다…",

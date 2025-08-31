@@ -1,5 +1,6 @@
 package org.bmsk.lifemash.feature.feed
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,12 +12,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.domain.core.model.Article
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
+import org.bmsk.lifemash.domain.core.model.ArticleId
 import org.bmsk.lifemash.domain.feed.usecase.GetArticlesUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.AddScrapUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.DeleteScrappedArticleUseCase
@@ -32,13 +34,13 @@ internal class FeedViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedUiState.Initial)
-    private val originalArticles = mutableMapOf<String, Article>()
+    private val originalArticles = mutableMapOf<ArticleId, Article>()
 
-    private val scrappedArticleIds: StateFlow<Set<String>> = getScrappedArticleIdsUseCase()
-        .map { ids -> ids.map { it.value }.toSet() }
+    private val scrappedArticleIds: StateFlow<Set<ArticleId>> = getScrappedArticleIdsUseCase()
+        .onEach { Log.e("FeedViewModel", "scrappedArticleIds: $it") }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = emptySet()
         )
 
@@ -46,18 +48,35 @@ internal class FeedViewModel @Inject constructor(
         _uiState,
         scrappedArticleIds
     ) { state, scrappedIds ->
-        val newArticlesById = state.articlesById.mapValues {
-            val article = it.value
-            article.copy(isScrapped = article.id in scrappedIds)
-        }.toPersistentMap()
+        val updatedArticlesById = state.articlesById
+            .mapValues { (_, article) ->
+                val newIsScrapped = article.id in scrappedIds
+                if (article.isScrapped != newIsScrapped) article.copy(isScrapped = newIsScrapped)
+                else article
+            }
+            .toPersistentMap()
 
-        val newState = state.copy(articlesById = newArticlesById)
+        val newState = state.copy(articlesById = updatedArticlesById)
         newState.copy(visibleArticles = recalculateVisibleArticles(newState))
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = FeedUiState.Initial
-    )
+    }
+        .onEach { s ->
+            val idsInState = s.articlesById.keys
+            val inter = idsInState.intersect(scrappedArticleIds.value)
+            Log.e("FeedViewModel", "idsInState=${idsInState.size}, scrapped=${scrappedArticleIds.value.size}, inter=${inter.size}")
+
+            // 샘플 몇 개 비교해서 차이 확인
+            idsInState.take(5).forEach { id ->
+                val hit = scrappedArticleIds.value.contains(id)
+                if (!hit) {
+                    Log.e("FeedViewModel", "mismatch sample: stateId=${id.value}")
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = FeedUiState.Initial
+        )
 
     fun getArticles(category: ArticleCategory) {
         viewModelScope.launch {
@@ -73,10 +92,10 @@ internal class FeedViewModel @Inject constructor(
             runCatching {
                 getArticlesUseCase(category)
             }.onSuccess { articles ->
-                originalArticles.putAll(articles.associateBy { it.id.value })
+                originalArticles.putAll(articles.associateBy(Article::id))
 
                 val articleUis = articles
-                    .map { ArticleUi.from(it, isScrapped = it.id.value in scrappedArticleIds.value) }
+                    .map { ArticleUi.from(it, isScrapped = it.id in scrappedArticleIds.value) }
                     .toPersistentList()
 
                 _uiState.update { currentState ->
@@ -111,7 +130,7 @@ internal class FeedViewModel @Inject constructor(
         }
     }
 
-    fun onScrapClick(article: ArticleUi) {
+    fun scrapArticle(article: ArticleUi) {
         val originalArticle = originalArticles[article.id] ?: return
 
         viewModelScope.launch {
