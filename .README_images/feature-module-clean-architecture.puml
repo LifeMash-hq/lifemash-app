@@ -1,0 +1,52 @@
+@startuml
+skinparam style strictuml
+skinparam packageStyle rectangle
+skinparam shadowing true
+skinparam linetype ortho
+left to right direction
+
+title Feature Module - Clean Architecture (Horizontal Layout)
+
+' UI Layer
+rectangle "UI Layer: :feature:xyz" {
+  package ":feature:xyz" {
+    [FeatureViewModel]
+    [FeatureUIModel]
+  }
+}
+
+' Domain Layer
+rectangle "Domain Layer: :domain:feature-xyz" {
+  package ":domain:feature-xyz" {
+    [FeatureUseCase]         as FUC
+    [FeatureUseCaseImpl]     as FUCImpl
+    [FeatureRepository]      as FR
+
+    [DomainModel]
+    [ValueObject]
+  }
+}
+
+' Data Layer
+rectangle "Data Layer: :data:xyz" {
+  package ":data:xyz" {
+    [FeatureRepositoryImpl]  as FRImpl
+    [FeatureDTO]
+    [FeatureEntity (DB)]
+  }
+}
+
+' --- Dependencies ---
+[FeatureViewModel] --> FUC : uses
+[FeatureViewModel] --> [FeatureUIModel]
+
+FUC --> FUCImpl : binds
+FUCImpl --> FR : depends on
+FUCImpl --> [DomainModel]
+[DomainModel] --> [ValueObject]
+
+FRImpl --> FR : implements
+FRImpl --> [FeatureEntity (DB)]
+FRImpl --> [FeatureDTO]
+
+@enduml
