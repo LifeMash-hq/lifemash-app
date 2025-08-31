@@ -9,6 +9,7 @@ android {
 dependencies {
     implementation(projects.domain.core)
     implementation(projects.domain.featureFeed)
+    implementation(projects.domain.featureScrap)
     implementation(projects.feature.feedApi)
     implementation(projects.feature.mainNavGraph)
 

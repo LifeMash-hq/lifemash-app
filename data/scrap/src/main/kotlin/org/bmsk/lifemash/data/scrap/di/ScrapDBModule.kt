@@ -7,26 +7,25 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import org.bmsk.lifemash.data.scrap.dao.ScrapNewsDao
-import org.bmsk.lifemash.data.scrap.db.ScrapNewsDB
-import org.bmsk.lifemash.data.scrap.entity.MIGRATION_1_2
+import org.bmsk.lifemash.data.scrap.dao.ScrapArticleDao
+import org.bmsk.lifemash.data.scrap.db.ScrapArticleDB
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal class ScrapDBModule {
     @Provides
-    fun provideScrapNewsDB(
-        db: ScrapNewsDB
-    ): ScrapNewsDao = db.newsDao()
+    fun provideScrapArticleDao(
+        db: ScrapArticleDB
+    ): ScrapArticleDao = db.articleDao()
 
     @Provides
     @Singleton
     fun provideDatabase(
         @ApplicationContext context: Context
-    ): ScrapNewsDB = Room.databaseBuilder(
+    ): ScrapArticleDB = Room.databaseBuilder(
         context = context,
-        klass = ScrapNewsDB::class.java,
-        name = ScrapNewsDB.SCRAP_NEWS_DB_NAME
-    ).addMigrations(MIGRATION_1_2).build()
+        klass = ScrapArticleDB::class.java,
+        name = "scrap_article_db"
+    ).build()
 }

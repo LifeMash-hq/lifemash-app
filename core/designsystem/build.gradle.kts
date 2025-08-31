@@ -12,4 +12,5 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.material.icons.extended)
 }
