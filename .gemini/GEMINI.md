@@ -13,7 +13,6 @@ As the Gemini CLI agent, I must adhere to the following principles, derived from
 - **Dependency Isolation:** Ensure the `Domain` layer is pure Kotlin (POJO/POKO), free from Android framework or specific library dependencies (Room, Retrofit, etc.).
 - **UseCase Focus:** Encapsulate business scenarios and complex logic within `UseCase` or `Domain Service` objects. Avoid direct `Repository` calls from `ViewModel`s.
 - **Immutability & Type Safety:** Prefer `Value Object`s over primitive types (e.g., String for IDs, dates) for type safety and meaningful encapsulation. Promote immutability.
-- **Explicit Error Handling:** Utilize explicit result types (e.g., `Result` type) for error classification and handling, rather than relying solely on exceptions.
 
 ## 3. Multi-Module Architecture Strategy:
 - **Avoid "God Domain":** Do not consolidate all `UseCase`s into a single, monolithic `domain` module.
