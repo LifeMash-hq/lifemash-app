@@ -70,8 +70,11 @@ internal class FeedViewModel @Inject constructor(
         val updatedArticlesById = state.articlesById
             .mapValues { (_, article) ->
                 val newIsScrapped = article.id in scrappedIds
-                if (article.isScrapped != newIsScrapped) article.copy(isScrapped = newIsScrapped)
-                else article
+                if (article.isScrapped != newIsScrapped) {
+                    article.copy(isScrapped = newIsScrapped)
+                } else {
+                    article
+                }
             }
             .toPersistentMap()
 
@@ -91,7 +94,8 @@ internal class FeedViewModel @Inject constructor(
     fun getArticles(category: ArticleCategory) {
         viewModelScope.launch {
             _internalState.update { currentState ->
-                val loadStateByCategory = currentState.loadStateByCategory.put(category, LoadState.Loading)
+                val loadStateByCategory =
+                    currentState.loadStateByCategory.put(category, LoadState.Loading)
                 currentState.copy(loadStateByCategory = loadStateByCategory)
             }
 
