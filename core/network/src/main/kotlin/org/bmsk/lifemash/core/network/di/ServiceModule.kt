@@ -11,6 +11,8 @@ import okhttp3.OkHttpClient
 import org.bmsk.lifemash.core.network.BASE_URL_GOOGLE
 import org.bmsk.lifemash.core.network.BASE_URL_SBS
 import org.bmsk.lifemash.core.network.service.GoogleNewsService
+import org.bmsk.lifemash.core.network.service.LifeMashAlgoliaService
+import org.bmsk.lifemash.core.network.service.LifeMashAlgoliaServiceImpl
 import org.bmsk.lifemash.core.network.service.LifeMashFirebaseService
 import org.bmsk.lifemash.core.network.service.LifeMashFirebaseServiceImpl
 import org.bmsk.lifemash.core.network.service.SbsNewsService
@@ -65,4 +67,10 @@ internal abstract class ServiceBindModule {
     abstract fun bindLifeMashFirebaseService(
         impl: LifeMashFirebaseServiceImpl,
     ): LifeMashFirebaseService
+
+    @Binds
+    @Singleton
+    abstract fun bindLifeMashAlgoliaService(
+        impl: LifeMashAlgoliaServiceImpl,
+    ): LifeMashAlgoliaService
 }

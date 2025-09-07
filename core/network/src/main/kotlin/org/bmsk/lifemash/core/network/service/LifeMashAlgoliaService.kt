@@ -14,12 +14,13 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import org.bmsk.lifemash.core.network.response.LifeMashArticleCategory
 import org.bmsk.lifemash.core.network.response.LifeMashArticleResponse
+import javax.inject.Inject
 
 interface LifeMashAlgoliaService {
     suspend fun search(query: String): List<LifeMashArticleResponse>
 }
 
-internal class LifeMashAlgoliaServiceImpl(
+internal class LifeMashAlgoliaServiceImpl @Inject constructor(
     private val algoliaClientProvider: AlgoliaClientProvider = FirebaseAlgoliaClientProvider()
 ) : LifeMashAlgoliaService {
     override suspend fun search(query: String): List<LifeMashArticleResponse> = Dispatchers.IO {
