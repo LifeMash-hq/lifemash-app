@@ -1,13 +1,16 @@
 package org.bmsk.lifemash.domain.feed.usecase
 
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import org.bmsk.lifemash.domain.feed.repository.ArticleRepository
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 @Module
-object FeedUseCaseModule {
-    @Provides
-    fun provideGetArticlesUseCase(
-        repo: ArticleRepository
-    ): GetArticlesUseCase = GetArticlesUseCaseImpl(repo)
+@InstallIn(SingletonComponent::class)
+internal abstract class FeedUseCaseModule {
+
+    @Binds
+    abstract fun provideGetArticlesUseCase(
+        impl: GetArticlesUseCaseImpl
+    ): GetArticlesUseCase
 }

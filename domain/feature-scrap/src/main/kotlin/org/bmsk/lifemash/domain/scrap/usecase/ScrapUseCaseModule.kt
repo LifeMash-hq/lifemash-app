@@ -1,24 +1,26 @@
 package org.bmsk.lifemash.domain.scrap.usecase
 
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import org.bmsk.lifemash.domain.scrap.repository.ScrapRepository
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 @Module
-object ScrapUseCaseModule {
+@InstallIn(SingletonComponent::class)
+internal abstract class ScrapUseCaseModule {
 
-    @Provides
-    fun provideAddScrapUseCase(
-        repo: ScrapRepository
-    ): AddScrapUseCase = AddScrapUseCaseImpl(repo)
+    @Binds
+    abstract fun bindAddScrapUseCase(
+        impl: AddScrapUseCaseImpl
+    ): AddScrapUseCase
 
-    @Provides
-    fun provideDeleteScrappedArticleUseCase(
-        repo: ScrapRepository
-    ): DeleteScrappedArticleUseCase = DeleteScrappedArticleUseCaseImpl(repo)
+    @Binds
+    abstract fun bindDeleteScrappedArticleUseCase(
+        impl: DeleteScrappedArticleUseCaseImpl
+    ): DeleteScrappedArticleUseCase
 
-    @Provides
-    fun provideGetScrappedArticlesUseCase(
-        repo: ScrapRepository
-    ): GetScrappedArticlesUseCase = GetScrappedArticlesUseCaseImpl(repo)
+    @Binds
+    abstract fun bindGetScrappedArticlesUseCase(
+        impl: GetScrappedArticlesUseCaseImpl
+    ): GetScrappedArticlesUseCase
 }

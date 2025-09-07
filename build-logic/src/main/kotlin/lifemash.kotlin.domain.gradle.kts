@@ -1,11 +1,11 @@
-import org.bmsk.lifemash.configureDagger
+import org.bmsk.lifemash.configureHiltKotlin
 import org.bmsk.lifemash.libs
 
 plugins {
     id("lifemash.kotlin.library")
 }
 
-configureDagger()
+configureHiltKotlin()
 
 dependencies {
     implementation(project(":domain:core"))
