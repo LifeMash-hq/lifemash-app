@@ -8,12 +8,12 @@ import org.bmsk.lifemash.domain.core.model.ImageUrl
 import org.bmsk.lifemash.domain.core.model.Publisher
 
 internal fun ArticleEntity.toDomain() = Article(
-    id = ArticleId(id),
-    publisher = Publisher(publisher),
+    id = ArticleId.from(id),
+    publisher = Publisher.from(publisher),
     title = title,
     summary = summary,
-    link = ArticleUrl(link),
-    image = image?.let { ImageUrl(it) },
+    link = ArticleUrl.from(link),
+    image = image?.let { ImageUrl.from(it) },
     publishedAt = publishedAt,
     categories = categories
 )

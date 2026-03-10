@@ -34,14 +34,19 @@ import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.core.designsystem.component.LifeMashCard
 import org.bmsk.lifemash.core.designsystem.component.NetworkImage
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.domain.core.model.Article
+import org.bmsk.lifemash.domain.core.model.ArticleId
+import org.bmsk.lifemash.domain.core.model.ArticleUrl
+import org.bmsk.lifemash.domain.core.model.Publisher
 import org.bmsk.lifemash.feature.scrap.R
-import org.bmsk.lifemash.feature.scrap.ScrapUiModel
+import org.bmsk.lifemash.feature.scrap.ScrapArticleUi
+import java.time.Instant
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ScrapNewsItem(
     modifier: Modifier = Modifier,
-    scrap: ScrapUiModel,
+    scrap: ScrapArticleUi,
     state: ScrapNewsItemState,
     onClick: () -> Unit,
     onClickDelete: () -> Unit,
@@ -64,7 +69,7 @@ internal fun ScrapNewsItem(
                 modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(1 / 1f),
-                imageUrl = scrap.imageUrl,
+                imageUrl = scrap.article.image?.value,
             )
             Column(
                 modifier = Modifier
@@ -74,7 +79,7 @@ internal fun ScrapNewsItem(
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = scrap.title,
+                    text = scrap.article.title,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
@@ -141,17 +146,19 @@ internal fun rememberScrapNewsItemState(initialIsLongClicked: Boolean = false): 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 private fun ScrapNewsItemPreview() {
-    val fakeScrap =
-        ScrapUiModel(
-            id = "1",
-            title =
-                "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews" +
-                        "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
-            publisher = "Publisher",
-            publishedAtRelative = "3 hours ago",
-            link = "",
-            imageUrl = "",
+    val fakeScrap = ScrapArticleUi.from(
+        Article(
+            id = ArticleId.from("preview-1"),
+            publisher = Publisher.from("Publisher"),
+            title = "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews" +
+                    "NewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNewsNews",
+            summary = "",
+            link = ArticleUrl.from("https://example.com/1"),
+            image = null,
+            publishedAt = Instant.now().minusSeconds(10800),
+            categories = emptyList(),
         )
+    )
 
     LifeMashTheme {
         ScrapNewsItem(

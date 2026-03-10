@@ -11,14 +11,15 @@ import java.time.Instant
 internal fun NewsItem.toDomain(): Article {
     // NewsItem doesn't have publisher, summary, categories, host.
     // pubDate is Date, not Long.
+    val nonNullLink = requireNotNull(this.link) { "NewsItem link cannot be null" }
     val publishedInstant =
         this.pubDate?.let { DateParser.parseDate(it).toInstant() } ?: Instant.EPOCH
     return Article(
-        id = ArticleId(this.link ?: ""),
-        publisher = Publisher("Unknown"),
+        id = ArticleId.from(nonNullLink),
+        publisher = Publisher.unknown,
         title = this.title ?: "",
         summary = "",
-        link = ArticleUrl(this.link ?: ""),
+        link = ArticleUrl.from(nonNullLink),
         image = null,
         publishedAt = publishedInstant,
         categories = emptyList()

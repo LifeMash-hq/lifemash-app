@@ -12,14 +12,15 @@ import java.time.Instant
 
 internal fun LifeMashArticleResponse.toDomain(): Article {
     val nonNullPublishedAt = requireNotNull(this.publishedAt) { "publishedAt cannot be null" }
+    val nonNullLink = requireNotNull(this.link) { "link cannot be null" }
 
     return Article(
-        id = ArticleId(this.id),
-        publisher = Publisher(this.publisher ?: ""),
+        id = ArticleId.from(this.id),
+        publisher = Publisher.from(this.publisher ?: Publisher.unknown.name),
         title = this.title ?: "",
         summary = this.summary ?: "",
-        link = ArticleUrl(this.link ?: ""),
-        image = this.image?.let { ImageUrl(it) },
+        link = ArticleUrl.from(nonNullLink),
+        image = this.image?.let { ImageUrl.from(it) },
         publishedAt = Instant.ofEpochSecond(nonNullPublishedAt),
         categories = this.categories.map { it.toDomain() }
     )

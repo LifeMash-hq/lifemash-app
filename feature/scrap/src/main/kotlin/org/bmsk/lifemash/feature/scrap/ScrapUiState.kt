@@ -2,12 +2,14 @@ package org.bmsk.lifemash.feature.scrap
 
 import kotlinx.collections.immutable.PersistentList
 import org.bmsk.lifemash.domain.core.model.Article
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 internal sealed interface ScrapUiState {
     data object NewsLoading : ScrapUiState
 
     data class NewsLoaded(
-        val scraps: PersistentList<ScrapUiModel>
+        val scraps: PersistentList<ScrapArticleUi>
     ) : ScrapUiState
 
     data object NewsEmpty : ScrapUiState
@@ -15,24 +17,18 @@ internal sealed interface ScrapUiState {
     data class Error(val throwable: Throwable) : ScrapUiState
 }
 
-internal data class ScrapUiModel(
-    val id: String,
-    val title: String,
-    val publisher: String,
+internal data class ScrapArticleUi(
+    val article: Article,
     val publishedAtRelative: String,
-    val link: String,
-    val imageUrl: String?
 ) {
     companion object {
-        // A simple mapper for now. A more sophisticated one could be added.
-        fun from(article: Article): ScrapUiModel {
-            return ScrapUiModel(
-                id = article.id.value,
-                title = article.title,
-                publisher = article.publisher.name,
-                publishedAtRelative = article.publishedAt.toString(), // Simplified for now
-                link = article.link.value,
-                imageUrl = article.image?.value
+        private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            .withZone(ZoneId.systemDefault())
+
+        fun from(article: Article): ScrapArticleUi {
+            return ScrapArticleUi(
+                article = article,
+                publishedAtRelative = formatter.format(article.publishedAt),
             )
         }
     }

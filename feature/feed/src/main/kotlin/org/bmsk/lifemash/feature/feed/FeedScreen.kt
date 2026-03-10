@@ -59,8 +59,12 @@ import kotlinx.collections.immutable.toPersistentList
 import org.bmsk.lifemash.core.designsystem.component.ScrapButton
 import org.bmsk.lifemash.core.designsystem.component.SpacerH
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.domain.core.model.Article
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
 import org.bmsk.lifemash.domain.core.model.ArticleId
+import org.bmsk.lifemash.domain.core.model.ArticleUrl
+import org.bmsk.lifemash.domain.core.model.ImageUrl
+import org.bmsk.lifemash.domain.core.model.Publisher
 import java.time.Instant
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -69,11 +73,11 @@ internal fun FeedScreen(
     modifier: Modifier = Modifier,
     selectedCategory: ArticleCategory = ArticleCategory.ALL,
     categories: List<ArticleCategory> = ArticleCategory.entries,
-    articles: PersistentList<ArticleUi> = persistentListOf(),
+    articles: PersistentList<ArticleUiState> = persistentListOf(),
     isSearchMode: Boolean = false,
     queryText: String = "",
-    onArticleOpen: (ArticleUi) -> Unit = {},
-    onScrapClick: (ArticleUi) -> Unit = {},
+    onArticleOpen: (ArticleUiState) -> Unit = {},
+    onScrapClick: (ArticleUiState) -> Unit = {},
     onQueryTextChange: (String) -> Unit = {},
     onQueryTextClear: () -> Unit = {},
     onSearchModeChange: (Boolean) -> Unit = {},
@@ -101,7 +105,7 @@ internal fun FeedScreen(
                 } else {
                     items(
                         items = articles,
-                        key = { it.id.value }
+                        key = { it.article.id.value }
                     ) { article ->
                         ArticleCard(
                             article = article,
@@ -138,11 +142,11 @@ internal fun FeedScreen(
 
 @Composable
 internal fun ArticleCard(
-    article: ArticleUi,
-    onOpen: (ArticleUi) -> Unit,
+    article: ArticleUiState,
+    onOpen: (ArticleUiState) -> Unit,
     onScrapClick: () -> Unit,
 ) {
-    val mainCat = article.categories.firstOrNull() ?: ArticleCategory.ALL
+    val mainCat = article.article.categories.firstOrNull() ?: ArticleCategory.ALL
     val style = remember(mainCat) { mainCat.style }
     val isDark = androidx.compose.foundation.isSystemInDarkTheme()
 
@@ -157,7 +161,7 @@ internal fun ArticleCard(
         Box(Modifier.fillMaxWidth()) {
             Column(Modifier.fillMaxWidth()) {
                 // 이미지
-                ArticleImage(url = article.image)
+                ArticleImage(url = article.article.image?.value)
                 // 본문
                 Column(Modifier.padding(14.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -169,7 +173,7 @@ internal fun ArticleCard(
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
-                            article.publisher,
+                            article.article.publisher.name,
                             style = MaterialTheme.typography.labelMedium,
                             color = style.color
                         )
@@ -188,14 +192,14 @@ internal fun ArticleCard(
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        article.title,
+                        article.article.title,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        article.summary,
+                        article.article.summary,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 3,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -305,77 +309,74 @@ private fun ShimmerOverlay() {
 }
 
 /** 리스트/피드용 */
-private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi>> {
+private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUiState>> {
     override val values = sequenceOf(
         listOf(
-            ArticleUi(
-                id = ArticleId("02f9f94fd7c7f804fd8f57e7cabebbf3a5272e7c"),
-                publisher = "뉴시스",
-                title = "대구 수성구서 60㎝ 땅 꺼짐 사고…\"상수도관 누수 탓\"",
-                summary = "[대구=뉴시스]정재익 기자 = 대구 수성구의 한 주차장 진입로에서 땅 꺼짐 사고가 발생했다…",
-                link = "https://www.newsis.com/view/NISX20250816_0003292356",
-                image = "https://image.newsis.com/2025/07/30/NISI20250730_0001906581_web.jpg?rnd=20250730132651",
-                publishedAtRelative = "2025-08-16 13:03",
-                publishedAtInstant = Instant.now(),
-                host = "www.newsis.com",
-                categories = persistentListOf(ArticleCategory.SOCIETY),
-                isScrapped = true
-            ),
-            ArticleUi(
-                id = ArticleId("14d3e90c4710c203bd999c487c333ad00da89f81"),
-                publisher = "동아일보",
-                title = "장동혁, 특검 앞 1인 시위…\"정치특검 광기 도 넘어\"",
-                summary = "장동혁 국민의힘 당대표 후보는 16일 특검팀 사무실 앞에 나와 1인 시위를 진행하면서 \"정치특검의 광기가 도를 넘었다\"고 밝혔다…",
-                link = "https://www.donga.com/news/Politics/article/all/20250816/132196672/1",
-                image = "https://dimg.donga.com/i/150/150/90/wps/NEWS/IMAGE/2025/08/16/132196673.1.jpg",
-                publishedAtRelative = "2025-08-16 12:50",
-                publishedAtInstant = Instant.now().minusSeconds(60),
-                host = "www.donga.com",
-                categories = persistentListOf(ArticleCategory.ALL, ArticleCategory.POLITICS),
-                isScrapped = false
-            ),
-            ArticleUi(
-                id = ArticleId("263debf456846f254361214548a784e280fdc29b"),
-                publisher = "동아일보",
-                title = "삼성전자 제쳤다…\"4대금융 상반기 급여 1억",
-                summary = "올해 상반기 우리나라 주요 시중은행 직원들의 평균 급여가 역대 최고 수준을 기록했다…",
-                link = "https://www.donga.com/news/Economy/article/all/20250816/132196667/1",
-                image = "https://dimg.donga.com/i/150/150/90/wps/NEWS/IMAGE/2025/08/16/132196668.1.jpg",
-                publishedAtRelative = "2025-08-16 12:44",
-                publishedAtInstant = Instant.now().minusSeconds(120),
-                host = "www.donga.com",
-                categories = persistentListOf(ArticleCategory.ECONOMY, ArticleCategory.ALL),
-                isScrapped = true
-            ),
-            ArticleUi(
-                id = ArticleId("88a8bd2298442d107b38fafb8734f3a501fe735f"),
-                publisher = "뉴시스",
-                title = "日, 한국 조사선 독도 주변 해양조사 활동에 강력 항의",
-                summary = "[서울=뉴시스]박지혁 기자 = 일본 정부가 한국 조사선이 독도 주변에서 해양조사 활동을 한 것을 두고 항의했다…",
-                link = "https://www.newsis.com/view/NISX20250816_0003292350",
-                image = "https://image.newsis.com/2025/04/09/NISI20250409_0001812899_web.jpg?rnd=20250409092704",
-                publishedAtRelative = "2025-08-16 12:24",
-                publishedAtInstant = Instant.now().minusSeconds(180),
-                host = "www.newsis.com",
-                categories = persistentListOf(
-                    ArticleCategory.INTERNATIONAL,
-                    ArticleCategory.POLITICS
+            ArticleUiState.from(
+                article = Article(
+                    id = ArticleId.from("02f9f94fd7c7f804fd8f57e7cabebbf3a5272e7c"),
+                    publisher = Publisher.from("뉴시스"),
+                    title = "대구 수성구서 60㎝ 땅 꺼짐 사고…\"상수도관 누수 탓\"",
+                    summary = "[대구=뉴시스]정재익 기자 = 대구 수성구의 한 주차장 진입로에서 땅 꺼짐 사고가 발생했다…",
+                    link = ArticleUrl.from("https://www.newsis.com/view/NISX20250816_0003292356"),
+                    image = ImageUrl.from("https://image.newsis.com/2025/07/30/NISI20250730_0001906581_web.jpg"),
+                    publishedAt = Instant.now(),
+                    categories = listOf(ArticleCategory.SOCIETY),
                 ),
-                isScrapped = false
+                isScrapped = true,
             ),
-            ArticleUi(
-                id = ArticleId("1e13ce051109b29bd8cd4b3f5d1a6d31f341651c"),
-                publisher = "서울신문",
-                title = "[속보] 열흘 ‘황금연휴’ 무산…정부 \"10월 10일 임시공휴일 검토 안해\"",
-                summary = "오는 10월 10일 임시공휴일 지정 시 열흘간의 황금연휴가 가능해 기대감이 커지고 있는 가운데 정부가 '이를 검토하지 않는다'고 선을 그었다…",
-                link = "https://www.seoul.co.kr/news/newsView.php?id=20250816500031",
-                image = "https://img.seoul.co.kr/img/upload/2025/08/11/SSC_20250811070507_V.jpg",
-                publishedAtRelative = "2025-08-16 12:13",
-                publishedAtInstant = Instant.now().minusSeconds(240),
-                host = "www.seoul.co.kr",
-                categories = persistentListOf(ArticleCategory.SOCIETY),
-                isScrapped = true
-            )
+            ArticleUiState.from(
+                article = Article(
+                    id = ArticleId.from("14d3e90c4710c203bd999c487c333ad00da89f81"),
+                    publisher = Publisher.from("동아일보"),
+                    title = "장동혁, 특검 앞 1인 시위…\"정치특검 광기 도 넘어\"",
+                    summary = "장동혁 국민의힘 당대표 후보는 16일 특검팀 사무실 앞에 나와 1인 시위를 진행하면서 \"정치특검의 광기가 도를 넘었다\"고 밝혔다…",
+                    link = ArticleUrl.from("https://www.donga.com/news/Politics/article/all/20250816/132196672/1"),
+                    image = ImageUrl.from("https://dimg.donga.com/i/150/150/90/wps/NEWS/IMAGE/2025/08/16/132196673.1.jpg"),
+                    publishedAt = Instant.now().minusSeconds(60),
+                    categories = listOf(ArticleCategory.ALL, ArticleCategory.POLITICS),
+                ),
+                isScrapped = false,
+            ),
+            ArticleUiState.from(
+                article = Article(
+                    id = ArticleId.from("263debf456846f254361214548a784e280fdc29b"),
+                    publisher = Publisher.from("동아일보"),
+                    title = "삼성전자 제쳤다…\"4대금융 상반기 급여 1억",
+                    summary = "올해 상반기 우리나라 주요 시중은행 직원들의 평균 급여가 역대 최고 수준을 기록했다…",
+                    link = ArticleUrl.from("https://www.donga.com/news/Economy/article/all/20250816/132196667/1"),
+                    image = ImageUrl.from("https://dimg.donga.com/i/150/150/90/wps/NEWS/IMAGE/2025/08/16/132196668.1.jpg"),
+                    publishedAt = Instant.now().minusSeconds(120),
+                    categories = listOf(ArticleCategory.ECONOMY, ArticleCategory.ALL),
+                ),
+                isScrapped = true,
+            ),
+            ArticleUiState.from(
+                article = Article(
+                    id = ArticleId.from("88a8bd2298442d107b38fafb8734f3a501fe735f"),
+                    publisher = Publisher.from("뉴시스"),
+                    title = "日, 한국 조사선 독도 주변 해양조사 활동에 강력 항의",
+                    summary = "[서울=뉴시스]박지혁 기자 = 일본 정부가 한국 조사선이 독도 주변에서 해양조사 활동을 한 것을 두고 항의했다…",
+                    link = ArticleUrl.from("https://www.newsis.com/view/NISX20250816_0003292350"),
+                    image = ImageUrl.from("https://image.newsis.com/2025/04/09/NISI20250409_0001812899_web.jpg"),
+                    publishedAt = Instant.now().minusSeconds(180),
+                    categories = listOf(ArticleCategory.INTERNATIONAL, ArticleCategory.POLITICS),
+                ),
+                isScrapped = false,
+            ),
+            ArticleUiState.from(
+                article = Article(
+                    id = ArticleId.from("1e13ce051109b29bd8cd4b3f5d1a6d31f341651c"),
+                    publisher = Publisher.from("서울신문"),
+                    title = "[속보] 열흘 ‘황금연휴’ 무산…정부 \"10월 10일 임시공휴일 검토 안해\"",
+                    summary = "오는 10월 10일 임시공휴일 지정 시 열흘간의 황금연휴가 가능해 기대감이 커지고 있는 가운데 정부가 ‘이를 검토하지 않는다’고 선을 그었다…",
+                    link = ArticleUrl.from("https://www.seoul.co.kr/news/newsView.php?id=20250816500031"),
+                    image = ImageUrl.from("https://img.seoul.co.kr/img/upload/2025/08/11/SSC_20250811070507_V.jpg"),
+                    publishedAt = Instant.now().minusSeconds(240),
+                    categories = listOf(ArticleCategory.SOCIETY),
+                ),
+                isScrapped = true,
+            ),
         )
     )
 }
@@ -384,7 +385,7 @@ private class ArticlesPreviewParameter : PreviewParameterProvider<List<ArticleUi
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun Preview_ArticleList(
-    @PreviewParameter(ArticlesPreviewParameter::class) articles: List<ArticleUi>
+    @PreviewParameter(ArticlesPreviewParameter::class) articles: List<ArticleUiState>
 ) {
     LifeMashTheme {
         Column(
@@ -407,7 +408,7 @@ private fun Preview_ArticleList(
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun Preview_FeedScreen_WithParams(
-    @PreviewParameter(ArticlesPreviewParameter::class) articles: List<ArticleUi>
+    @PreviewParameter(ArticlesPreviewParameter::class) articles: List<ArticleUiState>
 ) {
     LifeMashTheme {
         FeedScreen(
