@@ -31,14 +31,19 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.domain.core.model.Article
+import org.bmsk.lifemash.domain.core.model.ArticleId
+import org.bmsk.lifemash.domain.core.model.ArticleUrl
+import org.bmsk.lifemash.domain.core.model.Publisher
 import org.bmsk.lifemash.feature.scrap.component.ScrapNewsItem
 import org.bmsk.lifemash.feature.scrap.component.rememberScrapNewsItemState
+import java.time.Instant
 
 @Composable
 internal fun ScrapNewsScreen(
     scrapUiState: ScrapUiState,
     onClickNews: (url: String) -> Unit,
-    deleteScrapNews: (ScrapUiModel) -> Unit,
+    deleteScrapNews: (ScrapArticleUi) -> Unit,
 ) {
     when (scrapUiState) {
         is ScrapUiState.NewsLoading -> ScrapNewsLoadingScreen()
@@ -66,8 +71,8 @@ internal fun ScrapNewsLoadingScreen() {
 @Composable
 internal fun ScrapNewsLoadedScreen(
     onClickNews: (url: String) -> Unit,
-    scrapNewsList: PersistentList<ScrapUiModel>,
-    deleteScrapNews: (ScrapUiModel) -> Unit,
+    scrapNewsList: PersistentList<ScrapArticleUi>,
+    deleteScrapNews: (ScrapArticleUi) -> Unit,
 ) {
     val scrapNewsItemState = rememberScrapNewsItemState()
 
@@ -116,7 +121,7 @@ internal fun ScrapNewsLoadedScreen(
                 ScrapNewsItem(
                     scrap = scrap,
                     state = scrapNewsItemState,
-                    onClick = { onClickNews(scrap.link) },
+                    onClick = { onClickNews(scrap.article.link.value) },
                     onClickDelete = { deleteScrapNews(scrap) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -198,22 +203,30 @@ private class ScrapUiStateProvider : PreviewParameterProvider<ScrapUiState> {
         ScrapUiState.NewsLoading,
         ScrapUiState.NewsLoaded(
             persistentListOf(
-                ScrapUiModel(
-                    id = "1",
-                    title = "프리뷰 뉴스 제목",
-                    publisher = "Publisher",
-                    publishedAtRelative = "1 day ago",
-                    link = "",
-                    imageUrl = ""
+                ScrapArticleUi.from(
+                    Article(
+                        id = ArticleId.from("preview-1"),
+                        publisher = Publisher.from("Publisher"),
+                        title = "프리뷰 뉴스 제목",
+                        summary = "",
+                        link = ArticleUrl.from("https://example.com/1"),
+                        image = null,
+                        publishedAt = Instant.now().minusSeconds(86400),
+                        categories = emptyList(),
+                    )
                 ),
-                ScrapUiModel(
-                    id = "2",
-                    title = "또 다른 뉴스 제목",
-                    publisher = "Publisher 2",
-                    publishedAtRelative = "2 days ago",
-                    link = "",
-                    imageUrl = ""
-                )
+                ScrapArticleUi.from(
+                    Article(
+                        id = ArticleId.from("preview-2"),
+                        publisher = Publisher.from("Publisher 2"),
+                        title = "또 다른 뉴스 제목",
+                        summary = "",
+                        link = ArticleUrl.from("https://example.com/2"),
+                        image = null,
+                        publishedAt = Instant.now().minusSeconds(172800),
+                        categories = emptyList(),
+                    )
+                ),
             )
         ),
         ScrapUiState.NewsEmpty,

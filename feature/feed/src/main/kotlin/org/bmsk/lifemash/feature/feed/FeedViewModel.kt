@@ -14,9 +14,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.domain.core.model.Article
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
-import org.bmsk.lifemash.domain.core.model.ArticleId
 import org.bmsk.lifemash.domain.feed.usecase.GetArticlesUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.AddScrapUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.DeleteScrappedArticleUseCase
@@ -38,12 +36,6 @@ internal class FeedViewModel @Inject constructor(
      * 주로 기사 목록, 카테고리별 로드 상태 등 UI와 직접 관련 없는 데이터를 다룹니다.
      */
     private val _internalState = MutableStateFlow(FeedUiState.Initial)
-
-    /**
-     * 스크랩 추가/삭제 시 UseCase에 전달할 원본 Article 도메인 모델을 저장하는 Map입니다.
-     * UI 모델인 ArticleUi만으로는 도메인 로직을 처리할 수 없기 때문에 필요합니다.
-     */
-    private val originalArticles = mutableMapOf<ArticleId, Article>()
 
     /**
      * 스크랩된 모든 기사의 ID를 실시간으로 관찰하는 StateFlow입니다.
@@ -68,12 +60,12 @@ internal class FeedViewModel @Inject constructor(
         scrappedArticleIds
     ) { state, scrappedIds ->
         val updatedArticlesById = state.articlesById
-            .mapValues { (_, article) ->
-                val newIsScrapped = article.id in scrappedIds
-                if (article.isScrapped != newIsScrapped) {
-                    article.copy(isScrapped = newIsScrapped)
+            .mapValues { (_, articleState) ->
+                val newIsScrapped = articleState.article.id in scrappedIds
+                if (articleState.isScrapped != newIsScrapped) {
+                    articleState.copy(isScrapped = newIsScrapped)
                 } else {
-                    article
+                    articleState
                 }
             }
             .toPersistentMap()
@@ -102,21 +94,19 @@ internal class FeedViewModel @Inject constructor(
             runCatching {
                 getArticlesUseCase(category)
             }.onSuccess { articles ->
-                originalArticles.putAll(articles.associateBy(Article::id))
-
-                val articleUis = articles
-                    .map { ArticleUi.from(it, isScrapped = it.id in scrappedArticleIds.value) }
+                val articleUiStates = articles
+                    .map { ArticleUiState.from(it, isScrapped = it.id in scrappedArticleIds.value) }
                     .toPersistentList()
 
                 _internalState.update { currentState ->
                     val mergedArticlesById = currentState
                         .articlesById
                         .putAll(
-                            m = articleUis
-                                .associateBy(ArticleUi::id)
+                            m = articleUiStates
+                                .associateBy(ArticleUiState::id)
                                 .toPersistentMap()
                         )
-                    val newIds = articleUis.map { it.id }.toPersistentList()
+                    val newIds = articleUiStates.map { it.id }.toPersistentList()
 
                     currentState.copy(
                         articlesById = mergedArticlesById,
@@ -144,14 +134,12 @@ internal class FeedViewModel @Inject constructor(
      * 사용자가 스크랩 버튼을 클릭했을 때 호출됩니다.
      * 기사의 현재 스크랩 상태에 따라 add 또는 delete UseCase를 실행합니다.
      */
-    fun scrapArticle(article: ArticleUi) {
-        val originalArticle = originalArticles[article.id] ?: return
-
+    fun scrapArticle(state: ArticleUiState) {
         viewModelScope.launch {
-            if (article.isScrapped) {
-                deleteScrappedArticleUseCase(originalArticle.id)
+            if (state.isScrapped) {
+                deleteScrappedArticleUseCase(state.article.id)
             } else {
-                addScrapUseCase(originalArticle)
+                addScrapUseCase(state.article)
             }
         }
     }
@@ -171,7 +159,7 @@ internal class FeedViewModel @Inject constructor(
     /**
      * 현재 선택된 카테고리에 따라 화면에 표시될 기사 목록을 계산
      */
-    private fun recalculateVisibleArticles(state: FeedUiState): PersistentList<ArticleUi> {
+    private fun recalculateVisibleArticles(state: FeedUiState): PersistentList<ArticleUiState> {
         val articles = if (state.selectedCategory == ArticleCategory.ALL) {
             ArticleCategory.entries.asSequence()
                 .flatMap { (state.idsByCategory[it] ?: persistentListOf()).asSequence() }
@@ -181,6 +169,6 @@ internal class FeedViewModel @Inject constructor(
             (state.idsByCategory[state.selectedCategory] ?: persistentListOf()).asSequence()
                 .mapNotNull(state.articlesById::get)
         }
-        return articles.sortedByDescending { it.publishedAtInstant }.toPersistentList()
+        return articles.sortedByDescending { it.article.publishedAt }.toPersistentList()
     }
 }

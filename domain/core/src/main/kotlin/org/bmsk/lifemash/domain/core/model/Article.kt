@@ -3,16 +3,46 @@ package org.bmsk.lifemash.domain.core.model
 import java.time.Instant
 
 @JvmInline
-value class ArticleId(val value: String)
+value class ArticleId private constructor(val value: String) {
+    companion object {
+        fun from(raw: String): ArticleId {
+            require(raw.isNotBlank()) { "ArticleId must not be blank" }
+            return ArticleId(raw)
+        }
+    }
+}
 
 @JvmInline
-value class Publisher(val name: String)
+value class Publisher private constructor(val name: String) {
+    companion object {
+        val unknown: Publisher = Publisher("Unknown")
+
+        fun from(raw: String): Publisher {
+            require(raw.isNotBlank()) { "Publisher must not be blank" }
+            return Publisher(raw)
+        }
+    }
+}
 
 @JvmInline
-value class ArticleUrl(val value: String)
+value class ArticleUrl private constructor(val value: String) {
+    companion object {
+        fun from(raw: String): ArticleUrl {
+            require(raw.startsWith("http")) { "Invalid ArticleUrl: $raw" }
+            return ArticleUrl(raw)
+        }
+    }
+}
 
 @JvmInline
-value class ImageUrl(val value: String)
+value class ImageUrl private constructor(val value: String) {
+    companion object {
+        fun from(raw: String): ImageUrl {
+            require(raw.isNotBlank()) { "ImageUrl must not be blank" }
+            return ImageUrl(raw)
+        }
+    }
+}
 
 data class Article(
     val id: ArticleId,

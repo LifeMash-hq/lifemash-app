@@ -24,12 +24,10 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toPersistentList
 import org.bmsk.lifemash.domain.core.model.Article
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
 import org.bmsk.lifemash.domain.core.model.ArticleId
 import java.net.URI
-import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -42,10 +40,10 @@ internal sealed interface LoadState {
 
 internal data class FeedUiState(
     val selectedCategory: ArticleCategory,
-    val articlesById: PersistentMap<ArticleId, ArticleUi>,
+    val articlesById: PersistentMap<ArticleId, ArticleUiState>,
     val idsByCategory: PersistentMap<ArticleCategory, PersistentList<ArticleId>>,
     val loadStateByCategory: PersistentMap<ArticleCategory, LoadState>,
-    val visibleArticles: PersistentList<ArticleUi> = persistentListOf(),
+    val visibleArticles: PersistentList<ArticleUiState> = persistentListOf(),
     val isSearchMode: Boolean = false,
     val queryText: String = "",
 ) {
@@ -61,35 +59,23 @@ internal data class FeedUiState(
     }
 }
 
-internal data class ArticleUi(
-    val id: ArticleId,
-    val publisher: String,
-    val title: String,
-    val summary: String,
-    val link: String,
-    val image: String?,
+internal data class ArticleUiState(
+    val article: Article,
     val publishedAtRelative: String,
-    val publishedAtInstant: Instant,
     val host: String,
-    val categories: PersistentList<ArticleCategory>,
     val isScrapped: Boolean,
 ) {
+    val id: ArticleId get() = article.id
+
     companion object {
         private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             .withZone(ZoneId.systemDefault())
 
-        fun from(article: Article, isScrapped: Boolean): ArticleUi {
-            return ArticleUi(
-                id = article.id,
-                publisher = article.publisher.name,
-                title = article.title,
-                summary = article.summary,
-                link = article.link.value,
-                image = article.image?.value,
+        fun from(article: Article, isScrapped: Boolean): ArticleUiState {
+            return ArticleUiState(
+                article = article,
                 publishedAtRelative = formatter.format(article.publishedAt),
-                publishedAtInstant = article.publishedAt,
                 host = URI(article.link.value).host ?: article.link.value,
-                categories = article.categories.toPersistentList(),
                 isScrapped = isScrapped,
             )
         }

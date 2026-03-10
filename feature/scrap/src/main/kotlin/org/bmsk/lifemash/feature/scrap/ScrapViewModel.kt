@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.domain.core.model.ArticleId
 import org.bmsk.lifemash.domain.scrap.usecase.DeleteScrappedArticleUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.GetScrappedArticlesUseCase
 import javax.inject.Inject
@@ -27,7 +26,7 @@ internal class ScrapViewModel @Inject constructor(
             if (it.isEmpty()) {
                 ScrapUiState.NewsEmpty
             } else {
-                val scrapUiModels = it.map { article -> ScrapUiModel.from(article) }.toPersistentList()
+                val scrapUiModels = it.map { article -> ScrapArticleUi.from(article) }.toPersistentList()
                 ScrapUiState.NewsLoaded(scrapUiModels)
             }
         }
@@ -39,9 +38,9 @@ internal class ScrapViewModel @Inject constructor(
             initialValue = ScrapUiState.NewsLoading
         )
 
-    fun deleteScrapNews(scrap: ScrapUiModel) {
+    fun deleteScrapNews(scrap: ScrapArticleUi) {
         viewModelScope.launch {
-            deleteScrappedArticleUseCase(ArticleId(scrap.id))
+            deleteScrappedArticleUseCase(scrap.article.id)
         }
     }
 }

@@ -85,11 +85,11 @@ class ScrapViewModelTest {
         // Given
         val newsList = listOf(
             Article(
-                id = ArticleId("1"),
-                publisher = Publisher("publisher"),
+                id = ArticleId.from("1"),
+                publisher = Publisher.from("publisher"),
                 title = "title",
                 summary = "summary",
-                link = ArticleUrl("link"),
+                link = ArticleUrl.from("https://example.com/article/1"),
                 image = null,
                 publishedAt = Instant.now(),
                 categories = listOf(ArticleCategory.CARTOON)
@@ -141,13 +141,17 @@ class ScrapViewModelTest {
     @DisplayName("Given 특정 뉴스가 있을 때, When 뉴스 삭제를 호출하면, Then deleteScrappedArticleUseCase가 호출된다")
     fun `Given a news, When deleteScrapNews is called, Then deleteScrappedArticleUseCase is called`() = runTest {
         // Given
-        val scrap = ScrapUiModel(
-            id = "1",
-            title = "title",
-            publisher = "publisher",
-            publishedAtRelative = "1 day ago",
-            link = "link",
-            imageUrl = null
+        val scrap = ScrapArticleUi.from(
+            Article(
+                id = ArticleId.from("1"),
+                publisher = Publisher.from("publisher"),
+                title = "title",
+                summary = "",
+                link = ArticleUrl.from("https://example.com/article/1"),
+                image = null,
+                publishedAt = java.time.Instant.now(),
+                categories = emptyList(),
+            )
         )
         val getScrappedArticlesUseCase = object : GetScrappedArticlesUseCase {
             override fun invoke() = flowOf(emptyList<Article>())
