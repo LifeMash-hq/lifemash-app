@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.common)
     implementation(projects.domain.core)
     implementation(projects.domain.featureFeed)
     implementation(projects.domain.featureScrap)
