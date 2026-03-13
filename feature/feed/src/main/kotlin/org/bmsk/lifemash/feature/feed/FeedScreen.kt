@@ -35,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -237,8 +238,8 @@ internal fun ArticleCard(
 @Composable
 private fun ArticleImage(url: String?) {
     val painter = rememberAsyncImagePainter(model = url)
-    // 아래 조건이 항상 false라는 Lint 등장 이유?
-    val isLoading = painter.state is AsyncImagePainter.State.Loading
+    val painterState by painter.state.collectAsState()
+    val isLoading = painterState is AsyncImagePainter.State.Loading
 
     Box(
         modifier = Modifier
