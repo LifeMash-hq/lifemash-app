@@ -2,8 +2,7 @@ package org.bmsk.lifemash.feature.scrap
 
 import kotlinx.collections.immutable.PersistentList
 import org.bmsk.lifemash.domain.core.model.Article
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import org.bmsk.lifemash.core.common.ArticleDateFormatter
 
 internal sealed interface ScrapUiState {
     data object NewsLoading : ScrapUiState
@@ -22,13 +21,10 @@ internal data class ScrapArticleUi(
     val publishedAtRelative: String,
 ) {
     companion object {
-        private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-            .withZone(ZoneId.systemDefault())
-
         fun from(article: Article): ScrapArticleUi {
             return ScrapArticleUi(
                 article = article,
-                publishedAtRelative = formatter.format(article.publishedAt),
+                publishedAtRelative = ArticleDateFormatter.format(article.publishedAt),
             )
         }
     }

@@ -27,9 +27,8 @@ import kotlinx.collections.immutable.persistentMapOf
 import org.bmsk.lifemash.domain.core.model.Article
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
 import org.bmsk.lifemash.domain.core.model.ArticleId
+import org.bmsk.lifemash.core.common.ArticleDateFormatter
 import java.net.URI
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 internal sealed interface LoadState {
     data object NotLoaded : LoadState
@@ -68,13 +67,10 @@ internal data class ArticleUiState(
     val id: ArticleId get() = article.id
 
     companion object {
-        private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-            .withZone(ZoneId.systemDefault())
-
         fun from(article: Article, isScrapped: Boolean): ArticleUiState {
             return ArticleUiState(
                 article = article,
-                publishedAtRelative = formatter.format(article.publishedAt),
+                publishedAtRelative = ArticleDateFormatter.format(article.publishedAt),
                 host = URI(article.link.value).host ?: article.link.value,
                 isScrapped = isScrapped,
             )
