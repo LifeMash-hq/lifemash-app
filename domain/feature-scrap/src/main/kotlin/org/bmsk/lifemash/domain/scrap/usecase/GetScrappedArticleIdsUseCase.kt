@@ -6,10 +6,14 @@ import org.bmsk.lifemash.domain.core.model.ArticleId
 import org.bmsk.lifemash.domain.scrap.repository.ScrapRepository
 import javax.inject.Inject
 
-class GetScrappedArticleIdsUseCase @Inject constructor(
+interface GetScrappedArticleIdsUseCase {
+    operator fun invoke(): Flow<Set<ArticleId>>
+}
+
+internal class GetScrappedArticleIdsUseCaseImpl @Inject constructor(
     private val scrapRepository: ScrapRepository
-) {
-    operator fun invoke(): Flow<Set<ArticleId>> {
+) : GetScrappedArticleIdsUseCase {
+    override operator fun invoke(): Flow<Set<ArticleId>> {
         return scrapRepository.getScrappedArticles().map { articles ->
             articles.map { it.id }.toSet()
         }

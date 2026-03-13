@@ -23,4 +23,9 @@ internal abstract class ScrapUseCaseModule {
     abstract fun bindGetScrappedArticlesUseCase(
         impl: GetScrappedArticlesUseCaseImpl
     ): GetScrappedArticlesUseCase
+
+    @Binds
+    abstract fun bindGetScrappedArticleIdsUseCase(
+        impl: GetScrappedArticleIdsUseCaseImpl
+    ): GetScrappedArticleIdsUseCase
 }
