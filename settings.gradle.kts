@@ -35,6 +35,7 @@ include(
 )
 
 include(
+    ":core:common",
     ":core:designsystem",
     ":core:model",
     ":core:network",
