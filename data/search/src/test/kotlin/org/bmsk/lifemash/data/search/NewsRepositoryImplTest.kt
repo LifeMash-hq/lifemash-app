@@ -9,7 +9,6 @@ import org.bmsk.lifemash.core.network.service.GoogleNewsService
 import org.bmsk.lifemash.core.network.service.SbsNewsService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -37,8 +36,8 @@ class NewsRepositoryImplTest {
     )
 
     @Test
-    @DisplayName("getSbsNews - 서비스가 아이템 리스트를 반환하면 Article 리스트로 매핑된다")
-    fun `getSbsNews returns mapped articles when service returns items`() = runTest {
+    fun `서비스가 아이템을 반환하면 getSbsNews는 Article 리스트로 매핑한다`() = runTest {
+        // Given
         fakeSbsNewsService.response = {
             NewsRss(
                 RssChannel(
@@ -54,38 +53,43 @@ class NewsRepositoryImplTest {
             )
         }
 
+        // When
         val result = createRepository().getSbsNews(SBSSection.POLITICS)
 
+        // Then
         assertEquals(1, result.size)
         assertEquals("Test Title", result[0].title)
         assertEquals("https://example.com/1", result[0].link.value)
     }
 
     @Test
-    @DisplayName("getSbsNews - 서비스가 items=null을 반환하면 빈 리스트를 반환한다")
-    fun `getSbsNews returns empty list when items is null`() = runTest {
+    fun `서비스가 items를 null로 반환하면 getSbsNews는 빈 리스트를 반환한다`() = runTest {
+        // Given
         fakeSbsNewsService.response = {
             NewsRss(RssChannel(title = "SBS", items = null))
         }
 
+        // When
         val result = createRepository().getSbsNews(SBSSection.ECONOMICS)
 
+        // Then
         assertTrue(result.isEmpty())
     }
 
     @Test
-    @DisplayName("getSbsNews - 서비스가 예외를 발생시키면 호출자에게 전파된다")
-    fun `getSbsNews propagates exception from service`() = runTest {
+    fun `서비스가 예외를 발생시키면 getSbsNews는 예외를 전파한다`() = runTest {
+        // Given
         fakeSbsNewsService.response = { throw RuntimeException("network error") }
 
+        // When & Then
         assertThrows<RuntimeException> {
             createRepository().getSbsNews(SBSSection.SOCIAL)
         }
     }
 
     @Test
-    @DisplayName("getGoogleNews - 서비스가 아이템 리스트를 반환하면 Article 리스트로 매핑된다")
-    fun `getGoogleNews returns mapped articles when service returns items`() = runTest {
+    fun `서비스가 아이템을 반환하면 getGoogleNews는 Article 리스트로 매핑한다`() = runTest {
+        // Given
         fakeGoogleNewsService.response = {
             NewsRss(
                 RssChannel(
@@ -101,30 +105,35 @@ class NewsRepositoryImplTest {
             )
         }
 
+        // When
         val result = createRepository().getGoogleNews("테스트")
 
+        // Then
         assertEquals(1, result.size)
         assertEquals("Google Article", result[0].title)
         assertEquals("https://news.google.com/1", result[0].link.value)
     }
 
     @Test
-    @DisplayName("getGoogleNews - 서비스가 items=null을 반환하면 빈 리스트를 반환한다")
-    fun `getGoogleNews returns empty list when items is null`() = runTest {
+    fun `서비스가 items를 null로 반환하면 getGoogleNews는 빈 리스트를 반환한다`() = runTest {
+        // Given
         fakeGoogleNewsService.response = {
             NewsRss(RssChannel(title = "Google", items = null))
         }
 
+        // When
         val result = createRepository().getGoogleNews("테스트")
 
+        // Then
         assertTrue(result.isEmpty())
     }
 
     @Test
-    @DisplayName("getGoogleNews - 서비스가 예외를 발생시키면 호출자에게 전파된다")
-    fun `getGoogleNews propagates exception from service`() = runTest {
+    fun `서비스가 예외를 발생시키면 getGoogleNews는 예외를 전파한다`() = runTest {
+        // Given
         fakeGoogleNewsService.response = { throw RuntimeException("timeout") }
 
+        // When & Then
         assertThrows<RuntimeException> {
             createRepository().getGoogleNews("테스트")
         }

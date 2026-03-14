@@ -9,4 +9,5 @@ android {
 dependencies {
     implementation(projects.core.network)
     implementation(projects.domain.featureFeed)
+    testImplementation(projects.core.model)
 }
