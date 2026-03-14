@@ -7,7 +7,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.model)
-    implementation(projects.core.network)
+    implementation(projects.data.network)
     implementation(projects.domain.featureSearch)
 }

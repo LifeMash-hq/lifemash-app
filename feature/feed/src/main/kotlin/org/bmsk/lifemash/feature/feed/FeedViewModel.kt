@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.domain.core.model.ArticleCategory
-import org.bmsk.lifemash.domain.core.model.ArticleId
+import org.bmsk.lifemash.model.ArticleCategory
+import org.bmsk.lifemash.model.ArticleId
 import org.bmsk.lifemash.domain.feed.usecase.GetArticlesUseCase
 import org.bmsk.lifemash.domain.history.usecase.AddToHistoryUseCase
 import org.bmsk.lifemash.domain.history.usecase.GetReadArticleIdsUseCase

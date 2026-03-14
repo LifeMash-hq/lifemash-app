@@ -1,6 +1,6 @@
 package org.bmsk.lifemash.domain.feed.usecase
 
-import org.bmsk.lifemash.domain.core.model.Article
+import org.bmsk.lifemash.model.Article
 import org.bmsk.lifemash.domain.feed.repository.ArticleRepository
 import javax.inject.Inject
 

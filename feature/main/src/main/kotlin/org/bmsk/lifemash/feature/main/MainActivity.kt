@@ -16,7 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.feature.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.feature.feed.api.FeedNavController
 import org.bmsk.lifemash.feature.feed.api.FeedNavGraph
 import org.bmsk.lifemash.feature.feed.api.FeedNavGraphInfo

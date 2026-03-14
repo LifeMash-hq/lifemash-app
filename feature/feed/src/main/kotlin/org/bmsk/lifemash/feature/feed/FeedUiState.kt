@@ -24,11 +24,15 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
-import org.bmsk.lifemash.domain.core.model.Article
-import org.bmsk.lifemash.domain.core.model.ArticleCategory
-import org.bmsk.lifemash.domain.core.model.ArticleId
-import org.bmsk.lifemash.core.common.ArticleDateFormatter
+import org.bmsk.lifemash.model.Article
+import org.bmsk.lifemash.model.ArticleCategory
+import org.bmsk.lifemash.model.ArticleId
 import java.net.URI
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+private val ArticleDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    .withZone(ZoneId.systemDefault())
 
 internal sealed interface LoadState {
     data object NotLoaded : LoadState

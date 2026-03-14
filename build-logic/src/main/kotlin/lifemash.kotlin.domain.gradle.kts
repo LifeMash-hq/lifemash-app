@@ -8,7 +8,7 @@ plugins {
 configureHiltKotlin()
 
 dependencies {
-    implementation(project(":domain:core"))
+    implementation(project(":model"))
 
     val libs = project.extensions.libs
     implementation(libs.findLibrary("inject").get())

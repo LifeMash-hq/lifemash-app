@@ -30,11 +30,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
-import org.bmsk.lifemash.domain.core.model.Article
-import org.bmsk.lifemash.domain.core.model.ArticleId
-import org.bmsk.lifemash.domain.core.model.ArticleUrl
-import org.bmsk.lifemash.domain.core.model.Publisher
+import org.bmsk.lifemash.feature.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.model.Article
+import org.bmsk.lifemash.model.ArticleId
+import org.bmsk.lifemash.model.ArticleUrl
+import org.bmsk.lifemash.model.Publisher
 import org.bmsk.lifemash.feature.scrap.component.ScrapNewsItem
 import org.bmsk.lifemash.feature.scrap.component.rememberScrapNewsItemState
 import java.time.Instant

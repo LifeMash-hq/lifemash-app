@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.core.model)
+    implementation(projects.model)
     implementation(projects.feature.main)
     implementation(projects.feature.mainNavGraph)
     implementation(projects.feature.scrap)
@@ -17,7 +17,6 @@ dependencies {
     implementation(projects.domain.featureHistory)
     implementation(projects.domain.featureScrap)
 
-    implementation(projects.data.core)
     implementation(projects.data.article)
     implementation(projects.data.history)
     implementation(projects.data.scrap)

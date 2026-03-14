@@ -1,6 +1,6 @@
 package org.bmsk.lifemash.domain.scrap.usecase
 
-import org.bmsk.lifemash.domain.core.model.ArticleId
+import org.bmsk.lifemash.model.ArticleId
 import org.bmsk.lifemash.domain.scrap.repository.ScrapRepository
 import javax.inject.Inject
 
