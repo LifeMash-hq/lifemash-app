@@ -1,3 +1,6 @@
+import com.android.build.api.dsl.LibraryExtension
+import org.gradle.kotlin.dsl.configure
+
 plugins {
     id("lifemash.android.library")
     id("lifemash.android.hilt")
@@ -5,7 +8,7 @@ plugins {
     id("kotlin-kapt")
 }
 
-android {
+extensions.configure<LibraryExtension> {
     namespace = "org.bmsk.lifemash.data.network"
 
     defaultConfig {
