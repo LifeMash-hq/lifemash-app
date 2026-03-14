@@ -1,7 +1,7 @@
 package org.bmsk.lifemash.data.network.di
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
+import org.bmsk.lifemash.data.network.xml.RssConverterFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -29,7 +29,7 @@ internal object ServiceModule {
     @Singleton
     fun providesGoogleNewsService(
         okHttpClientBuilder: OkHttpClient.Builder,
-        tikXmlConverterFactory: TikXmlConverterFactory,
+        tikXmlConverterFactory: RssConverterFactory,
     ): GoogleNewsService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL_GOOGLE)
@@ -43,7 +43,7 @@ internal object ServiceModule {
     @Singleton
     fun providesSbsNewsService(
         okHttpClientBuilder: OkHttpClient.Builder,
-        tikXmlConverterFactory: TikXmlConverterFactory,
+        tikXmlConverterFactory: RssConverterFactory,
     ): SbsNewsService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL_SBS)
