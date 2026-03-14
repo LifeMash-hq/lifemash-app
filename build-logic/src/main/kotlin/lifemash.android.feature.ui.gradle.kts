@@ -1,12 +1,14 @@
+import com.android.build.api.dsl.LibraryExtension
 import org.bmsk.lifemash.configureHiltAndroid
 import org.bmsk.lifemash.libs
+import org.gradle.kotlin.dsl.configure
 
 plugins {
     id("lifemash.android.library")
     id("lifemash.android.compose")
 }
 
-android {
+extensions.configure<LibraryExtension> {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -1,7 +1,9 @@
+import com.android.build.api.dsl.ApplicationExtension
 import org.bmsk.lifemash.configureHiltAndroid
 import org.bmsk.lifemash.configureKotestAndroid
 import org.bmsk.lifemash.configureKotlinAndroid
 import org.bmsk.lifemash.libs
+import org.gradle.kotlin.dsl.configure
 
 plugins {
     id("com.android.application")
@@ -13,7 +15,7 @@ configureKotlinAndroid()
 configureHiltAndroid()
 configureKotestAndroid()
 
-android {
+extensions.configure<ApplicationExtension> {
     namespace = "org.bmsk.lifemash"
 
     defaultConfig {
