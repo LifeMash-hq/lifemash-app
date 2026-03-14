@@ -6,7 +6,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.bmsk.lifemash.core.network.service.LifeMashFirebaseService
 import org.bmsk.lifemash.data.article.model.toDomain
-import org.bmsk.lifemash.data.article.model.toServiceCategory
 import org.bmsk.lifemash.domain.core.model.Article
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
 import org.bmsk.lifemash.domain.feed.repository.ArticleRepository
@@ -60,7 +59,7 @@ internal class ArticleRepositoryImpl @Inject constructor(
     private suspend fun fetchFromNetwork(category: ArticleCategory): List<Article> {
         return withContext(Dispatchers.IO) {
             lifeMashFirebaseService
-                .getArticles(category = category.toServiceCategory())
+                .getArticles(category = category.key)
                 .mapNotNull { response ->
                     runCatching {
                         response.toDomain()
