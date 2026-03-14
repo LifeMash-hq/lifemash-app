@@ -1,0 +1,42 @@
+package org.bmsk.lifemash.feed.ui
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.bmsk.lifemash.model.ArticleCategory
+
+internal object FeedRoute {
+    const val ROUTE = "feed"
+
+    @Composable
+    operator fun invoke(
+        onArticleOpen: (String) -> Unit,
+        viewModel: FeedViewModel = hiltViewModel()
+    ) {
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        LaunchedEffect(uiState.selectedCategory) {
+            viewModel.getArticles(uiState.selectedCategory)
+        }
+
+        FeedScreen(
+            selectedCategory = uiState.selectedCategory,
+            categories = ArticleCategory.entries,
+            articles = uiState.visibleArticles,
+            isSearchMode = uiState.isSearchMode,
+            queryText = uiState.queryText,
+            onArticleOpen = {
+                viewModel.addToHistory(it.article.id)
+                onArticleOpen(it.article.link.value)
+            },
+            onScrapClick = viewModel::scrapArticle,
+            onQueryTextChange = viewModel::setQueryText,
+            onQueryTextClear = { viewModel.setQueryText("") },
+            onSearchModeChange = viewModel::setSearchMode,
+            onSearchClick = {},
+            onCategorySelect = viewModel::setCategory
+        )
+    }
+}
