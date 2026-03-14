@@ -1,19 +1,17 @@
 plugins {
-    id("lifemash.android.feature")
+    id("lifemash.android.feature.ui")
 }
 
 android {
-    namespace = "org.bmsk.lifemash.feature.main"
+    namespace = "org.bmsk.lifemash.main"
 }
 
 dependencies {
-    implementation(projects.feature.all)
+    implementation(projects.shared.common)
+    implementation(projects.shared.navigation)
+    implementation(projects.shared.webview)
+    implementation(projects.feature.feed.api)
+    implementation(projects.feature.scrap.api)
 
-    implementation(projects.feature.mainNavGraph)
-    implementation(projects.feature.scrapApi)
-    implementation(projects.feature.webviewApi)
-    implementation(projects.feature.feedApi)
-
-    // navigation
     implementation(libs.androidx.navigation.ui.ktx)
 }

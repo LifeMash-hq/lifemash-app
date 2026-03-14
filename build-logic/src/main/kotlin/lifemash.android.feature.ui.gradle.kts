@@ -15,7 +15,7 @@ android {
 configureHiltAndroid()
 
 dependencies {
-    implementation(project(":feature-shared:designsystem"))
+    implementation(project(":shared:designsystem"))
     implementation(project(":model"))
 
     val libs = project.extensions.libs
@@ -25,6 +25,4 @@ dependencies {
 
     implementation(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
     implementation(libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
-
-    testImplementation(libs.findLibrary("mockk").get())
 }
