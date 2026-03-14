@@ -1,10 +1,6 @@
 package org.bmsk.lifemash.core.network.service
 
 import android.util.Log
-import com.algolia.client.api.SearchClient
-import com.algolia.client.configuration.ClientOptions
-import com.algolia.client.model.search.SearchForHits
-import com.algolia.client.model.search.SearchMethodParams
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.functions
