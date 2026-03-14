@@ -23,6 +23,7 @@ include(":app")
 include(
     ":domain:core",
     ":domain:feature-feed",
+    ":domain:feature-history",
     ":domain:feature-scrap",
     ":domain:feature-search",
 )
@@ -30,6 +31,7 @@ include(
 include(
     ":data:core",
     ":data:article",
+    ":data:history",
     ":data:scrap",
     ":data:search",
 )

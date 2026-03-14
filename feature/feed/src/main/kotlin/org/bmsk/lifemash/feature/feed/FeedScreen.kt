@@ -196,7 +196,12 @@ internal fun ArticleCard(
                         article.article.title,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = if (article.isRead) {
+                            MaterialTheme.colorScheme.outline
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        }
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(

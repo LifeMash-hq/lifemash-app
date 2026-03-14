@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
 import org.bmsk.lifemash.domain.core.model.ArticleId
 import org.bmsk.lifemash.domain.feed.usecase.GetArticlesUseCase
+import org.bmsk.lifemash.domain.history.usecase.AddToHistoryUseCase
+import org.bmsk.lifemash.domain.history.usecase.GetReadArticleIdsUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.AddScrapUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.DeleteScrappedArticleUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.GetScrappedArticleIdsUseCase
@@ -28,6 +30,8 @@ internal class FeedViewModel @Inject constructor(
     getScrappedArticleIdsUseCase: GetScrappedArticleIdsUseCase,
     private val addScrapUseCase: AddScrapUseCase,
     private val deleteScrappedArticleUseCase: DeleteScrappedArticleUseCase,
+    getReadArticleIdsUseCase: GetReadArticleIdsUseCase,
+    private val addToHistoryUseCase: AddToHistoryUseCase,
 ) : ViewModel() {
 
     // region State
@@ -50,21 +54,31 @@ internal class FeedViewModel @Inject constructor(
         )
 
     /**
+     * 읽은 기사의 ID를 실시간으로 관찰하는 StateFlow입니다.
+     */
+    private val readArticleIds: StateFlow<Set<ArticleId>> = getReadArticleIdsUseCase()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptySet()
+        )
+
+    /**
      * UI에 최종적으로 노출되는 StateFlow입니다.
-     * ViewModel의 내부 상태(_internalState)와 스크랩된 기사 ID 목록(scrappedArticleIds)을
-     * 결합(combine)하여 최종 UI 상태를 생성합니다.
-     *
-     * 스크랩 상태가 변경되면, 이 Flow가 자동으로 새로운 UI 상태를 발행하여 UI를 업데이트합니다.
+     * ViewModel의 내부 상태(_internalState)와 스크랩된 기사 ID 목록(scrappedArticleIds),
+     * 읽은 기사 ID 목록(readArticleIds)을 결합(combine)하여 최종 UI 상태를 생성합니다.
      */
     val uiState: StateFlow<FeedUiState> = combine(
         _internalState,
-        scrappedArticleIds
-    ) { state, scrappedIds ->
+        scrappedArticleIds,
+        readArticleIds,
+    ) { state, scrappedIds, readIds ->
         val updatedArticlesById = state.articlesById
             .mapValues { (_, articleState) ->
                 val newIsScrapped = articleState.article.id in scrappedIds
-                if (articleState.isScrapped != newIsScrapped) {
-                    articleState.copy(isScrapped = newIsScrapped)
+                val newIsRead = articleState.article.id in readIds
+                if (articleState.isScrapped != newIsScrapped || articleState.isRead != newIsRead) {
+                    articleState.copy(isScrapped = newIsScrapped, isRead = newIsRead)
                 } else {
                     articleState
                 }
@@ -96,7 +110,13 @@ internal class FeedViewModel @Inject constructor(
                 getArticlesUseCase(category)
             }.onSuccess { articles ->
                 val articleUiStates = articles
-                    .map { ArticleUiState.from(it, isScrapped = it.id in scrappedArticleIds.value) }
+                    .map {
+                        ArticleUiState.from(
+                            it,
+                            isScrapped = it.id in scrappedArticleIds.value,
+                            isRead = it.id in readArticleIds.value,
+                        )
+                    }
                     .toPersistentList()
 
                 _internalState.update { currentState ->
@@ -142,6 +162,12 @@ internal class FeedViewModel @Inject constructor(
             } else {
                 addScrapUseCase(state.article)
             }
+        }
+    }
+
+    fun addToHistory(articleId: ArticleId) {
+        viewModelScope.launch {
+            addToHistoryUseCase(articleId)
         }
     }
 
