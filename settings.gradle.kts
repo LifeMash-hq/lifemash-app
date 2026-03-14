@@ -20,34 +20,30 @@ gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:testClasses"
 rootProject.name = "LifeMash"
 include(":app")
 include(":model")
+include(":lint")
 
 include(
-    ":domain:feature-feed",
-    ":domain:feature-history",
-    ":domain:feature-scrap",
-    ":domain:feature-search",
+    ":feature:feed:domain",
+    ":feature:feed:data",
+    ":feature:feed:api",
+    ":feature:feed:ui",
 )
 
 include(
-    ":data:article",
-    ":data:history",
-    ":data:network",
-    ":data:scrap",
-    ":data:search",
+    ":feature:scrap:domain",
+    ":feature:scrap:data",
+    ":feature:scrap:api",
+    ":feature:scrap:ui",
 )
 
 include(
-    ":feature-shared:designsystem",
-)
-
-include(
-    ":feature:main-nav-graph",
     ":feature:main",
-    ":feature:feed",
-    ":feature:feed-api",
-    ":feature:all",
-    ":feature:scrap-api",
-    ":feature:scrap",
-    ":feature:webview-api",
-    ":feature:webview",
+)
+
+include(
+    ":shared:network",
+    ":shared:navigation",
+    ":shared:designsystem",
+    ":shared:common",
+    ":shared:webview",
 )
