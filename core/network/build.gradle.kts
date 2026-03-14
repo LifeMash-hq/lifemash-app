@@ -32,9 +32,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.functions)
-    implementation(platform(libs.algolia.bom))
-    implementation(libs.algolia.client)
-    implementation(libs.ktor.client.okhttp)
 
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext)

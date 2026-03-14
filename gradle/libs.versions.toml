@@ -62,8 +62,6 @@ ossLicensesPlugin = "0.10.6"
 
 google-services = "4.4.3"
 firebaseCrashlytics = "3.0.6"
-algolia = "3.27.0"
-ktor = "2.3.7"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -167,9 +165,6 @@ inject = "javax.inject:javax.inject:1"
 kotlinx-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxImmutable" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
-algolia-bom = { group = "com.algolia", name = "algoliasearch-client-kotlin-bom", version.ref = "algolia" }
-algolia-client = { group = "com.algolia", name = "algoliasearch-client-kotlin" }
-ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
