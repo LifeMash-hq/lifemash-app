@@ -14,8 +14,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal fun Project.configureKotlinAndroid() {
-    pluginManager.apply("org.jetbrains.kotlin.android")
-
     val libs = extensions.libs
 
     extensions.findByType<LibraryExtension>()?.applyAndroidOptions()
