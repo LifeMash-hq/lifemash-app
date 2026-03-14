@@ -8,19 +8,19 @@ plugins {
 dependencies {
     implementation(projects.model)
     implementation(projects.feature.main)
-    implementation(projects.feature.mainNavGraph)
-    implementation(projects.feature.scrap)
-    implementation(projects.feature.webview)
-    implementation(projects.feature.feed)
 
-    implementation(projects.domain.featureFeed)
-    implementation(projects.domain.featureHistory)
-    implementation(projects.domain.featureScrap)
+    implementation(projects.feature.feed.domain)
+    implementation(projects.feature.feed.data)
+    implementation(projects.feature.feed.api)
+    implementation(projects.feature.feed.ui)
 
-    implementation(projects.data.article)
-    implementation(projects.data.history)
-    implementation(projects.data.scrap)
-    implementation(projects.data.search)
+    implementation(projects.feature.scrap.domain)
+    implementation(projects.feature.scrap.data)
+    implementation(projects.feature.scrap.api)
+    implementation(projects.feature.scrap.ui)
+
+    implementation(projects.shared.navigation)
+    implementation(projects.shared.webview)
 
     implementation(libs.androidx.appcompat)
     implementation(platform(libs.firebase.bom))
