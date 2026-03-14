@@ -10,11 +10,11 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.bmsk.lifemash.domain.core.model.Article
-import org.bmsk.lifemash.domain.core.model.ArticleCategory
-import org.bmsk.lifemash.domain.core.model.ArticleId
-import org.bmsk.lifemash.domain.core.model.ArticleUrl
-import org.bmsk.lifemash.domain.core.model.Publisher
+import org.bmsk.lifemash.model.Article
+import org.bmsk.lifemash.model.ArticleCategory
+import org.bmsk.lifemash.model.ArticleId
+import org.bmsk.lifemash.model.ArticleUrl
+import org.bmsk.lifemash.model.Publisher
 import org.bmsk.lifemash.domain.scrap.usecase.DeleteScrappedArticleUseCase
 import org.bmsk.lifemash.domain.scrap.usecase.GetScrappedArticlesUseCase
 import org.junit.jupiter.api.AfterEach

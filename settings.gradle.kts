@@ -19,9 +19,9 @@ gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:testClasses"
 
 rootProject.name = "LifeMash"
 include(":app")
+include(":model")
 
 include(
-    ":domain:core",
     ":domain:feature-feed",
     ":domain:feature-history",
     ":domain:feature-scrap",
@@ -29,18 +29,15 @@ include(
 )
 
 include(
-    ":data:core",
     ":data:article",
     ":data:history",
+    ":data:network",
     ":data:scrap",
     ":data:search",
 )
 
 include(
-    ":core:common",
-    ":core:designsystem",
-    ":core:model",
-    ":core:network",
+    ":feature-shared:designsystem",
 )
 
 include(

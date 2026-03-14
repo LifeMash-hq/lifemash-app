@@ -57,15 +57,15 @@ import coil3.compose.rememberAsyncImagePainter
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import org.bmsk.lifemash.core.designsystem.component.ScrapButton
-import org.bmsk.lifemash.core.designsystem.component.SpacerH
-import org.bmsk.lifemash.core.designsystem.theme.LifeMashTheme
-import org.bmsk.lifemash.domain.core.model.Article
-import org.bmsk.lifemash.domain.core.model.ArticleCategory
-import org.bmsk.lifemash.domain.core.model.ArticleId
-import org.bmsk.lifemash.domain.core.model.ArticleUrl
-import org.bmsk.lifemash.domain.core.model.ImageUrl
-import org.bmsk.lifemash.domain.core.model.Publisher
+import org.bmsk.lifemash.feature.designsystem.component.ScrapButton
+import org.bmsk.lifemash.feature.designsystem.component.SpacerH
+import org.bmsk.lifemash.feature.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.model.Article
+import org.bmsk.lifemash.model.ArticleCategory
+import org.bmsk.lifemash.model.ArticleId
+import org.bmsk.lifemash.model.ArticleUrl
+import org.bmsk.lifemash.model.ImageUrl
+import org.bmsk.lifemash.model.Publisher
 import java.time.Instant
 
 @OptIn(ExperimentalFoundationApi::class)

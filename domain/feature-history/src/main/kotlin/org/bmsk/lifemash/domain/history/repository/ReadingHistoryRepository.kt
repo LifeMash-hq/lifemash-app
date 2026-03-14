@@ -1,7 +1,7 @@
 package org.bmsk.lifemash.domain.history.repository
 
 import kotlinx.coroutines.flow.Flow
-import org.bmsk.lifemash.domain.core.model.ArticleId
+import org.bmsk.lifemash.model.ArticleId
 
 interface ReadingHistoryRepository {
     fun getReadArticleIds(): Flow<Set<ArticleId>>

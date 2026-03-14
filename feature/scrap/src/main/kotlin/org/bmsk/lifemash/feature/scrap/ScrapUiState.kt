@@ -1,8 +1,12 @@
 package org.bmsk.lifemash.feature.scrap
 
 import kotlinx.collections.immutable.PersistentList
-import org.bmsk.lifemash.domain.core.model.Article
-import org.bmsk.lifemash.core.common.ArticleDateFormatter
+import org.bmsk.lifemash.model.Article
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+private val ArticleDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    .withZone(ZoneId.systemDefault())
 
 internal sealed interface ScrapUiState {
     data object NewsLoading : ScrapUiState

@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.bmsk.lifemash.domain.core.model.ArticleCategory
+import org.bmsk.lifemash.model.ArticleCategory
 
 internal object FeedRoute {
     const val ROUTE = "feed"

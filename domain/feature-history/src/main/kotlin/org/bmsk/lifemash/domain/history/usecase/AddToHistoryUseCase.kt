@@ -1,6 +1,6 @@
 package org.bmsk.lifemash.domain.history.usecase
 
-import org.bmsk.lifemash.domain.core.model.ArticleId
+import org.bmsk.lifemash.model.ArticleId
 import org.bmsk.lifemash.domain.history.repository.ReadingHistoryRepository
 import javax.inject.Inject
 
