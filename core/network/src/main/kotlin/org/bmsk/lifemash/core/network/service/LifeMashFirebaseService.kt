@@ -1,24 +1,25 @@
 package org.bmsk.lifemash.core.network.service
 
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.functions.functions
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
-import org.bmsk.lifemash.core.model.section.LifeMashCategory
-import org.bmsk.lifemash.core.network.response.LegacyLifeMashArticleResponse
+import kotlinx.coroutines.withContext
 import org.bmsk.lifemash.core.network.response.LifeMashArticleResponse
 import javax.inject.Inject
 
 interface LifeMashFirebaseService {
-    suspend fun getLatestNews(
-        limit: Int = 20,
-        category: LifeMashCategory? = null,
-    ): List<LegacyLifeMashArticleResponse>
-
     suspend fun getArticles(
         category: String,
         limit: Long = 20,
+    ): List<LifeMashArticleResponse>
+
+    suspend fun searchArticles(
+        query: String,
+        category: String? = null,
+        limit: Int = 20,
     ): List<LifeMashArticleResponse>
 }
 
@@ -26,28 +27,6 @@ interface LifeMashFirebaseService {
 internal class LifeMashFirebaseServiceImpl @Inject constructor(
     private val db: FirebaseFirestore
 ) : LifeMashFirebaseService {
-
-    override suspend fun getLatestNews(
-        limit: Int,
-        category: LifeMashCategory?
-    ): List<LegacyLifeMashArticleResponse> {
-        val safeLimit = limit.coerceAtLeast(1)
-
-        var query: Query = db.collection(ARTICLES)
-
-        if (category != null) {
-            query = query.whereArrayContains(Fields.CATEGORY, category.id)
-        }
-
-        query = query
-            .orderBy(Fields.PUBLISHED_TS, Query.Direction.DESCENDING)
-            .limit(safeLimit.toLong())
-
-        val snap = query.get().await()
-        return snap.documents.mapNotNull {
-            runCatching { it.toLifeMashArticle() }.getOrNull()
-        }
-    }
 
     override suspend fun getArticles(
         category: String,
@@ -85,33 +64,45 @@ internal class LifeMashFirebaseServiceImpl @Inject constructor(
         }
     }
 
-    private fun DocumentSnapshot.toLifeMashArticle(): LegacyLifeMashArticleResponse {
-        val publishedTs = get(Fields.PUBLISHED_TS) as Timestamp
-        return LegacyLifeMashArticleResponse(
-            id = id,
-            title = get(Fields.TITLE) as String,
-            url = get(Fields.URL) as String,
-            source = get(Fields.SOURCE) as String,
-            pubDate = publishedTs.toDate(),
-            summary = get(Fields.SUMMARY) as String,
-            category = LifeMashCategory.fromId(
-                (get(Fields.CATEGORY) as List<*>).filterIsInstance<String>().first()
-            ),
-            imageUrl = get(Fields.IMAGE_URL) as String
-        )
+    override suspend fun searchArticles(
+        query: String,
+        category: String?,
+        limit: Int,
+    ): List<LifeMashArticleResponse> = withContext(Dispatchers.IO) {
+        val functions = Firebase.functions(REGION)
+        val callable = functions.getHttpsCallable("searchArticles")
+
+        val params = buildMap<String, Any> {
+            put("query", query)
+            if (category != null) put("category", category)
+            put("limit", limit)
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        val result = callable.call(params).await().data as Map<String, Any?>
+
+        @Suppress("UNCHECKED_CAST")
+        val articles = (result["articles"] as? List<Map<String, Any?>>).orEmpty()
+
+        articles.map { article ->
+            @Suppress("UNCHECKED_CAST")
+            LifeMashArticleResponse(
+                id = article["id"] as? String ?: "",
+                publisher = article["publisher"] as? String,
+                title = article["title"] as? String,
+                summary = article["summary"] as? String,
+                link = article["link"] as? String,
+                image = article["image"] as? String,
+                publishedAt = (article["publishedAt"] as? Number)?.toLong(),
+                host = article["host"] as? String,
+                categories = (article["categories"] as? List<String>).orEmpty(),
+                visible = article["visible"] as? Boolean ?: true,
+            )
+        }
     }
 
     private companion object {
+        const val REGION = "asia-northeast3"
         const val ARTICLES = "articles"
-
-        object Fields {
-            const val TITLE = "title"
-            const val URL = "url"
-            const val SOURCE = "source"
-            const val PUBLISHED_TS = "published_ts"
-            const val SUMMARY = "summary"
-            const val CATEGORY = "categories"
-            const val IMAGE_URL = "image_url"
-        }
     }
 }

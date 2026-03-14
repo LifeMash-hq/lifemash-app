@@ -1,8 +1,6 @@
 package org.bmsk.lifemash.data.article.repository
 
 import kotlinx.coroutines.test.runTest
-import org.bmsk.lifemash.core.model.section.LifeMashCategory
-import org.bmsk.lifemash.core.network.response.LegacyLifeMashArticleResponse
 import org.bmsk.lifemash.core.network.response.LifeMashArticleResponse
 import org.bmsk.lifemash.core.network.service.LifeMashFirebaseService
 import org.bmsk.lifemash.domain.core.model.ArticleCategory
@@ -19,11 +17,6 @@ class ArticleRepositoryImplTest {
     private var responseProvider: (String) -> List<LifeMashArticleResponse> = { emptyList() }
 
     private val fakeFirebaseService = object : LifeMashFirebaseService {
-        override suspend fun getLatestNews(
-            limit: Int,
-            category: LifeMashCategory?,
-        ): List<LegacyLifeMashArticleResponse> = emptyList()
-
         override suspend fun getArticles(
             category: String,
             limit: Long,
