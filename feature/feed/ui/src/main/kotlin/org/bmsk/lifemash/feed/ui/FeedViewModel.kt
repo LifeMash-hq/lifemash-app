@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import org.bmsk.lifemash.model.ArticleCategory
 import org.bmsk.lifemash.model.ArticleId
 import org.bmsk.lifemash.feed.domain.usecase.GetArticlesUseCase
+import org.bmsk.lifemash.feed.domain.usecase.SearchArticlesUseCase
 import org.bmsk.lifemash.feed.domain.history.usecase.AddToHistoryUseCase
 import org.bmsk.lifemash.feed.domain.history.usecase.GetReadArticleIdsUseCase
 import org.bmsk.lifemash.scrap.domain.usecase.AddScrapUseCase
@@ -32,6 +33,7 @@ internal class FeedViewModel @Inject constructor(
     private val deleteScrappedArticleUseCase: DeleteScrappedArticleUseCase,
     getReadArticleIdsUseCase: GetReadArticleIdsUseCase,
     private val addToHistoryUseCase: AddToHistoryUseCase,
+    private val searchArticlesUseCase: SearchArticlesUseCase,
 ) : ViewModel() {
 
     // region State
@@ -175,8 +177,32 @@ internal class FeedViewModel @Inject constructor(
         _internalState.update { it.copy(queryText = queryText) }
     }
 
+    fun searchArticles(query: String) {
+        if (query.isBlank()) return
+        viewModelScope.launch {
+            runCatching {
+                searchArticlesUseCase(query)
+            }.onSuccess { articles ->
+                val articleUiStates = articles.map {
+                    ArticleUiState.from(
+                        it,
+                        isScrapped = it.id in scrappedArticleIds.value,
+                        isRead = it.id in readArticleIds.value,
+                    )
+                }.toPersistentList()
+                _internalState.update { it.copy(searchResults = articleUiStates) }
+            }
+        }
+    }
+
     fun setSearchMode(isSearchMode: Boolean) {
-        _internalState.update { it.copy(isSearchMode = isSearchMode) }
+        _internalState.update {
+            if (isSearchMode) {
+                it.copy(isSearchMode = true)
+            } else {
+                it.copy(isSearchMode = false, queryText = "", searchResults = persistentListOf())
+            }
+        }
     }
 
     fun setCategory(category: ArticleCategory) {
@@ -187,6 +213,9 @@ internal class FeedViewModel @Inject constructor(
      * 현재 선택된 카테고리에 따라 화면에 표시될 기사 목록을 계산
      */
     private fun recalculateVisibleArticles(state: FeedUiState): PersistentList<ArticleUiState> {
+        if (state.isSearchMode && state.searchResults.isNotEmpty()) {
+            return state.searchResults
+        }
         val articles = if (state.selectedCategory == ArticleCategory.ALL) {
             ArticleCategory.entries.asSequence()
                 .flatMap { (state.idsByCategory[it] ?: persistentListOf()).asSequence() }

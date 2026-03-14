@@ -35,7 +35,7 @@ internal object FeedRoute {
             onQueryTextChange = viewModel::setQueryText,
             onQueryTextClear = { viewModel.setQueryText("") },
             onSearchModeChange = viewModel::setSearchMode,
-            onSearchClick = {},
+            onSearchClick = viewModel::searchArticles,
             onCategorySelect = viewModel::setCategory
         )
     }
