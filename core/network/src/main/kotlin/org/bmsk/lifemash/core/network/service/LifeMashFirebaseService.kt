@@ -1,13 +1,13 @@
 package org.bmsk.lifemash.core.network.service
 
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.functions.functions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.bmsk.lifemash.core.network.response.LifeMashArticleResponse
+import org.bmsk.lifemash.core.network.response.SearchRequestBody
+import org.bmsk.lifemash.core.network.response.SearchRequestData
 import javax.inject.Inject
 
 interface LifeMashFirebaseService {
@@ -25,7 +25,8 @@ interface LifeMashFirebaseService {
 
 // LifeMash Firestore 호출용
 internal class LifeMashFirebaseServiceImpl @Inject constructor(
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val searchService: SearchService,
 ) : LifeMashFirebaseService {
 
     override suspend fun getArticles(
@@ -69,40 +70,33 @@ internal class LifeMashFirebaseServiceImpl @Inject constructor(
         category: String?,
         limit: Int,
     ): List<LifeMashArticleResponse> = withContext(Dispatchers.IO) {
-        val functions = Firebase.functions(REGION)
-        val callable = functions.getHttpsCallable("searchArticles")
+        val response = searchService.search(
+            SearchRequestBody(
+                data = SearchRequestData(
+                    query = query,
+                    category = category,
+                    limit = limit,
+                )
+            )
+        )
 
-        val params = buildMap<String, Any> {
-            put("query", query)
-            if (category != null) put("category", category)
-            put("limit", limit)
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        val result = callable.call(params).await().data as Map<String, Any?>
-
-        @Suppress("UNCHECKED_CAST")
-        val articles = (result["articles"] as? List<Map<String, Any?>>).orEmpty()
-
-        articles.map { article ->
-            @Suppress("UNCHECKED_CAST")
+        response.result.articles.map { article ->
             LifeMashArticleResponse(
-                id = article["id"] as? String ?: "",
-                publisher = article["publisher"] as? String,
-                title = article["title"] as? String,
-                summary = article["summary"] as? String,
-                link = article["link"] as? String,
-                image = article["image"] as? String,
-                publishedAt = (article["publishedAt"] as? Number)?.toLong(),
-                host = article["host"] as? String,
-                categories = (article["categories"] as? List<String>).orEmpty(),
-                visible = article["visible"] as? Boolean ?: true,
+                id = article.id,
+                publisher = article.publisher,
+                title = article.title,
+                summary = article.summary,
+                link = article.link,
+                image = article.image,
+                publishedAt = article.publishedAt,
+                host = article.host,
+                categories = article.categories,
+                visible = article.visible,
             )
         }
     }
 
     private companion object {
-        const val REGION = "asia-northeast3"
         const val ARTICLES = "articles"
     }
 }

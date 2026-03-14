@@ -13,4 +13,9 @@ internal abstract class FeedUseCaseModule {
     abstract fun provideGetArticlesUseCase(
         impl: GetArticlesUseCaseImpl
     ): GetArticlesUseCase
+
+    @Binds
+    abstract fun provideSearchArticlesUseCase(
+        impl: SearchArticlesUseCaseImpl
+    ): SearchArticlesUseCase
 }
