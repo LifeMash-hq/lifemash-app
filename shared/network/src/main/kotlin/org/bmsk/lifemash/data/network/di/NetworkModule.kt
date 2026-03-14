@@ -1,7 +1,6 @@
 package org.bmsk.lifemash.data.network.di
 
-import com.tickaroo.tikxml.TikXml
-import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
+import org.bmsk.lifemash.data.network.xml.RssConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,13 +20,7 @@ internal object NetworkModule {
 
     @Provides
     @Singleton
-    fun providesXmlConverterFactory(): TikXmlConverterFactory {
-        return TikXmlConverterFactory.create(
-            TikXml.Builder()
-                .exceptionOnUnreadXml(false)
-                .build(),
-        )
-    }
+    fun providesXmlConverterFactory(): RssConverterFactory = RssConverterFactory.create()
 
     @Provides
     @Singleton

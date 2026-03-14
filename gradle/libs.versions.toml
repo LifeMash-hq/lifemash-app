@@ -12,7 +12,6 @@ playServicesAuth = "20.7.0"
 retrofit = "3.0.0"
 okHttp = "5.1.0"
 coil = "3.3.0"
-tikxml = "0.8.13"
 firebaseBom = "34.1.0"
 jsoup = "1.21.1"
 lottie = "6.4.0"
@@ -135,10 +134,6 @@ compose-shimmer = { group = "com.valentinilk.shimmer", name = "compose-shimmer",
 coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutine" }
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutine" }
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutine" }
-
-tikxml-annotation = { module = "com.tickaroo.tikxml:annotation", version.ref = "tikxml" }
-tikxml-processor = { module = "com.tickaroo.tikxml:processor", version.ref = "tikxml" }
-tikxml-retrofit = { module = "com.tickaroo.tikxml:retrofit-converter", version.ref = "tikxml" }
 
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
