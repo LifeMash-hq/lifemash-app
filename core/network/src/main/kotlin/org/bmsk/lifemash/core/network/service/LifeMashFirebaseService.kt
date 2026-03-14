@@ -7,7 +7,6 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import org.bmsk.lifemash.core.model.section.LifeMashCategory
 import org.bmsk.lifemash.core.network.response.LegacyLifeMashArticleResponse
-import org.bmsk.lifemash.core.network.response.LifeMashArticleCategory
 import org.bmsk.lifemash.core.network.response.LifeMashArticleResponse
 import javax.inject.Inject
 
@@ -18,7 +17,7 @@ interface LifeMashFirebaseService {
     ): List<LegacyLifeMashArticleResponse>
 
     suspend fun getArticles(
-        category: LifeMashArticleCategory,
+        category: String,
         limit: Long = 20,
     ): List<LifeMashArticleResponse>
 }
@@ -51,14 +50,15 @@ internal class LifeMashFirebaseServiceImpl @Inject constructor(
     }
 
     override suspend fun getArticles(
-        category: LifeMashArticleCategory,
+        category: String,
         limit: Long
     ): List<LifeMashArticleResponse> {
+        val isAll = category == "_all_"
         val query = db.collection(ARTICLES)
             .whereEqualTo("visible", true)
             .let { q ->
-                if (category != LifeMashArticleCategory.ALL) {
-                    q.whereArrayContains("categories", category.key)
+                if (!isAll) {
+                    q.whereArrayContains("categories", category)
                 } else {
                     q
                 }
@@ -79,9 +79,7 @@ internal class LifeMashFirebaseServiceImpl @Inject constructor(
                 image = doc.getString("image"),
                 publishedAt = doc.getLong("publishedAt"),
                 host = doc.getString("host"),
-                categories = (doc.get("categories") as? List<String>)
-                    ?.map(LifeMashArticleCategory::fromKey)
-                    .orEmpty(),
+                categories = (doc.get("categories") as? List<String>).orEmpty(),
                 visible = doc.getBoolean("visible") ?: true
             )
         }

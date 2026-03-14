@@ -12,7 +12,6 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
-import org.bmsk.lifemash.core.network.response.LifeMashArticleCategory
 import org.bmsk.lifemash.core.network.response.LifeMashArticleResponse
 
 interface LifeMashAlgoliaService {
@@ -72,8 +71,7 @@ internal class LifeMashAlgoliaServiceImpl(
                     image = props["image"].string(),
                     publishedAt = props["publishedAt"].long(),
                     host = props["host"].string(),
-                    categories = props["categories"].stringList().orEmpty()
-                        .map { LifeMashArticleCategory.fromKey(it) },
+                    categories = props["categories"].stringList().orEmpty(),
                     visible = props["visible"].bool() ?: true
                 )
             }

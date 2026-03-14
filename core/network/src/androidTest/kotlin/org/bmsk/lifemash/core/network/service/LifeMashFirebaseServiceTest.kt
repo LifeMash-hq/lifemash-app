@@ -10,7 +10,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.functions
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
-import org.bmsk.lifemash.core.network.response.LifeMashArticleCategory
 import org.junit.Rule
 import org.junit.Test
 import kotlin.time.Duration.Companion.milliseconds
@@ -27,7 +26,7 @@ class LifeMashFirebaseServiceTest {
         )
 
         lifeMashFirebaseService.getArticles(
-            category = LifeMashArticleCategory.INTERNATIONAL,
+            category = "international",
         ).also {
             print(it)
         }
