@@ -1,5 +1,5 @@
 plugins {
-    id("lifemash.android.feature.ui")
+    id("lifemash.android.ui")
 }
 
 android {
