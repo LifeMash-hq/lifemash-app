@@ -111,7 +111,7 @@ class ScrapViewModelTest {
         assertEquals(ScrapUiState.NewsLoading, emissions[0])
         val loadedState = emissions[1] as ScrapUiState.NewsLoaded
         assertEquals(1, loadedState.scraps.size)
-        assertEquals("title", loadedState.scraps.first().title)
+        assertEquals("title", loadedState.scraps.first().article.title)
     }
 
     @Test
