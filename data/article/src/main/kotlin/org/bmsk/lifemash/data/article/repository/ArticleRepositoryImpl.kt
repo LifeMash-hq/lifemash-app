@@ -56,6 +56,20 @@ internal class ArticleRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun searchArticles(
+        query: String,
+        category: String?,
+        limit: Int,
+    ): List<Article> {
+        return withContext(Dispatchers.IO) {
+            lifeMashFirebaseService
+                .searchArticles(query = query, category = category, limit = limit)
+                .mapNotNull { response ->
+                    runCatching { response.toDomain() }.getOrNull()
+                }
+        }
+    }
+
     private suspend fun fetchFromNetwork(category: ArticleCategory): List<Article> {
         return withContext(Dispatchers.IO) {
             lifeMashFirebaseService

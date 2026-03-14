@@ -8,3 +8,6 @@ internal const val BASE_URL_SBS = "https://news.sbs.co.kr/"
 
 // Google
 internal const val BASE_URL_GOOGLE = "https://news.google.com/"
+
+// Cloud Run 검색 서버
+internal const val BASE_URL_SEARCH = "https://lifemash-search-asia-northeast3.run.app/"

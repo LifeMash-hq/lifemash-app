@@ -7,14 +7,19 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import org.bmsk.lifemash.core.network.BASE_URL_GOOGLE
 import org.bmsk.lifemash.core.network.BASE_URL_SBS
+import org.bmsk.lifemash.core.network.BASE_URL_SEARCH
 import org.bmsk.lifemash.core.network.service.GoogleNewsService
 import org.bmsk.lifemash.core.network.service.LifeMashFirebaseService
 import org.bmsk.lifemash.core.network.service.LifeMashFirebaseServiceImpl
 import org.bmsk.lifemash.core.network.service.SbsNewsService
+import org.bmsk.lifemash.core.network.service.SearchService
 import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -46,6 +51,20 @@ internal object ServiceModule {
             .addConverterFactory(tikXmlConverterFactory)
             .build()
             .create(SbsNewsService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesSearchService(
+        okHttpClientBuilder: OkHttpClient.Builder,
+    ): SearchService {
+        val json = Json { ignoreUnknownKeys = true }
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL_SEARCH)
+            .client(okHttpClientBuilder.build())
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(SearchService::class.java)
     }
 }
 
