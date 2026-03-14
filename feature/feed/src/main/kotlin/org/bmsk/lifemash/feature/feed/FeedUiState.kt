@@ -63,16 +63,18 @@ internal data class ArticleUiState(
     val publishedAtRelative: String,
     val host: String,
     val isScrapped: Boolean,
+    val isRead: Boolean = false,
 ) {
     val id: ArticleId get() = article.id
 
     companion object {
-        fun from(article: Article, isScrapped: Boolean): ArticleUiState {
+        fun from(article: Article, isScrapped: Boolean, isRead: Boolean = false): ArticleUiState {
             return ArticleUiState(
                 article = article,
                 publishedAtRelative = ArticleDateFormatter.format(article.publishedAt),
                 host = URI(article.link.value).host ?: article.link.value,
                 isScrapped = isScrapped,
+                isRead = isRead,
             )
         }
     }

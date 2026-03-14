@@ -10,6 +10,7 @@ dependencies {
     implementation(projects.core.common)
     implementation(projects.domain.core)
     implementation(projects.domain.featureFeed)
+    implementation(projects.domain.featureHistory)
     implementation(projects.domain.featureScrap)
     implementation(projects.feature.feedApi)
     implementation(projects.feature.mainNavGraph)

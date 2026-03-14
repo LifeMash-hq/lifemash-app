@@ -14,10 +14,12 @@ dependencies {
     implementation(projects.feature.feed)
 
     implementation(projects.domain.featureFeed)
+    implementation(projects.domain.featureHistory)
     implementation(projects.domain.featureScrap)
 
     implementation(projects.data.core)
     implementation(projects.data.article)
+    implementation(projects.data.history)
     implementation(projects.data.scrap)
     implementation(projects.data.search)
 
