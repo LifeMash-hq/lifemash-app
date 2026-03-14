@@ -6,6 +6,7 @@ import org.bmsk.lifemash.libs
 plugins {
     id("com.android.application")
     id("lifemash.android.compose")
+    id("lifemash.android.lint")
 }
 
 configureKotlinAndroid()
@@ -28,4 +29,6 @@ dependencies {
 
     implementation(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
     implementation(libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
+
+    lintChecks(project(":lint"))
 }
