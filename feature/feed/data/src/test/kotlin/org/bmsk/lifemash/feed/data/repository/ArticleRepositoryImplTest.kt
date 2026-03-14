@@ -15,6 +15,7 @@ class ArticleRepositoryImplTest {
     private var callCount = 0
     private var lastRequestedCategory: String? = null
     private var responseProvider: (String) -> List<LifeMashArticleResponse> = { emptyList() }
+    private var searchResponseProvider: (String) -> List<LifeMashArticleResponse> = { emptyList() }
 
     private val fakeFirebaseService = object : LifeMashFirebaseService {
         override suspend fun getArticles(
@@ -30,7 +31,7 @@ class ArticleRepositoryImplTest {
             query: String,
             category: String?,
             limit: Int,
-        ): List<LifeMashArticleResponse> = emptyList()
+        ): List<LifeMashArticleResponse> = searchResponseProvider(query)
     }
 
     private lateinit var repository: ArticleRepositoryImpl
@@ -40,6 +41,7 @@ class ArticleRepositoryImplTest {
         callCount = 0
         lastRequestedCategory = null
         responseProvider = { emptyList() }
+        searchResponseProvider = { emptyList() }
         repository = ArticleRepositoryImpl(fakeFirebaseService)
     }
 
@@ -138,5 +140,38 @@ class ArticleRepositoryImplTest {
         assertThrows<RuntimeException> {
             repository.getArticles(ArticleCategory.TECH)
         }
+    }
+
+    @Test
+    fun `searchArticles가 결과를 반환하면 Article 리스트로 매핑된다`() = runTest {
+        // Given
+        searchResponseProvider = { listOf(validResponse(id = "10", title = "검색결과")) }
+
+        // When
+        val result = repository.searchArticles(query = "검색", category = null, limit = 20)
+
+        // Then
+        assertEquals(1, result.size)
+        assertEquals("검색결과", result[0].title)
+    }
+
+    @Test
+    fun `searchArticles에서 변환 실패 항목은 무시된다`() = runTest {
+        // Given
+        searchResponseProvider = {
+            listOf(
+                validResponse(id = "1"),
+                LifeMashArticleResponse(id = "2", link = null, publishedAt = null),
+                validResponse(id = "3"),
+            )
+        }
+
+        // When
+        val result = repository.searchArticles(query = "test", category = null, limit = 20)
+
+        // Then
+        assertEquals(2, result.size)
+        assertEquals("1", result[0].id.value)
+        assertEquals("3", result[1].id.value)
     }
 }

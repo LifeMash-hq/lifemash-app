@@ -49,6 +49,7 @@ internal data class FeedUiState(
     val visibleArticles: PersistentList<ArticleUiState> = persistentListOf(),
     val isSearchMode: Boolean = false,
     val queryText: String = "",
+    val searchResults: PersistentList<ArticleUiState> = persistentListOf(),
 ) {
     companion object {
         val Initial = FeedUiState(
