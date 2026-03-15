@@ -1,5 +1,4 @@
 import com.android.build.api.dsl.ApplicationExtension
-import org.bmsk.lifemash.configureHiltAndroid
 import org.bmsk.lifemash.configureKotestAndroid
 import org.bmsk.lifemash.configureKotlinAndroid
 import org.bmsk.lifemash.libs
@@ -12,7 +11,6 @@ plugins {
 }
 
 configureKotlinAndroid()
-configureHiltAndroid()
 configureKotestAndroid()
 
 extensions.configure<ApplicationExtension> {
@@ -27,8 +25,6 @@ extensions.configure<ApplicationExtension> {
 
 dependencies {
     val libs = project.extensions.libs
-    implementation(libs.findLibrary("androidx.compose.navigation").get())
-
     implementation(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
     implementation(libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
 

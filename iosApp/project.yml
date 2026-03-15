@@ -1,0 +1,33 @@
+name: LifeMash
+options:
+  bundleIdPrefix: org.bmsk.lifemash
+  deploymentTarget:
+    iOS: "16.0"
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  iosApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+        type: group
+    settings:
+      base:
+        INFOPLIST_FILE: iosApp/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: org.bmsk.lifemash
+        PRODUCT_NAME: LifeMash
+        SWIFT_VERSION: "5.9"
+        ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+    dependencies:
+      - framework: "../feature/main/build/XCFrameworks/debug/LifeMashShared.xcframework"
+        embed: true
+    preBuildScripts:
+      - name: "Build Kotlin Framework"
+        script: |
+          cd "$SRCROOT/.."
+          ./gradlew :feature:main:assembleLifeMashSharedDebugXCFramework
+        basedOnDependencyAnalysis: false

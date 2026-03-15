@@ -1,22 +1,35 @@
-import com.android.build.api.dsl.LibraryExtension
-import org.gradle.kotlin.dsl.configure
-
 plugins {
-    id("lifemash.android.ui")
+    id("lifemash.kmp.compose")
 }
 
-extensions.configure<LibraryExtension> {
+android {
     namespace = "org.bmsk.lifemash.feed.ui"
 }
 
-dependencies {
-    implementation(projects.feature.feed.domain)
-    implementation(projects.feature.feed.api)
-    implementation(projects.feature.scrap.domain)
-    implementation(projects.shared.navigation)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":feature:feed:domain"))
+            implementation(project(":feature:feed:api"))
+            implementation(project(":feature:scrap:domain"))
+            implementation(project(":shared:designsystem"))
+            implementation(project(":model"))
 
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
-    implementation(libs.kotlinx.immutable)
-    implementation(libs.androidx.compose.material.icons.extended)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.ui)
+
+            implementation(libs.jetbrains.navigation.compose)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.jetbrains.lifecycle.runtime.compose)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor3)
+            implementation(libs.kotlinx.immutable)
+            implementation(libs.kotlinx.datetime)
+        }
+    }
 }

@@ -1,9 +1,21 @@
+import com.android.build.api.dsl.LibraryExtension
+
 plugins {
-    id("lifemash.kotlin.domain")
-    id("kotlinx-serialization")
+    id("lifemash.kmp.library")
+    alias(libs.plugins.kotlin.serialization)
 }
 
-dependencies {
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.coroutines.core)
+configure<LibraryExtension> {
+    namespace = "org.bmsk.lifemash.scrap.domain"
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(projects.model)
+            implementation(libs.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.koin.core)
+        }
+    }
 }

@@ -12,10 +12,10 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     config.setFrom(listOf(file("$rootDir/config/detekt/detekt.yml"))) // point to your custom config defining rules to run, overwriting default behavior
 
     reports {
-        file("$rootDir/build/reports/test/${project.name}/").mkdirs()
+        rootProject.layout.projectDirectory.dir("build/reports/test/${project.name}").asFile.mkdirs()
         html.required.set(true) // observe findings in your browser with structure and code snippets
-        html.outputLocation.set(file("$rootDir/build/reports/detekt/${project.name}.html"))
+        html.outputLocation.set(rootProject.layout.projectDirectory.file("build/reports/detekt/${project.name}.html").asFile)
         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
-        xml.outputLocation.set(file("$rootDir/build/reports/detekt/${project.name}.xml"))
+        xml.outputLocation.set(rootProject.layout.projectDirectory.file("build/reports/detekt/${project.name}.xml").asFile)
     }
 }

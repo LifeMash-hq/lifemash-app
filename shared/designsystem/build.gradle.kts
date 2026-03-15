@@ -1,11 +1,8 @@
-import com.android.build.api.dsl.LibraryExtension
-import org.gradle.kotlin.dsl.configure
-
 plugins {
-    id("lifemash.android.compose.library")
+    id("lifemash.kmp.compose")
 }
 
-extensions.configure<LibraryExtension> {
+android {
     namespace = "org.bmsk.lifemash.feature.designsystem"
 
     lint {
@@ -13,10 +10,22 @@ extensions.configure<LibraryExtension> {
     }
 }
 
-dependencies {
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
-    
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.compose.material.icons.extended)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.ui)
+            implementation(compose.components.resources)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor3)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.appcompat)
+            implementation(libs.androidx.compose.ui.text.google.fonts)
+            implementation(libs.androidx.compose.ui.tooling.preview)
+        }
+    }
 }

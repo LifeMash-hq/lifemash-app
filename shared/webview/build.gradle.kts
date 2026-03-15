@@ -1,16 +1,21 @@
-import com.android.build.api.dsl.LibraryExtension
-import org.gradle.kotlin.dsl.configure
-
 plugins {
-    id("lifemash.android.ui")
+    id("lifemash.kmp.compose")
+    alias(libs.plugins.kotlin.serialization)
 }
 
-extensions.configure<LibraryExtension> {
+android {
     namespace = "org.bmsk.lifemash.feature.shared.webview"
 }
 
-dependencies {
-    implementation(projects.shared.navigation)
-
-    implementation(libs.kotlinx.immutable)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.ui)
+            implementation(libs.jetbrains.navigation.compose)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.immutable)
+        }
+    }
 }
