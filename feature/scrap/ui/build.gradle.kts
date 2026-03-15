@@ -1,18 +1,32 @@
-import com.android.build.api.dsl.LibraryExtension
-import org.gradle.kotlin.dsl.configure
-
 plugins {
-    id("lifemash.android.ui")
+    id("lifemash.kmp.compose")
 }
 
-extensions.configure<LibraryExtension> {
+android {
     namespace = "org.bmsk.lifemash.scrap.ui"
 }
 
-dependencies {
-    implementation(projects.feature.scrap.api)
-    implementation(projects.feature.scrap.domain)
-    implementation(projects.shared.navigation)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":feature:scrap:api"))
+            implementation(project(":feature:scrap:domain"))
+            implementation(project(":shared:designsystem"))
+            implementation(project(":model"))
 
-    implementation(libs.kotlinx.immutable)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.ui)
+
+            implementation(libs.jetbrains.navigation.compose)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.jetbrains.lifecycle.runtime.compose)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.kotlinx.immutable)
+            implementation(libs.kotlinx.datetime)
+        }
+    }
 }

@@ -1,19 +1,41 @@
 import com.android.build.api.dsl.LibraryExtension
-import org.gradle.kotlin.dsl.configure
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
-    id("lifemash.android.data")
-    id("com.google.devtools.ksp")
+    id("lifemash.kmp.library")
+    alias(libs.plugins.ksp)
 }
 
-extensions.configure<LibraryExtension> {
+configure<LibraryExtension> {
     namespace = "org.bmsk.lifemash.scrap.data"
 }
 
-dependencies {
-    implementation(projects.feature.scrap.domain)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(projects.model)
+            implementation(projects.feature.scrap.domain)
+            implementation(libs.coroutines.core)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.koin.core)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
+        }
+    }
+}
 
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
+dependencies {
+    add("kspCommonMainMetadata", libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+}
+
+tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
+}
+tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
 }

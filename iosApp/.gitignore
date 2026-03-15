@@ -1,0 +1,7 @@
+Pods/
+LifeMash.xcworkspace/
+LifeMash.xcodeproj/xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+GoogleService-Info.plist

@@ -1,40 +1,30 @@
 import com.android.build.api.dsl.LibraryExtension
-import org.gradle.kotlin.dsl.configure
 
 plugins {
-    id("lifemash.android.library")
-    id("lifemash.android.hilt")
-    id("kotlinx-serialization")
+    id("lifemash.kmp.library")
+    alias(libs.plugins.kotlin.serialization)
 }
 
-extensions.configure<LibraryExtension> {
+configure<LibraryExtension> {
     namespace = "org.bmsk.lifemash.data.network"
-
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildFeatures {
-        buildConfig = true
-    }
 }
 
-dependencies {
-    implementation(projects.model)
-
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.kotlinx.serialization)
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.functions)
-
-    androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.ext)
-    androidTestImplementation(libs.androidx.test.core)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.coroutines.test)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(projects.model)
+            implementation(libs.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.koin.core)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ksoup)
+            implementation(libs.gitlive.firebase.firestore)
+        }
+        androidMain.dependencies {
+            implementation(libs.ktor.client.okhttp)
+        }
+    }
 }

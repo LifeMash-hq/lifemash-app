@@ -1,8 +1,8 @@
 plugins {
     id("lifemash.android.application")
-    id("lifemash.android.hilt")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    alias(libs.plugins.kotlin.android)
 }
 
 dependencies {
@@ -19,12 +19,30 @@ dependencies {
     implementation(projects.feature.scrap.api)
     implementation(projects.feature.scrap.ui)
 
-    implementation(projects.shared.navigation)
+    implementation(projects.feature.history.api)
+    implementation(projects.feature.history.ui)
+
+    implementation(projects.feature.calendar.domain)
+    implementation(projects.feature.calendar.data)
+    implementation(projects.feature.auth.domain)
+    implementation(projects.feature.auth.data)
+    implementation(projects.feature.notification.domain)
+    implementation(projects.feature.notification.data)
+    implementation(projects.shared.fcm)
+
+    implementation(projects.shared.network)
     implementation(projects.shared.webview)
 
+    implementation(libs.koin.android)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.logging)
     implementation(libs.androidx.appcompat)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.core.ktx)
 }

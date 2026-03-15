@@ -1,13 +1,20 @@
-import com.android.build.api.dsl.LibraryExtension
-import org.gradle.kotlin.dsl.configure
-
 plugins {
-    id("lifemash.android.ui")
+    id("lifemash.kmp.compose")
 }
 
-extensions.configure<LibraryExtension> {
+android {
     namespace = "org.bmsk.lifemash.feature.shared.common"
 }
 
-dependencies {
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
+            implementation(project(":shared:designsystem"))
+            implementation(project(":model"))
+        }
+    }
 }

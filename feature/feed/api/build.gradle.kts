@@ -1,15 +1,18 @@
-import com.android.build.api.dsl.LibraryExtension
-import org.gradle.kotlin.dsl.configure
-
 plugins {
-    id("lifemash.android.compose.library")
+    id("lifemash.kmp.compose")
+    alias(libs.plugins.kotlin.serialization)
 }
 
-extensions.configure<LibraryExtension> {
+android {
     namespace = "org.bmsk.lifemash.feed.api"
 }
 
-dependencies {
-    implementation(projects.shared.navigation)
-    implementation(libs.androidx.compose.navigation)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(libs.jetbrains.navigation.compose)
+            implementation(libs.kotlinx.serialization.json)
+        }
+    }
 }

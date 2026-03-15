@@ -40,7 +40,27 @@ include(
 )
 
 include(
+    ":feature:history:api",
+    ":feature:history:ui",
+)
+
+include(
     ":feature:main",
+)
+
+include(
+    ":feature:calendar:domain",
+    ":feature:calendar:data",
+)
+
+include(
+    ":feature:notification:domain",
+    ":feature:notification:data",
+)
+
+include(
+    ":feature:auth:domain",
+    ":feature:auth:data",
 )
 
 include(
@@ -49,4 +69,5 @@ include(
     ":shared:designsystem",
     ":shared:common",
     ":shared:webview",
+    ":shared:fcm",
 )
