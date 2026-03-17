@@ -51,16 +51,22 @@ include(
 include(
     ":feature:calendar:domain",
     ":feature:calendar:data",
+    ":feature:calendar:api",
+    ":feature:calendar:ui",
 )
 
 include(
     ":feature:notification:domain",
     ":feature:notification:data",
+    ":feature:notification:api",
+    ":feature:notification:ui",
 )
 
 include(
     ":feature:auth:domain",
     ":feature:auth:data",
+    ":feature:auth:api",
+    ":feature:auth:ui",
 )
 
 include(

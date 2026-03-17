@@ -19,6 +19,13 @@ kotlin {
             implementation(project(":feature:scrap:ui"))
             implementation(project(":feature:history:api"))
             implementation(project(":feature:history:ui"))
+            implementation(project(":feature:notification:api"))
+            implementation(project(":feature:notification:ui"))
+            implementation(project(":feature:calendar:api"))
+            implementation(project(":feature:calendar:ui"))
+            implementation(project(":feature:auth:api"))
+            implementation(project(":feature:auth:ui"))
+            implementation(project(":feature:auth:domain"))
 
             implementation(compose.runtime)
             implementation(compose.foundation)
