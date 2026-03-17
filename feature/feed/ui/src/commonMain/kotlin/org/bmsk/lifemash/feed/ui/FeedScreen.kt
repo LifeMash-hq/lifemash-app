@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -104,11 +104,17 @@ internal fun FeedScreen(
                 if (articles.isEmpty()) {
                     item { Box(modifier = Modifier.fillParentMaxSize()) }
                 } else {
-                    items(items = articles, key = { it.article.id }) { article ->
+                    itemsIndexed(items = articles, key = { _, it -> it.article.id }) { index, article ->
+                        val variant = when (index) {
+                            0 -> ArticleCardStyle.Headline
+                            1, 2 -> ArticleCardStyle.Compact
+                            else -> ArticleCardStyle.Standard
+                        }
                         ArticleCard(
                             article = article,
+                            variant = variant,
                             onOpen = onArticleOpen,
-                            onScrapClick = { onScrapClick(article) }
+                            onScrapClick = { onScrapClick(article) },
                         )
                     }
                 }
@@ -138,9 +144,12 @@ internal fun FeedScreen(
     }
 }
 
+enum class ArticleCardStyle { Headline, Compact, Standard }
+
 @Composable
 internal fun ArticleCard(
     article: ArticleUiState,
+    variant: ArticleCardStyle = ArticleCardStyle.Standard,
     onOpen: (ArticleUiState) -> Unit,
     onScrapClick: () -> Unit,
 ) {
@@ -148,57 +157,175 @@ internal fun ArticleCard(
     val style = remember(mainCat) { mainCat.style }
     val isDark = isSystemInDarkTheme()
 
+    when (variant) {
+        ArticleCardStyle.Headline -> HeadlineCard(article, style, isDark, onOpen, onScrapClick)
+        ArticleCardStyle.Compact -> CompactCard(article, style, isDark, onOpen, onScrapClick)
+        ArticleCardStyle.Standard -> StandardCard(article, style, isDark, onOpen, onScrapClick)
+    }
+}
+
+@Composable
+private fun StandardCard(
+    article: ArticleUiState,
+    style: CategoryStyle,
+    isDark: Boolean,
+    onOpen: (ArticleUiState) -> Unit,
+    onScrapClick: () -> Unit,
+) {
     Card(
         onClick = { onOpen(article) },
         modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp).shadow(1.dp, RoundedCornerShape(22.dp)),
-        shape = RoundedCornerShape(22.dp)
+        shape = RoundedCornerShape(22.dp),
     ) {
         Box(Modifier.fillMaxWidth()) {
             Column(Modifier.fillMaxWidth()) {
                 ArticleImage(url = article.article.image, contentDescription = article.article.title)
-                Column(Modifier.padding(14.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(style.icon, contentDescription = style.label, tint = style.color, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(article.article.publisher, style = MaterialTheme.typography.labelMedium, color = style.color)
-                        Spacer(Modifier.width(8.dp))
-                        Text("· ${article.host}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(article.publishedAtRelative, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        article.article.title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                        color = if (article.isRead) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(article.article.summary, style = MaterialTheme.typography.bodyMedium, maxLines = 3, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(8.dp))
+                ArticleTextContent(article, style)
+            }
+            ScrapOverlay(isDark, article.isScrapped, onScrapClick, Modifier.align(Alignment.TopEnd))
+        }
+    }
+}
+
+@Composable
+private fun HeadlineCard(
+    article: ArticleUiState,
+    style: CategoryStyle,
+    isDark: Boolean,
+    onOpen: (ArticleUiState) -> Unit,
+    onScrapClick: () -> Unit,
+) {
+    Card(
+        onClick = { onOpen(article) },
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp).shadow(2.dp, RoundedCornerShape(22.dp)),
+        shape = RoundedCornerShape(22.dp),
+    ) {
+        Box(Modifier.fillMaxWidth()) {
+            ArticleImage(url = article.article.image, contentDescription = article.article.title, height = 240.dp)
+            // 하단 그라데이션 오버레이
+            Box(
+                Modifier.fillMaxWidth().height(140.dp).align(Alignment.BottomCenter)
+                    .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))))
+            )
+            // 제목 + 카테고리 오버레이
+            Column(
+                Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(14.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(style.icon, contentDescription = style.label, tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(article.article.publisher, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.8f))
+                    Spacer(Modifier.width(8.dp))
+                    Text("· ${article.host}", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f))
+                }
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    article.article.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.White,
+                )
+            }
+            ScrapOverlay(isDark, article.isScrapped, onScrapClick, Modifier.align(Alignment.TopEnd))
+        }
+    }
+}
+
+@Composable
+private fun CompactCard(
+    article: ArticleUiState,
+    style: CategoryStyle,
+    isDark: Boolean,
+    onOpen: (ArticleUiState) -> Unit,
+    onScrapClick: () -> Unit,
+) {
+    Card(
+        onClick = { onOpen(article) },
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp).shadow(1.dp, RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(style.icon, contentDescription = style.label, tint = style.color, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(article.article.publisher, style = MaterialTheme.typography.labelSmall, color = style.color)
+                    Spacer(Modifier.width(6.dp))
+                    Text(article.publishedAtRelative, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    article.article.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = if (article.isRead) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("${article.host}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.weight(1f))
+                    ScrapButton(isScrapped = article.isScrapped, onClick = onScrapClick, modifier = Modifier.size(20.dp))
                 }
             }
-            Surface(
-                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.55f else 0.72f),
-                tonalElevation = 2.dp
-            ) {
-                Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
-                    ScrapButton(isScrapped = article.isScrapped, onClick = onScrapClick, modifier = Modifier.size(24.dp))
-                }
+            if (article.article.image != null) {
+                ArticleImage(
+                    url = article.article.image,
+                    contentDescription = article.article.title,
+                    height = 80.dp,
+                    modifier = Modifier.size(80.dp).clip(RoundedCornerShape(12.dp)),
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ArticleImage(url: String?, contentDescription: String? = null) {
+private fun ArticleTextContent(article: ArticleUiState, style: CategoryStyle) {
+    Column(Modifier.padding(14.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(style.icon, contentDescription = style.label, tint = style.color, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(article.article.publisher, style = MaterialTheme.typography.labelMedium, color = style.color)
+            Spacer(Modifier.width(8.dp))
+            Text("· ${article.host}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+            Spacer(modifier = Modifier.weight(1f))
+            Text(article.publishedAtRelative, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            article.article.title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis,
+            color = if (article.isRead) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(article.article.summary, style = MaterialTheme.typography.bodyMedium, maxLines = 3, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun ScrapOverlay(isDark: Boolean, isScrapped: Boolean, onScrapClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.padding(8.dp),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.55f else 0.72f),
+        tonalElevation = 2.dp,
+    ) {
+        Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+            ScrapButton(isScrapped = isScrapped, onClick = onScrapClick, modifier = Modifier.size(24.dp))
+        }
+    }
+}
+
+@Composable
+private fun ArticleImage(url: String?, contentDescription: String? = null, height: Dp = 180.dp, modifier: Modifier = Modifier) {
     val painter = rememberAsyncImagePainter(model = url)
     val painterState by painter.state.collectAsState()
     val isLoading = painterState is AsyncImagePainter.State.Loading
 
     val isError = painterState is AsyncImagePainter.State.Error
 
-    Box(modifier = Modifier.fillMaxWidth().height(180.dp).background(MaterialTheme.colorScheme.surfaceVariant)) {
+    Box(modifier = modifier.fillMaxWidth().height(height).background(MaterialTheme.colorScheme.surfaceVariant)) {
         if (url != null && !isError) {
             Image(painter = painter, contentDescription = contentDescription, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         }
