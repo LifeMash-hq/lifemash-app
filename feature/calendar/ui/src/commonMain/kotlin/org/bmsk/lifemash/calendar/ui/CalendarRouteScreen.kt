@@ -1,8 +1,10 @@
 package org.bmsk.lifemash.calendar.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import kotlin.time.Instant
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -11,6 +13,13 @@ internal fun CalendarRouteScreen(
     viewModel: CalendarViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            onShowErrorSnackbar(Exception(it))
+            viewModel.clearError()
+        }
+    }
 
     CalendarScreen(
         uiState = uiState,
@@ -31,5 +40,35 @@ internal fun CalendarRouteScreen(
             }
             viewModel.changeMonth(y, m)
         },
+        onCreateGroup = viewModel::createGroup,
+        onJoinGroup = viewModel::joinGroup,
+        onSelectGroup = viewModel::selectGroup,
+        onShowEventCreate = viewModel::showEventCreate,
+        onHideEventCreate = viewModel::hideEventCreate,
+        onCreateEvent = { title, desc, startMs, endMs, isAllDay, color ->
+            viewModel.createEvent(
+                title = title,
+                description = desc,
+                startAt = Instant.fromEpochMilliseconds(startMs),
+                endAt = endMs?.let { Instant.fromEpochMilliseconds(it) },
+                isAllDay = isAllDay,
+                color = color,
+            )
+        },
+        onShowEventDetail = viewModel::showEventDetail,
+        onHideEventDetail = viewModel::hideEventDetail,
+        onStartEditEvent = viewModel::startEditEvent,
+        onUpdateEvent = { eventId, title, desc, startMs, endMs, isAllDay, color ->
+            viewModel.updateEvent(
+                eventId = eventId,
+                title = title,
+                description = desc,
+                startAt = startMs?.let { Instant.fromEpochMilliseconds(it) },
+                endAt = endMs?.let { Instant.fromEpochMilliseconds(it) },
+                isAllDay = isAllDay,
+                color = color,
+            )
+        },
+        onDeleteEvent = viewModel::deleteEvent,
     )
 }
