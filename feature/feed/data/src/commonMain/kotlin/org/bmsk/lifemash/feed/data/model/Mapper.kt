@@ -5,22 +5,20 @@ import org.bmsk.lifemash.model.Article
 import org.bmsk.lifemash.model.ArticleCategory
 import org.bmsk.lifemash.model.ArticleId
 import org.bmsk.lifemash.model.ArticleUrl
-import org.bmsk.lifemash.model.ImageUrl
-import org.bmsk.lifemash.model.Publisher
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
-fun LifeMashArticleResponse.toDomain(): Article {
-    val nonNullPublishedAt = requireNotNull(this.publishedAt) { "publishedAt cannot be null" }
-    val nonNullLink = requireNotNull(this.link) { "link cannot be null" }
+fun LifeMashArticleResponse.toDomain(): Article? {
+    val publishedAt = this.publishedAt ?: return null
+    val link = this.link?.takeIf { it.startsWith("http") } ?: return null
 
     return Article(
         id = ArticleId.from(this.id),
-        publisher = Publisher.from(this.publisher ?: Publisher.unknown.name),
-        title = this.title ?: "",
-        summary = this.summary ?: "",
-        link = ArticleUrl.from(nonNullLink),
-        image = this.image?.let { ImageUrl.from(it) },
-        publishedAt = Instant.fromEpochSeconds(nonNullPublishedAt),
-        categories = this.categories.map { ArticleCategory.fromKey(it) }
+        publisher = this.publisher ?: Article.UNKNOWN_PUBLISHER,
+        title = this.title.orEmpty(),
+        summary = this.summary.orEmpty(),
+        link = ArticleUrl.from(link),
+        image = this.image?.takeIf { it.isNotBlank() },
+        publishedAt = Instant.fromEpochSeconds(publishedAt),
+        categories = this.categories.map { ArticleCategory.fromKey(it) },
     )
 }

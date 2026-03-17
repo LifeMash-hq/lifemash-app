@@ -2,7 +2,7 @@ package org.bmsk.lifemash.notification.data.source
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 internal interface FcmTokenFirestoreSource {
     suspend fun syncKeywords(fcmToken: String, keywords: List<String>)

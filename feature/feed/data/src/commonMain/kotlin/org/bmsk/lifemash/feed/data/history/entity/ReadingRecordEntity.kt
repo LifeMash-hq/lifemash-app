@@ -3,7 +3,7 @@ package org.bmsk.lifemash.feed.data.history.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.bmsk.lifemash.model.ArticleCategory
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = "reading_history")
 data class ReadingRecordEntity(

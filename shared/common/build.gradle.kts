@@ -2,17 +2,18 @@ plugins {
     id("lifemash.kmp.compose")
 }
 
-android {
-    namespace = "org.bmsk.lifemash.feature.shared.common"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.feature.shared.common"
+    }
+
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.extended)
+            implementation(libs.compose.ui)
             implementation(project(":shared:designsystem"))
             implementation(project(":model"))
         }

@@ -16,11 +16,11 @@ enum class ArticleCategory(val key: String) {
     HEALTH("health"),
     MEDICAL("medical"),
     WOMEN("women"),
-    CARTOON("cartoon");
+    CARTOON("cartoon"),
+    UNKNOWN("unknown");
 
     companion object {
-        fun fromKey(key: String): ArticleCategory {
-            return entries.first { it.key == key }
-        }
+        fun fromKey(key: String): ArticleCategory =
+            entries.firstOrNull { it.key == key } ?: UNKNOWN
     }
 }

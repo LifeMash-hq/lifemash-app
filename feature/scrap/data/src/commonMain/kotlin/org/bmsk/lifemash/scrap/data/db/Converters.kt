@@ -2,7 +2,7 @@ package org.bmsk.lifemash.scrap.data.db
 
 import androidx.room.TypeConverter
 import org.bmsk.lifemash.model.ArticleCategory
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 class Converters {
     @TypeConverter

@@ -104,7 +104,7 @@ internal fun FeedScreen(
                 if (articles.isEmpty()) {
                     item { Box(modifier = Modifier.fillParentMaxSize()) }
                 } else {
-                    items(items = articles, key = { it.article.id.value }) { article ->
+                    items(items = articles, key = { it.article.id }) { article ->
                         ArticleCard(
                             article = article,
                             onOpen = onArticleOpen,
@@ -155,12 +155,12 @@ internal fun ArticleCard(
     ) {
         Box(Modifier.fillMaxWidth()) {
             Column(Modifier.fillMaxWidth()) {
-                ArticleImage(url = article.article.image?.value, contentDescription = article.article.title)
+                ArticleImage(url = article.article.image, contentDescription = article.article.title)
                 Column(Modifier.padding(14.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(style.icon, contentDescription = style.label, tint = style.color, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text(article.article.publisher.name, style = MaterialTheme.typography.labelMedium, color = style.color)
+                        Text(article.article.publisher, style = MaterialTheme.typography.labelMedium, color = style.color)
                         Spacer(Modifier.width(8.dp))
                         Text("· ${article.host}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
                         Spacer(modifier = Modifier.weight(1f))

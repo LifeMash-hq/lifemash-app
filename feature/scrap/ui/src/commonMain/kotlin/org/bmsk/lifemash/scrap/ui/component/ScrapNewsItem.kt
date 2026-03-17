@@ -51,14 +51,14 @@ internal fun ScrapNewsItem(
             modifier = Modifier.fillMaxWidth().aspectRatio(16 / 5f).padding(8.dp)
                 .combinedClickable(onClick = onClick, onLongClick = state::onLongClick),
         ) {
-            NetworkImage(modifier = Modifier.fillMaxHeight().aspectRatio(1 / 1f), imageUrl = scrap.article.image?.value)
+            NetworkImage(modifier = Modifier.fillMaxHeight().aspectRatio(1 / 1f), imageUrl = scrap.article.image)
             Column(
                 modifier = Modifier.padding(start = 8.dp).fillMaxHeight().weight(1f),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(text = scrap.article.title, style = MaterialTheme.typography.titleMedium, maxLines = 3, overflow = TextOverflow.Ellipsis)
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = "${scrap.article.publisher.name} · ${scrap.publishedAtRelative}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = "${scrap.article.publisher} · ${scrap.publishedAtRelative}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             AnimatedVisibility(

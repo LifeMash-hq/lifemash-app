@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import org.bmsk.lifemash.data.network.response.LifeMashArticleResponse
 import org.bmsk.lifemash.data.network.service.LifeMashFirebaseService
 import org.bmsk.lifemash.model.ArticleCategory
+import org.bmsk.lifemash.model.ArticleId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -115,8 +116,8 @@ class ArticleRepositoryImplTest {
 
         // Then
         assertEquals(2, result.size)
-        assertEquals("1", result[0].id.value)
-        assertEquals("3", result[1].id.value)
+        assertEquals(ArticleId.from("1"), result[0].id)
+        assertEquals(ArticleId.from("3"), result[1].id)
     }
 
     @Test
@@ -171,7 +172,7 @@ class ArticleRepositoryImplTest {
 
         // Then
         assertEquals(2, result.size)
-        assertEquals("1", result[0].id.value)
-        assertEquals("3", result[1].id.value)
+        assertEquals(ArticleId.from("1"), result[0].id)
+        assertEquals(ArticleId.from("3"), result[1].id)
     }
 }

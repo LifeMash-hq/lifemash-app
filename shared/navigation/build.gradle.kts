@@ -3,14 +3,14 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-    namespace = "org.bmsk.lifemash.feature.shared.navigation"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.feature.shared.navigation"
+    }
+
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
+            implementation(libs.compose.runtime)
             api(libs.jetbrains.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
         }

@@ -3,17 +3,17 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-    namespace = "org.bmsk.lifemash.feature.shared.webview"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.feature.shared.webview"
+    }
+
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.ui)
             implementation(libs.jetbrains.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.immutable)

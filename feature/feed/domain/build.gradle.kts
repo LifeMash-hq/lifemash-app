@@ -1,15 +1,13 @@
-import com.android.build.api.dsl.LibraryExtension
-
 plugins {
     id("lifemash.kmp.library")
     alias(libs.plugins.kotlin.serialization)
 }
 
-configure<LibraryExtension> {
-    namespace = "org.bmsk.lifemash.feed.domain"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.feed.domain"
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(projects.model)

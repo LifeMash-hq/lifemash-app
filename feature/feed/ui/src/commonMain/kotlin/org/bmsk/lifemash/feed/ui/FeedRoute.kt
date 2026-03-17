@@ -34,7 +34,7 @@ internal fun FeedRouteScreen(
         queryText = uiState.queryText,
         onArticleOpen = {
             viewModel.addToHistory(it.article)
-            onArticleOpen(it.article.link.value)
+            onArticleOpen(it.article.link.toString())
         },
         onScrapClick = viewModel::scrapArticle,
         onQueryTextChange = viewModel::setQueryText,

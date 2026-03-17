@@ -20,6 +20,8 @@ import org.bmsk.lifemash.notification.domain.di.notificationDomainModule
 import org.bmsk.lifemash.notification.ui.di.notificationUiModule
 import org.bmsk.lifemash.auth.ui.di.authUiModule
 import org.bmsk.lifemash.calendar.ui.di.calendarUiModule
+import org.bmsk.lifemash.error.CrashlyticsErrorReporter
+import org.bmsk.lifemash.feature.shared.error.ErrorReporter
 import org.bmsk.lifemash.scrap.data.db.getScrapArticleDBBuilder
 import org.bmsk.lifemash.scrap.data.di.scrapDataModule
 import org.bmsk.lifemash.scrap.domain.di.scrapDomainModule
@@ -33,6 +35,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.bmsk.lifemash.fcm.PushNotificationService
 import org.bmsk.lifemash.notification.domain.usecase.SyncKeywordsUseCase
+import java.io.IOException
 
 class LifeMashApplication : Application() {
     override fun onCreate() {
@@ -47,6 +50,7 @@ class LifeMashApplication : Application() {
             modules(
                 module { single { PushNotificationService() } },
                 module { single { dataStore } },
+                module { single<ErrorReporter> { CrashlyticsErrorReporter() } },
                 koinAppModule,
                 networkKoinModule,
                 calendarDomainModule,
@@ -74,13 +78,16 @@ class LifeMashApplication : Application() {
     private fun syncFcmToken() {
         val pushService: PushNotificationService = get()
         val syncUseCase: SyncKeywordsUseCase = get()
+        val errorReporter: ErrorReporter = get()
 
         pushService.registerToken { token ->
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     syncUseCase(token)
-                } catch (_: Exception) {
-                    // 실패해도 앱 시작 차단하지 않음
+                } catch (e: IOException) {
+                    errorReporter.log("FCM token sync: network unavailable")
+                } catch (e: Exception) {
+                    errorReporter.report(e)
                 }
             }
         }

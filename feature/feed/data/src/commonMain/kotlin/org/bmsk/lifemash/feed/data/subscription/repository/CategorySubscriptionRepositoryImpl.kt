@@ -12,9 +12,7 @@ class CategorySubscriptionRepositoryImpl(
 
     override fun getSubscribedCategories(): Flow<Set<ArticleCategory>> =
         dataSource.getSubscribedCategoryKeys().map { keys ->
-            keys.mapNotNull { key ->
-                runCatching { ArticleCategory.fromKey(key) }.getOrNull()
-            }.toSet()
+            keys.map { ArticleCategory.fromKey(it) }.toSet()
         }
 
     override suspend fun setSubscribedCategories(categories: Set<ArticleCategory>) {

@@ -5,7 +5,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.bmsk.lifemash.feed.data.history.dao.ReadingHistoryDao
 import org.bmsk.lifemash.feed.data.history.entity.toDomain
 import org.bmsk.lifemash.feed.data.history.entity.toReadingRecordEntity

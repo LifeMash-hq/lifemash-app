@@ -75,9 +75,7 @@ data class ArticleUiState(
                 publishedAtRelative = article.publishedAt
                     .toLocalDateTime(TimeZone.currentSystemDefault())
                     .let { "${it.year.toString().padStart(4, '0')}-${it.monthNumber.toString().padStart(2, '0')}-${it.dayOfMonth.toString().padStart(2, '0')} ${it.hour.toString().padStart(2, '0')}:${it.minute.toString().padStart(2, '0')}" },
-                host = article.link.value
-                    .substringAfter("://")
-                    .substringBefore("/"),
+                host = article.link.host,
                 isScrapped = isScrapped,
                 isRead = isRead,
             )

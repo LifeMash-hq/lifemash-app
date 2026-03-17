@@ -2,11 +2,11 @@ plugins {
     id("lifemash.kmp.compose")
 }
 
-android {
-    namespace = "org.bmsk.lifemash.auth.ui"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.auth.ui"
+    }
+
     sourceSets {
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -17,11 +17,11 @@ kotlin {
             implementation(project(":feature:auth:domain"))
             implementation(project(":shared:designsystem"))
 
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.ui)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.extended)
+            implementation(libs.compose.ui)
 
             implementation(libs.jetbrains.navigation.compose)
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)

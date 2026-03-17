@@ -13,8 +13,8 @@ interface EventRepository {
 data class CreateEventRequest(
     val title: String,
     val description: String?,
-    val startAt: kotlinx.datetime.Instant,
-    val endAt: kotlinx.datetime.Instant?,
+    val startAt: kotlin.time.Instant,
+    val endAt: kotlin.time.Instant?,
     val isAllDay: Boolean,
     val color: String?,
 )
@@ -22,8 +22,8 @@ data class CreateEventRequest(
 data class UpdateEventRequest(
     val title: String?,
     val description: String?,
-    val startAt: kotlinx.datetime.Instant?,
-    val endAt: kotlinx.datetime.Instant?,
+    val startAt: kotlin.time.Instant?,
+    val endAt: kotlin.time.Instant?,
     val isAllDay: Boolean?,
     val color: String?,
 )
