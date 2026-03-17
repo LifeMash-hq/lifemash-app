@@ -9,23 +9,26 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import org.bmsk.lifemash.calendar.domain.model.Event
 import org.bmsk.lifemash.calendar.domain.model.Group
 import org.bmsk.lifemash.calendar.domain.model.GroupType
 import org.bmsk.lifemash.calendar.domain.repository.CreateEventRequest
-import org.bmsk.lifemash.calendar.domain.repository.EventRepository
-import org.bmsk.lifemash.calendar.domain.repository.GroupRepository
 import org.bmsk.lifemash.calendar.domain.repository.UpdateEventRequest
+import org.bmsk.lifemash.calendar.domain.usecase.CreateEventUseCase
+import org.bmsk.lifemash.calendar.domain.usecase.CreateGroupUseCase
+import org.bmsk.lifemash.calendar.domain.usecase.DeleteEventUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.GetMonthEventsUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.GetMyGroupsUseCase
+import org.bmsk.lifemash.calendar.domain.usecase.JoinGroupUseCase
+import org.bmsk.lifemash.calendar.domain.usecase.UpdateEventUseCase
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.time.Clock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CalendarViewModelTest {
@@ -48,25 +51,43 @@ class CalendarViewModelTest {
     private var groupsResult: List<Group> = listOf(testGroup)
     private var eventsResult: List<Event> = listOf(testEvent)
 
-    private val fakeGroupRepo = object : GroupRepository {
-        override suspend fun getMyGroups(): List<Group> = groupsResult
-        override suspend fun getGroup(groupId: String): Group = testGroup
-        override suspend fun createGroup(type: GroupType, name: String?): Group = testGroup
-        override suspend fun joinGroup(inviteCode: String): Group = testGroup
-        override suspend fun deleteGroup(groupId: String) {}
+    private val fakeGetMonthEvents = object : GetMonthEventsUseCase {
+        override fun invoke(groupId: String, year: Int, month: Int): Flow<List<Event>> =
+            flowOf(eventsResult)
     }
 
-    private val fakeEventRepo = object : EventRepository {
-        override fun getMonthEvents(groupId: String, year: Int, month: Int): Flow<List<Event>> =
-            flowOf(eventsResult)
-        override suspend fun createEvent(groupId: String, request: CreateEventRequest): Event = testEvent
-        override suspend fun updateEvent(groupId: String, eventId: String, request: UpdateEventRequest): Event = testEvent
-        override suspend fun deleteEvent(groupId: String, eventId: String) {}
+    private val fakeGetMyGroups = object : GetMyGroupsUseCase {
+        override suspend fun invoke(): List<Group> = groupsResult
+    }
+
+    private val fakeCreateGroup = object : CreateGroupUseCase {
+        override suspend fun invoke(type: GroupType, name: String?): Group = testGroup
+    }
+
+    private val fakeJoinGroup = object : JoinGroupUseCase {
+        override suspend fun invoke(inviteCode: String): Group = testGroup
+    }
+
+    private val fakeCreateEvent = object : CreateEventUseCase {
+        override suspend fun invoke(groupId: String, request: CreateEventRequest): Event = testEvent
+    }
+
+    private val fakeUpdateEvent = object : UpdateEventUseCase {
+        override suspend fun invoke(groupId: String, eventId: String, request: UpdateEventRequest): Event = testEvent
+    }
+
+    private val fakeDeleteEvent = object : DeleteEventUseCase {
+        override suspend fun invoke(groupId: String, eventId: String) {}
     }
 
     private fun createViewModel() = CalendarViewModel(
-        getMonthEventsUseCase = GetMonthEventsUseCase(fakeEventRepo),
-        getMyGroupsUseCase = GetMyGroupsUseCase(fakeGroupRepo),
+        getMonthEventsUseCase = fakeGetMonthEvents,
+        getMyGroupsUseCase = fakeGetMyGroups,
+        createGroupUseCase = fakeCreateGroup,
+        joinGroupUseCase = fakeJoinGroup,
+        createEventUseCase = fakeCreateEvent,
+        updateEventUseCase = fakeUpdateEvent,
+        deleteEventUseCase = fakeDeleteEvent,
     )
 
     @BeforeTest
@@ -77,7 +98,9 @@ class CalendarViewModelTest {
     }
 
     @AfterTest
-    fun tearDown() { Dispatchers.resetMain() }
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     @Test
     fun `초기화 시 그룹을 로드하고 Loading이 해제된다`() = runTest(testDispatcher) {
