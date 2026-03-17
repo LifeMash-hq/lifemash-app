@@ -19,6 +19,9 @@ val FeedTab = BottomNavItem(
 
 fun NavGraphBuilder.feedNavGraph(navInfo: FeedNavGraphInfo) {
     composable<FeedRoute> {
-        FeedRouteScreen(onArticleOpen = navInfo.onArticleOpen)
+        FeedRouteScreen(
+            onArticleOpen = navInfo.onArticleOpen,
+            onNotificationClick = navInfo.onNotificationClick,
+        )
     }
 }

@@ -1,7 +1,11 @@
 package org.bmsk.lifemash.notification.domain.usecase
 
-import org.bmsk.lifemash.notification.domain.repository.NotificationKeywordRepository
+import org.bmsk.lifemash.notification.domain.model.Keyword
+import org.bmsk.lifemash.notification.domain.repository.KeywordRepository
 
-class AddKeywordUseCase(private val repository: NotificationKeywordRepository) {
-    suspend operator fun invoke(keyword: String) = repository.addKeyword(keyword.trim())
+class AddKeywordUseCase(private val repository: KeywordRepository) {
+    suspend operator fun invoke(raw: String) {
+        val keyword = Keyword.from(raw)
+        repository.addKeyword(keyword)
+    }
 }

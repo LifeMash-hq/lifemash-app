@@ -10,6 +10,7 @@ import org.bmsk.lifemash.model.ArticleCategory
 @Composable
 internal fun FeedRouteScreen(
     onArticleOpen: (String) -> Unit,
+    onNotificationClick: () -> Unit,
     viewModel: FeedViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -25,6 +26,7 @@ internal fun FeedRouteScreen(
     }
 
     FeedScreen(
+        onNotificationClick = onNotificationClick,
         selectedCategory = uiState.selectedCategory,
         categories = visibleCategories,
         articles = uiState.visibleArticles,

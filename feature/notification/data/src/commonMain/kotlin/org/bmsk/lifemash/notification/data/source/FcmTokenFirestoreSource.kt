@@ -2,34 +2,39 @@ package org.bmsk.lifemash.notification.data.source
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
+import kotlinx.datetime.Clock
 
-/**
- * Firestore fcm_tokens/{token} 문서를 갱신한다.
- * keywords 필드: Cloud Functions이 키워드 알림 매칭에 사용
- * userId 필드:   Ktor 백엔드가 캘린더 알림 발송에 사용 (auth 모듈에서 세팅)
- */
-internal class FcmTokenFirestoreSource {
+internal interface FcmTokenFirestoreSource {
+    suspend fun syncKeywords(fcmToken: String, keywords: List<String>)
+    suspend fun updateUserId(fcmToken: String, userId: String)
+}
 
-    suspend fun syncKeywords(fcmToken: String, keywords: List<String>) {
-        Firebase.firestore
-            .collection("fcm_tokens")
-            .document(fcmToken)
-            .set(
-                data = mapOf(
-                    "keywords" to keywords,
-                    "updatedAt" to kotlinx.datetime.Clock.System.now().toEpochMilliseconds(),
-                ),
-                merge = true,
-            )
+internal class FcmTokenFirestoreSourceImpl : FcmTokenFirestoreSource {
+
+    override suspend fun syncKeywords(fcmToken: String, keywords: List<String>) {
+        tokenDocument(fcmToken).set(
+            data = mapOf(
+                Fields.KEYWORDS to keywords,
+                Fields.UPDATED_AT to Clock.System.now().toEpochMilliseconds(),
+            ),
+            merge = true,
+        )
     }
 
-    suspend fun updateUserId(fcmToken: String, userId: String) {
-        Firebase.firestore
-            .collection("fcm_tokens")
-            .document(fcmToken)
-            .set(
-                data = mapOf("userId" to userId),
-                merge = true,
-            )
+    override suspend fun updateUserId(fcmToken: String, userId: String) {
+        tokenDocument(fcmToken).set(
+            data = mapOf(Fields.USER_ID to userId),
+            merge = true,
+        )
+    }
+
+    private fun tokenDocument(fcmToken: String) =
+        Firebase.firestore.collection(Fields.COLLECTION).document(fcmToken)
+
+    private object Fields {
+        const val COLLECTION = "fcm_tokens"
+        const val KEYWORDS = "keywords"
+        const val UPDATED_AT = "updatedAt"
+        const val USER_ID = "userId"
     }
 }
