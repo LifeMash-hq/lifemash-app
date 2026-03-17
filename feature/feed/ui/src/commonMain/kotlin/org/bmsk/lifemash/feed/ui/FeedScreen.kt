@@ -28,6 +28,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BrokenImage
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -63,6 +65,7 @@ import org.bmsk.lifemash.model.ArticleCategory
 @Composable
 internal fun FeedScreen(
     modifier: Modifier = Modifier,
+    onNotificationClick: () -> Unit = {},
     selectedCategory: ArticleCategory = ArticleCategory.ALL,
     categories: List<ArticleCategory> = ArticleCategory.entries,
     articles: PersistentList<ArticleUiState> = persistentListOf(),
@@ -129,6 +132,7 @@ internal fun FeedScreen(
                 onSearchClick = onSearchClick,
                 onCategorySelect = onCategorySelect,
                 onSubscriptionSettingClick = { showSubscriptionDialog = true },
+                onNotificationClick = onNotificationClick,
             )
         }
     }
@@ -151,10 +155,10 @@ internal fun ArticleCard(
     ) {
         Box(Modifier.fillMaxWidth()) {
             Column(Modifier.fillMaxWidth()) {
-                ArticleImage(url = article.article.image?.value)
+                ArticleImage(url = article.article.image?.value, contentDescription = article.article.title)
                 Column(Modifier.padding(14.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(style.icon, contentDescription = null, tint = style.color, modifier = Modifier.size(16.dp))
+                        Icon(style.icon, contentDescription = style.label, tint = style.color, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(article.article.publisher.name, style = MaterialTheme.typography.labelMedium, color = style.color)
                         Spacer(Modifier.width(8.dp))
@@ -187,14 +191,24 @@ internal fun ArticleCard(
 }
 
 @Composable
-private fun ArticleImage(url: String?) {
+private fun ArticleImage(url: String?, contentDescription: String? = null) {
     val painter = rememberAsyncImagePainter(model = url)
     val painterState by painter.state.collectAsState()
     val isLoading = painterState is AsyncImagePainter.State.Loading
 
+    val isError = painterState is AsyncImagePainter.State.Error
+
     Box(modifier = Modifier.fillMaxWidth().height(180.dp).background(MaterialTheme.colorScheme.surfaceVariant)) {
-        if (url != null) {
-            Image(painter = painter, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+        if (url != null && !isError) {
+            Image(painter = painter, contentDescription = contentDescription, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+        }
+        if (isError) {
+            Icon(
+                imageVector = Icons.Outlined.BrokenImage,
+                contentDescription = "이미지 로딩 실패",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.size(48.dp).align(Alignment.Center),
+            )
         }
         if (isLoading || url == null) { ShimmerOverlay() }
     }

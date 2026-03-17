@@ -6,7 +6,11 @@ import androidx.compose.ui.interop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSURLRequest
 import platform.Foundation.NSURL
-import platform.WebKit.WKWebView
+
+private fun isAllowedUrl(url: String): Boolean {
+    val scheme = url.substringBefore("://").lowercase()
+    return scheme == "https" || scheme == "http"
+}
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
@@ -14,12 +18,16 @@ actual fun PlatformWebView(url: String, modifier: Modifier) {
     UIKitView(
         modifier = modifier,
         factory = {
-            WKWebView().apply {
-                loadRequest(NSURLRequest(uRL = NSURL(string = url)!!))
+            platform.WebKit.WKWebView().apply {
+                if (isAllowedUrl(url)) {
+                    loadRequest(NSURLRequest(uRL = NSURL(string = url)!!))
+                }
             }
         },
         update = { webView ->
-            webView.loadRequest(NSURLRequest(uRL = NSURL(string = url)!!))
+            if (isAllowedUrl(url)) {
+                webView.loadRequest(NSURLRequest(uRL = NSURL(string = url)!!))
+            }
         },
     )
 }

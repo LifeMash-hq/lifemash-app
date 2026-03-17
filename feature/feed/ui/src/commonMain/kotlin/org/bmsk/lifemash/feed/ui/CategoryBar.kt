@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -50,6 +51,7 @@ internal fun CategoryBar(
     onSearchClick: (String) -> Unit = {},
     onCategorySelect: (ArticleCategory) -> Unit,
     onSubscriptionSettingClick: () -> Unit = {},
+    onNotificationClick: () -> Unit = {},
 ) {
     Surface(
         modifier = modifier,
@@ -73,6 +75,7 @@ internal fun CategoryBar(
                     onSearchIconClick = { onSearchModeChange(true) },
                     onSelect = onCategorySelect,
                     onSubscriptionSettingClick = onSubscriptionSettingClick,
+                    onNotificationClick = onNotificationClick,
                 )
             }
 
@@ -143,12 +146,16 @@ private fun FilterModeBar(
     onSearchIconClick: () -> Unit,
     onSelect: (ArticleCategory) -> Unit,
     onSubscriptionSettingClick: () -> Unit,
+    onNotificationClick: () -> Unit,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onSearchIconClick) {
             Icon(imageVector = Icons.Filled.Search, contentDescription = "검색")
         }
         FilterChipsRow(modifier = Modifier.weight(1f), selected = selected, categories = categories, onSelect = onSelect)
+        IconButton(onClick = onNotificationClick) {
+            Icon(imageVector = Icons.Outlined.Notifications, contentDescription = "키워드 알림")
+        }
         IconButton(onClick = onSubscriptionSettingClick) {
             Icon(imageVector = Icons.Outlined.Tune, contentDescription = "구독 설정")
         }
@@ -169,7 +176,7 @@ private fun FilterChipsRow(
                 onClick = { onSelect(category) },
                 label = { Text(category.style.label) },
                 leadingIcon = {
-                    Icon(category.style.icon, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(category.style.icon, contentDescription = category.style.label, modifier = Modifier.size(16.dp))
                 }
             )
         }

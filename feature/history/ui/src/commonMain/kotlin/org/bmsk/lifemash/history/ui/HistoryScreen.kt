@@ -83,7 +83,7 @@ private fun HistoryArticleItem(item: HistoryArticleUi, onClick: () -> Unit, modi
 private fun HistoryEmptyScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(imageVector = Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.size(72.dp))
+            Icon(imageVector = Icons.Filled.Info, contentDescription = "읽은 기사 없음", tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.size(72.dp))
             Text(text = "읽은 기사가 없습니다", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 16.dp))
             Text(text = "기사를 열람하면 여기에 표시됩니다", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.padding(top = 4.dp))
         }
@@ -94,7 +94,7 @@ private fun HistoryEmptyScreen() {
 private fun HistoryErrorScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(imageVector = Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(72.dp))
+            Icon(imageVector = Icons.Filled.Warning, contentDescription = "오류 발생", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(72.dp))
             Text(text = "오류가 발생했습니다", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 16.dp))
             Text(text = "잠시 후 다시 시도해 주세요", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.padding(top = 4.dp))
         }
