@@ -1,15 +1,13 @@
-import com.android.build.api.dsl.LibraryExtension
-
 plugins {
     id("lifemash.kmp.library")
     alias(libs.plugins.kotlin.serialization)
 }
 
-configure<LibraryExtension> {
-    namespace = "org.bmsk.lifemash.data.network"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.data.network"
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(projects.model)
@@ -24,6 +22,7 @@ kotlin {
             implementation(libs.gitlive.firebase.firestore)
         }
         androidMain.dependencies {
+            implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.ktor.client.okhttp)
         }
     }

@@ -1,14 +1,13 @@
-import com.android.build.api.dsl.LibraryExtension
 plugins {
     id("lifemash.kmp.library")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
-configure<com.android.build.api.dsl.LibraryExtension> {
-    namespace = "org.bmsk.lifemash.auth.data"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.auth.data"
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(projects.feature.auth.domain)

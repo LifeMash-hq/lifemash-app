@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.LibraryExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -6,11 +5,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-configure<LibraryExtension> {
-    namespace = "org.bmsk.lifemash.feed.data"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.feed.data"
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(projects.model)

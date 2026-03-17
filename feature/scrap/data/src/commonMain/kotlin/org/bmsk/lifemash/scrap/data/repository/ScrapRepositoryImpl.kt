@@ -30,7 +30,7 @@ class ScrapRepositoryImpl(
 
     override suspend fun deleteScrappedArticle(articleId: ArticleId) {
         withContext(Dispatchers.IO) {
-            scrapArticleDao.deleteArticle(articleId.value)
+            scrapArticleDao.deleteArticle(articleId.toString())
         }
     }
 }

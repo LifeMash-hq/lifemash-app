@@ -40,8 +40,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import org.bmsk.lifemash.notification.domain.model.NotificationKeyword
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -3,30 +3,28 @@ package org.bmsk.lifemash.feed.data.history.entity
 import org.bmsk.lifemash.model.Article
 import org.bmsk.lifemash.model.ArticleId
 import org.bmsk.lifemash.model.ArticleUrl
-import org.bmsk.lifemash.model.ImageUrl
-import org.bmsk.lifemash.model.Publisher
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 fun ReadingRecordEntity.toDomain(): Article = Article(
     id = ArticleId.from(articleId),
-    publisher = Publisher.from(publisher),
+    publisher = publisher,
     title = title,
     summary = summary,
     link = ArticleUrl.from(link),
-    image = image?.let { ImageUrl.from(it) },
+    image = image,
     publishedAt = publishedAt,
     categories = categories,
 )
 
 fun Article.toReadingRecordEntity(readAt: Instant): ReadingRecordEntity =
     ReadingRecordEntity(
-        articleId = id.value,
+        articleId = id.toString(),
         readAt = readAt,
-        publisher = publisher.name,
+        publisher = publisher,
         title = title,
         summary = summary,
-        link = link.value,
-        image = image?.value,
+        link = link.toString(),
+        image = image,
         publishedAt = publishedAt,
         categories = categories,
     )

@@ -5,7 +5,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.bmsk.lifemash.data.network.service.LifeMashFirebaseService
 import org.bmsk.lifemash.feed.data.model.toDomain
 import org.bmsk.lifemash.feed.domain.repository.ArticleRepository
@@ -67,9 +67,7 @@ class ArticleRepositoryImpl(
         return withContext(Dispatchers.IO) {
             lifeMashFirebaseService
                 .searchArticles(query = query, category = category, limit = limit)
-                .mapNotNull { response ->
-                    runCatching { response.toDomain() }.getOrNull()
-                }
+                .mapNotNull { it.toDomain() }
         }
     }
 
@@ -77,11 +75,7 @@ class ArticleRepositoryImpl(
         return withContext(Dispatchers.IO) {
             lifeMashFirebaseService
                 .getArticles(category = category.key)
-                .mapNotNull { response ->
-                    runCatching {
-                        response.toDomain()
-                    }.getOrNull()
-                }
+                .mapNotNull { it.toDomain() }
         }
     }
 }

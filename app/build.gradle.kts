@@ -2,7 +2,6 @@ plugins {
     id("lifemash.android.application")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    alias(libs.plugins.kotlin.android)
 }
 
 dependencies {
@@ -36,6 +35,7 @@ dependencies {
     implementation(projects.feature.notification.ui)
     implementation(projects.shared.fcm)
 
+    implementation(projects.shared.common)
     implementation(projects.shared.network)
     implementation(projects.shared.webview)
 

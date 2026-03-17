@@ -1,6 +1,6 @@
 package org.bmsk.lifemash.calendar.data.api.dto
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 import org.bmsk.lifemash.calendar.domain.model.Comment
 

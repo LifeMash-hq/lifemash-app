@@ -34,6 +34,10 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import platform.Foundation.NSHomeDirectory
 
+private val iosDataStore: DataStore<Preferences> = PreferenceDataStoreFactory.createWithPath {
+    (NSHomeDirectory() + "/Documents/lifemash_prefs.preferences_pb").toPath()
+}
+
 private val iosAppModule = module {
     single<HttpClient> {
         HttpClient(Darwin) {
@@ -43,11 +47,7 @@ private val iosAppModule = module {
             install(Logging) { level = LogLevel.BODY }
         }
     }
-    single<DataStore<Preferences>> {
-        PreferenceDataStoreFactory.createWithPath {
-            (NSHomeDirectory() + "/Documents/lifemash_prefs.preferences_pb").toPath()
-        }
-    }
+    single<DataStore<Preferences>> { iosDataStore }
 }
 
 fun initKoin() {
@@ -63,7 +63,7 @@ fun initKoin() {
             scrapUiModule,
             historyUiModule,
             authDomainModule,
-            authDataModule,
+            authDataModule(iosDataStore),
             calendarDomainModule,
             calendarDataModule,
             notificationDomainModule,

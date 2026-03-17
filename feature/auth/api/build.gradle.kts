@@ -3,14 +3,14 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-    namespace = "org.bmsk.lifemash.auth.api"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.auth.api"
+    }
+
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
+            implementation(libs.compose.runtime)
             implementation(libs.jetbrains.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
         }

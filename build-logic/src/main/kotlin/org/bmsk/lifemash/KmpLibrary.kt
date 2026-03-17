@@ -1,7 +1,6 @@
 package org.bmsk.lifemash
 
-import com.android.build.api.dsl.LibraryExtension
-import org.gradle.api.JavaVersion
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -12,7 +11,12 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 internal fun Project.configureKmpLibrary() {
     configure<KotlinMultiplatformExtension> {
-        androidTarget {
+        val androidLib = (this as org.gradle.api.plugins.ExtensionAware)
+            .extensions
+            .getByName("android") as KotlinMultiplatformAndroidLibraryTarget
+        androidLib.apply {
+            compileSdk = 36
+            minSdk = 28
             compilerOptions {
                 jvmTarget.set(JvmTarget.JVM_17)
                 freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -26,17 +30,6 @@ internal fun Project.configureKmpLibrary() {
                 isStatic = true
                 xcf.add(this)
             }
-        }
-
-        // 의존성은 각 모듈의 build.gradle.kts에서 직접 구성
-    }
-
-    configure<LibraryExtension> {
-        compileSdk = 36
-        defaultConfig { minSdk = 28 }
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
         }
     }
 }

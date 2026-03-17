@@ -79,7 +79,7 @@ internal fun ScrapNewsLoadedScreen(
             items(scrapNewsList) { scrap ->
                 ScrapNewsItem(
                     scrap = scrap, state = scrapNewsItemState,
-                    onClick = { onClickNews(scrap.article.link.value) },
+                    onClick = { onClickNews(scrap.article.link.toString()) },
                     onClickDelete = { deleteScrapNews(scrap) },
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                 )

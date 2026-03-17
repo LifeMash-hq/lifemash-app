@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.LibraryExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -6,11 +5,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-configure<LibraryExtension> {
-    namespace = "org.bmsk.lifemash.notification.data"
-}
-
 kotlin {
+    android {
+        namespace = "org.bmsk.lifemash.notification.data"
+    }
+
     sourceSets {
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -24,6 +23,9 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.gitlive.firebase.firestore)
+        }
+        androidMain.dependencies {
+            implementation(project.dependencies.platform(libs.firebase.bom))
         }
     }
 }

@@ -8,8 +8,12 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import org.bmsk.lifemash.feature.shared.error.ErrorReporter
 
-class NotificationDisplayer(private val context: Context) {
+class NotificationDisplayer(
+    private val context: Context,
+    private val errorReporter: ErrorReporter,
+) {
 
     fun show(title: String, body: String, articleUrl: String?) {
         ensureChannel()
@@ -34,8 +38,8 @@ class NotificationDisplayer(private val context: Context) {
 
         try {
             NotificationManagerCompat.from(context).notify(System.currentTimeMillis().toInt(), notification)
-        } catch (_: SecurityException) {
-            // POST_NOTIFICATIONS 권한 없음
+        } catch (e: SecurityException) {
+            errorReporter.log("Notification blocked: POST_NOTIFICATIONS permission not granted")
         }
     }
 

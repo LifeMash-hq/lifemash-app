@@ -3,7 +3,7 @@ package org.bmsk.lifemash.scrap.data.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.bmsk.lifemash.model.ArticleCategory
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = "scrap_articles")
 data class ArticleEntity(

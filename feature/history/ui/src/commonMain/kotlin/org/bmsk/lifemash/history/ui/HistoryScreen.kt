@@ -62,7 +62,7 @@ private fun HistoryLoadedScreen(articles: PersistentList<HistoryArticleUi>, onCl
         HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), color = MaterialTheme.colorScheme.outlineVariant)
         LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(16.dp), contentPadding = PaddingValues(bottom = 36.dp)) {
             items(articles) { item ->
-                HistoryArticleItem(item = item, onClick = { onClickArticle(item.article.link.value) }, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
+                HistoryArticleItem(item = item, onClick = { onClickArticle(item.article.link.toString()) }, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
             }
         }
     }
@@ -73,7 +73,7 @@ private fun HistoryArticleItem(item: HistoryArticleUi, onClick: () -> Unit, modi
     Column(modifier = modifier.clickable(onClick = onClick), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(text = item.article.title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(text = item.article.publisher.name, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = item.article.publisher, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(text = item.publishedAtFormatted, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }

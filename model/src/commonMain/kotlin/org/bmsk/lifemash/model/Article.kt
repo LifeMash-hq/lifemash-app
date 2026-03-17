@@ -1,10 +1,12 @@
 package org.bmsk.lifemash.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class ArticleId private constructor(val value: String) {
+value class ArticleId private constructor(private val raw: String) {
+    override fun toString(): String = raw
+
     companion object {
         fun from(raw: String): ArticleId {
             require(raw.isNotBlank()) { "ArticleId must not be blank" }
@@ -14,19 +16,11 @@ value class ArticleId private constructor(val value: String) {
 }
 
 @JvmInline
-value class Publisher private constructor(val name: String) {
-    companion object {
-        val unknown: Publisher = Publisher("Unknown")
+value class ArticleUrl private constructor(private val raw: String) {
+    val host: String get() = raw.substringAfter("://").substringBefore("/")
 
-        fun from(raw: String): Publisher {
-            require(raw.isNotBlank()) { "Publisher must not be blank" }
-            return Publisher(raw)
-        }
-    }
-}
+    override fun toString(): String = raw
 
-@JvmInline
-value class ArticleUrl private constructor(val value: String) {
     companion object {
         fun from(raw: String): ArticleUrl {
             require(raw.startsWith("http")) { "Invalid ArticleUrl: $raw" }
@@ -35,30 +29,21 @@ value class ArticleUrl private constructor(val value: String) {
     }
 }
 
-@JvmInline
-value class ImageUrl private constructor(val value: String) {
-    companion object {
-        fun from(raw: String): ImageUrl {
-            require(raw.isNotBlank()) { "ImageUrl must not be blank" }
-            return ImageUrl(raw)
-        }
-    }
-}
-
 data class Article(
     val id: ArticleId,
-    val publisher: Publisher,
+    val publisher: String,
     val title: String,
     val summary: String,
     val link: ArticleUrl,
-    val image: ImageUrl?,
+    val image: String?,
     val publishedAt: Instant,
-    val categories: List<ArticleCategory>
+    val categories: List<ArticleCategory>,
 ) {
-    // Example of business logic that could be added later,
-    // as learned from the articles.
     fun isRecent(now: Instant): Boolean {
-        // e.g., published within the last 24 hours
         return (now - publishedAt).inWholeSeconds < 86400
+    }
+
+    companion object {
+        const val UNKNOWN_PUBLISHER = "Unknown"
     }
 }
