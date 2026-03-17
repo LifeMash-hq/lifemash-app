@@ -1,15 +1,20 @@
 package org.bmsk.lifemash.main
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.feature.designsystem.theme.LifeMashTheme
 import java.net.UnknownHostException
@@ -19,9 +24,14 @@ internal class MainActivity : AppCompatActivity() {
     private var backPressedTime = 0L
     private val exitWhenBackButtonPressedTwiceCall = getOnBackPressedCallback()
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* granted or denied — 앱 동작에는 영향 없음 */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(exitWhenBackButtonPressedTwiceCall)
+        requestNotificationPermission()
 
         setContent {
             LifeMashTheme {
@@ -40,6 +50,16 @@ internal class MainActivity : AppCompatActivity() {
                 }
 
                 MainScreen(onShowErrorSnackbar = onShowErrorSnackbar)
+            }
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
