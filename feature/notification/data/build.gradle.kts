@@ -12,6 +12,10 @@ configure<LibraryExtension> {
 
 kotlin {
     sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.coroutines.test)
+        }
         commonMain.dependencies {
             implementation(projects.feature.notification.domain)
             implementation(libs.coroutines.core)

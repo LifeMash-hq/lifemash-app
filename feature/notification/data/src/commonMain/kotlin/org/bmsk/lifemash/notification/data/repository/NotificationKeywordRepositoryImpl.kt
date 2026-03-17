@@ -7,21 +7,23 @@ import kotlinx.datetime.Instant
 import org.bmsk.lifemash.notification.data.db.NotificationKeywordDao
 import org.bmsk.lifemash.notification.data.db.NotificationKeywordEntity
 import org.bmsk.lifemash.notification.data.source.FcmTokenFirestoreSource
+import org.bmsk.lifemash.notification.domain.model.Keyword
 import org.bmsk.lifemash.notification.domain.model.NotificationKeyword
-import org.bmsk.lifemash.notification.domain.repository.NotificationKeywordRepository
+import org.bmsk.lifemash.notification.domain.repository.KeywordRepository
+import org.bmsk.lifemash.notification.domain.repository.KeywordSyncRepository
 
 internal class NotificationKeywordRepositoryImpl(
     private val dao: NotificationKeywordDao,
     private val firestoreSource: FcmTokenFirestoreSource,
-) : NotificationKeywordRepository {
+) : KeywordRepository, KeywordSyncRepository {
 
     override fun getKeywords(): Flow<List<NotificationKeyword>> =
         dao.getAll().map { entities -> entities.map { it.toDomain() } }
 
-    override suspend fun addKeyword(keyword: String) {
+    override suspend fun addKeyword(keyword: Keyword) {
         dao.insert(
             NotificationKeywordEntity(
-                keyword = keyword.trim().lowercase(),
+                keyword = keyword.value,
                 createdAt = Clock.System.now().toEpochMilliseconds(),
             )
         )
@@ -31,14 +33,14 @@ internal class NotificationKeywordRepositoryImpl(
         dao.delete(id)
     }
 
-    override suspend fun syncToFirestore(fcmToken: String) {
+    override suspend fun syncKeywords(deviceToken: String) {
         val keywords = dao.getAllOnce().map { it.keyword }
-        firestoreSource.syncKeywords(fcmToken, keywords)
+        firestoreSource.syncKeywords(deviceToken, keywords)
     }
 
     private fun NotificationKeywordEntity.toDomain() = NotificationKeyword(
         id = id,
-        keyword = keyword,
+        keyword = Keyword(keyword),
         createdAt = Instant.fromEpochMilliseconds(createdAt),
     )
 }

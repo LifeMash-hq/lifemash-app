@@ -1,11 +1,15 @@
 package org.bmsk.lifemash.notification.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import org.bmsk.lifemash.notification.domain.model.Keyword
 import org.bmsk.lifemash.notification.domain.model.NotificationKeyword
 
-interface NotificationKeywordRepository {
+interface KeywordRepository {
     fun getKeywords(): Flow<List<NotificationKeyword>>
-    suspend fun addKeyword(keyword: String)
+    suspend fun addKeyword(keyword: Keyword)
     suspend fun removeKeyword(id: Long)
-    suspend fun syncToFirestore(fcmToken: String)
+}
+
+interface KeywordSyncRepository {
+    suspend fun syncKeywords(deviceToken: String)
 }
