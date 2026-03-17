@@ -58,7 +58,7 @@ internal fun ScrapNewsItem(
             ) {
                 Text(text = scrap.article.title, style = MaterialTheme.typography.titleMedium, maxLines = 3, overflow = TextOverflow.Ellipsis)
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = scrap.publishedAtRelative)
+                    Text(text = "${scrap.article.publisher.name} · ${scrap.publishedAtRelative}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             AnimatedVisibility(
@@ -69,11 +69,11 @@ internal fun ScrapNewsItem(
             ) {
                 Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
-                        imageVector = Icons.Filled.Delete, contentDescription = null,
+                        imageVector = Icons.Filled.Delete, contentDescription = "삭제",
                         modifier = Modifier.weight(1f).clickable { onClickDelete() },
                     )
                     Icon(
-                        imageVector = Icons.Filled.Close, contentDescription = null,
+                        imageVector = Icons.Filled.Close, contentDescription = "취소",
                         modifier = Modifier.weight(1f).clickable { state.onLongClick() },
                     )
                 }

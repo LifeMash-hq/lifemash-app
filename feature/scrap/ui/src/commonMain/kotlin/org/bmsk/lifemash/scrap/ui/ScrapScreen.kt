@@ -92,7 +92,7 @@ internal fun ScrapNewsLoadedScreen(
 internal fun ScrapNewsEmptyScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(imageVector = Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.align(Alignment.CenterHorizontally).size(72.dp))
+            Icon(imageVector = Icons.Filled.Info, contentDescription = "스크랩한 뉴스 없음", tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), modifier = Modifier.align(Alignment.CenterHorizontally).size(72.dp))
             Text(text = "스크랩한 뉴스가 없어요", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 16.dp))
             Text(text = "스크랩한 뉴스가 여기에 표시됩니다.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.padding(top = 4.dp))
         }
@@ -103,7 +103,7 @@ internal fun ScrapNewsEmptyScreen() {
 internal fun ScrapNewsErrorScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(imageVector = Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.CenterHorizontally).size(72.dp))
+            Icon(imageVector = Icons.Filled.Warning, contentDescription = "오류 발생", tint = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.CenterHorizontally).size(72.dp))
             Text(text = "에러가 발생했습니다.", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 16.dp))
             Text(text = "다시 시도해 주세요.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.padding(top = 4.dp))
         }
