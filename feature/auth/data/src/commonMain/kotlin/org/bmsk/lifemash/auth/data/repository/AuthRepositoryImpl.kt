@@ -1,8 +1,6 @@
 package org.bmsk.lifemash.auth.data.repository
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.bmsk.lifemash.auth.data.api.AuthApi
 import org.bmsk.lifemash.auth.data.storage.TokenStorage
 import org.bmsk.lifemash.auth.domain.model.AuthToken
@@ -14,21 +12,21 @@ internal class AuthRepositoryImpl(
     private val tokenStorage: TokenStorage,
 ) : AuthRepository {
 
-    private val _currentUser = MutableStateFlow<AuthUser?>(null)
-
-    override fun getCurrentUser(): Flow<AuthUser?> = _currentUser.asStateFlow()
+    override fun getCurrentUser(): Flow<AuthUser?> = tokenStorage.userFlow()
 
     override suspend fun signInWithKakao(accessToken: String): AuthToken {
         val token = api.signInWithKakao(accessToken).toDomain()
         tokenStorage.save(token)
-        refreshCurrentUser()
+        val user = api.getMe(token.accessToken).toDomain()
+        tokenStorage.saveUser(user)
         return token
     }
 
     override suspend fun signInWithGoogle(idToken: String): AuthToken {
         val token = api.signInWithGoogle(idToken).toDomain()
         tokenStorage.save(token)
-        refreshCurrentUser()
+        val user = api.getMe(token.accessToken).toDomain()
+        tokenStorage.saveUser(user)
         return token
     }
 
@@ -41,14 +39,10 @@ internal class AuthRepositoryImpl(
     override suspend fun signOut() {
         api.signOut()
         tokenStorage.clear()
-        _currentUser.value = null
+        tokenStorage.clearUser()
     }
 
     override suspend fun getStoredToken(): AuthToken? = tokenStorage.get()
 
     override suspend fun saveToken(token: AuthToken) = tokenStorage.save(token)
-
-    private suspend fun refreshCurrentUser() {
-        _currentUser.value = api.getMe().toDomain()
-    }
 }

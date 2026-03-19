@@ -20,11 +20,17 @@ internal fun AuthRouteScreen(
         }
     }
 
+    val launchKakaoLogin = rememberKakaoLoginLauncher { result ->
+        result.onSuccess { accessToken ->
+            viewModel.signInWithKakao(accessToken)
+        }.onFailure { error ->
+            onShowErrorSnackbar(error)
+        }
+    }
+
     AuthScreen(
         uiState = uiState,
-        // TODO: 실제 소셜 SDK 연동 시 토큰을 받아서 전달
-        // 현재는 placeholder — 소셜 SDK expect/actual 구현 필요
-        onKakaoSignIn = { viewModel.signInWithKakao("placeholder-kakao-token") },
+        onKakaoSignIn = launchKakaoLogin,
         onGoogleSignIn = { viewModel.signInWithGoogle("placeholder-google-token") },
     )
 }

@@ -7,10 +7,11 @@ import org.bmsk.lifemash.auth.data.api.AuthApi
 import org.bmsk.lifemash.auth.data.repository.AuthRepositoryImpl
 import org.bmsk.lifemash.auth.data.storage.TokenStorage
 import org.bmsk.lifemash.auth.domain.repository.AuthRepository
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 fun authDataModule(dataStore: DataStore<Preferences>) = module {
     single { TokenStorage(dataStore) }
-    single { AuthApi(get<HttpClient>()) }
+    single { AuthApi(get<HttpClient>(named("auth"))) }
     single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
 }
