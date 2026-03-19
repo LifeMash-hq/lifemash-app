@@ -1,11 +1,28 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     id("lifemash.android.application")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
 
+val localProps = gradleLocalProperties(rootDir, providers)
+val kakaoNativeAppKey: String = localProps.getProperty("KAKAO_NATIVE_APP_KEY", "")
+val backendBaseUrl: String = localProps.getProperty("BACKEND_BASE_URL", "https://lifemash-backend.onrender.com")
+
+android {
+    defaultConfig {
+        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoNativeAppKey
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
+        buildConfigField("String", "BACKEND_BASE_URL", "\"$backendBaseUrl\"")
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
 dependencies {
-    implementation(projects.model)
+    implementation(projects.shared.model)
     implementation(projects.feature.main)
 
     implementation(projects.feature.feed.domain)
@@ -33,6 +50,10 @@ dependencies {
     implementation(projects.feature.notification.data)
     implementation(projects.feature.notification.api)
     implementation(projects.feature.notification.ui)
+    implementation(projects.feature.assistant.domain)
+    implementation(projects.feature.assistant.data)
+    implementation(projects.feature.assistant.api)
+    implementation(projects.feature.assistant.ui)
     implementation(projects.shared.fcm)
 
     implementation(projects.shared.common)
@@ -40,6 +61,7 @@ dependencies {
     implementation(projects.shared.webview)
 
     implementation(libs.koin.android)
+    implementation(libs.kakao.user)
     implementation(libs.androidx.room.runtime)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)

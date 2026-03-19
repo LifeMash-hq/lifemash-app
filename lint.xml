@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- compose-lint-checks: ComposeModifierMissing만 활성화 -->
+    <issue id="ComposeModifierMissing" severity="error" />
+
+    <issue id="ComposeComposableFunctionNaming" severity="ignore" />
+    <issue id="ComposeCompositionLocalUsage" severity="ignore" />
+    <issue id="ComposeContentEmitterReturningValues" severity="ignore" />
+    <issue id="ComposeModifierReused" severity="ignore" />
+    <issue id="ComposeModifierWithoutDefault" severity="ignore" />
+    <issue id="ComposeM2Api" severity="ignore" />
+    <issue id="ComposeMultipleContentEmitters" severity="ignore" />
+    <issue id="ComposeMutableParameters" severity="ignore" />
+    <issue id="ComposeParameterOrder" severity="ignore" />
+    <issue id="ComposePreviewNaming" severity="ignore" />
+    <issue id="ComposePreviewPublic" severity="ignore" />
+    <issue id="ComposeRememberMissing" severity="ignore" />
+    <issue id="ComposeSlotReused" severity="ignore" />
+    <issue id="ComposeUnstableCollections" severity="ignore" />
+    <issue id="ComposeViewModelForwarding" severity="ignore" />
+    <issue id="ComposeViewModelInjection" severity="ignore" />
+    <issue id="ComposeModifierComposed" severity="ignore" />
+    <issue id="ComposeUnstableReceiver" severity="ignore" />
+</lint>

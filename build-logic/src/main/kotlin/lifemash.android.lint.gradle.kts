@@ -11,5 +11,6 @@ fun Lint.configure() {
     xmlReport = true
     sarifReport = true
     checkDependencies = true
+    lintConfig = rootProject.file("lint.xml")
     disable += "GradleDependency"
 }

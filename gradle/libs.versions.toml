@@ -60,11 +60,14 @@ ossLicensesPlugin = "0.10.6"
 google-services = "4.4.3"
 firebaseCrashlytics = "3.0.6"
 
+kakaoSdk = "2.20.6"
+composeLintChecks = "1.4.2"
 lint = "32.1.0"
 coreKtx = "1.18.0"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "composeLintChecks" }
 lint-api = { group = "com.android.tools.lint", name = "lint-api", version.ref = "lint" }
 lint-checks = { group = "com.android.tools.lint", name = "lint-checks", version.ref = "lint" }
 lint-tests = { group = "com.android.tools.lint", name = "lint-tests", version.ref = "lint" }
@@ -178,6 +181,9 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 gitlive-firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "gitliveFirebase" }
 gitlive-firebase-analytics = { module = "dev.gitlive:firebase-analytics", version.ref = "gitliveFirebase" }
 gitlive-firebase-messaging = { module = "dev.gitlive:firebase-messaging", version.ref = "gitliveFirebase" }
+
+# Kakao SDK
+kakao-user = { module = "com.kakao.sdk:v2-user", version.ref = "kakaoSdk" }
 
 # ksoup
 ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }

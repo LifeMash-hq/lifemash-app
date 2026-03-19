@@ -89,29 +89,23 @@ internal data class CategoryStyle(
     val color: Color
 )
 
-private val CATEGORY_STYLES: PersistentMap<ArticleCategory, CategoryStyle> = persistentMapOf(
-    ArticleCategory.ALL to CategoryStyle("전체", Icons.Outlined.DynamicFeed, Color(0xFF9E9E9E)),
-    ArticleCategory.POLITICS to CategoryStyle("정치", Icons.Outlined.Gavel, Color(0xFFEF5350)),
-    ArticleCategory.ECONOMY to CategoryStyle("경제", Icons.AutoMirrored.Outlined.TrendingUp, Color(0xFFFFB300)),
-    ArticleCategory.SOCIETY to CategoryStyle("사회", Icons.Outlined.Groups, Color(0xFF42A5F5)),
-    ArticleCategory.INTERNATIONAL to CategoryStyle("국제", Icons.Outlined.Public, Color(0xFF66BB6A)),
-    ArticleCategory.SPORTS to CategoryStyle("스포츠", Icons.Outlined.SportsSoccer, Color(0xFFAB47BC)),
-    ArticleCategory.CULTURE to CategoryStyle("문화", Icons.Outlined.Palette, Color(0xFF5C6BC0)),
-    ArticleCategory.ENTERTAINMENT to CategoryStyle("연예", Icons.Outlined.Movie, Color(0xFFFF7043)),
-    ArticleCategory.TECH to CategoryStyle("IT", Icons.Outlined.Memory, Color(0xFF26C6DA)),
-    ArticleCategory.SCIENCE to CategoryStyle("과학", Icons.Outlined.Science, Color(0xFF26C6DA)),
-    ArticleCategory.COLUMN to CategoryStyle("칼럼", Icons.Outlined.FormatQuote, Color(0xFF8D6E63)),
-    ArticleCategory.PEOPLE to CategoryStyle("인물", Icons.Outlined.Person, Color(0xFF7E57C2)),
-    ArticleCategory.HEALTH to CategoryStyle("건강", Icons.Outlined.HealthAndSafety, Color(0xFF26A69A)),
-    ArticleCategory.MEDICAL to CategoryStyle("의학", Icons.Outlined.MedicalServices, Color(0xFF26A69A)),
-    ArticleCategory.WOMEN to CategoryStyle("여성", Icons.Outlined.Woman, Color(0xFFEC407A)),
-    ArticleCategory.CARTOON to CategoryStyle("만화", Icons.Outlined.EmojiEmotions, Color(0xFF009688)),
-).also { map ->
-    check(map.size == ArticleCategory.entries.size) {
-        "CATEGORY_STYLES size=${map.size} mismatches ArticleCategory size=${ArticleCategory.entries.size}"
-    }
-}
-
 internal val ArticleCategory.style: CategoryStyle
-    get() = CATEGORY_STYLES[this]
-        ?: error("Missing CategoryStyle for $this. Did you update CATEGORY_STYLES?")
+    get() = when (this) {
+        ArticleCategory.ALL -> CategoryStyle("전체", Icons.Outlined.DynamicFeed, Color(0xFF9E9E9E))
+        ArticleCategory.POLITICS -> CategoryStyle("정치", Icons.Outlined.Gavel, Color(0xFFEF5350))
+        ArticleCategory.ECONOMY -> CategoryStyle("경제", Icons.AutoMirrored.Outlined.TrendingUp, Color(0xFFFFB300))
+        ArticleCategory.SOCIETY -> CategoryStyle("사회", Icons.Outlined.Groups, Color(0xFF42A5F5))
+        ArticleCategory.INTERNATIONAL -> CategoryStyle("국제", Icons.Outlined.Public, Color(0xFF66BB6A))
+        ArticleCategory.SPORTS -> CategoryStyle("스포츠", Icons.Outlined.SportsSoccer, Color(0xFFAB47BC))
+        ArticleCategory.CULTURE -> CategoryStyle("문화", Icons.Outlined.Palette, Color(0xFF5C6BC0))
+        ArticleCategory.ENTERTAINMENT -> CategoryStyle("연예", Icons.Outlined.Movie, Color(0xFFFF7043))
+        ArticleCategory.TECH -> CategoryStyle("IT", Icons.Outlined.Memory, Color(0xFF26C6DA))
+        ArticleCategory.SCIENCE -> CategoryStyle("과학", Icons.Outlined.Science, Color(0xFF26C6DA))
+        ArticleCategory.COLUMN -> CategoryStyle("칼럼", Icons.Outlined.FormatQuote, Color(0xFF8D6E63))
+        ArticleCategory.PEOPLE -> CategoryStyle("인물", Icons.Outlined.Person, Color(0xFF7E57C2))
+        ArticleCategory.HEALTH -> CategoryStyle("건강", Icons.Outlined.HealthAndSafety, Color(0xFF26A69A))
+        ArticleCategory.MEDICAL -> CategoryStyle("의학", Icons.Outlined.MedicalServices, Color(0xFF26A69A))
+        ArticleCategory.WOMEN -> CategoryStyle("여성", Icons.Outlined.Woman, Color(0xFFEC407A))
+        ArticleCategory.CARTOON -> CategoryStyle("만화", Icons.Outlined.EmojiEmotions, Color(0xFF009688))
+        ArticleCategory.UNKNOWN -> CategoryStyle("기타", Icons.Outlined.DynamicFeed, Color(0xFF9E9E9E))
+    }

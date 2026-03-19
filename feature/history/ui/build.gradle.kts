@@ -12,7 +12,7 @@ kotlin {
             implementation(project(":feature:history:api"))
             implementation(project(":feature:feed:domain"))
             implementation(project(":shared:designsystem"))
-            implementation(project(":model"))
+            implementation(project(":shared:model"))
 
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)

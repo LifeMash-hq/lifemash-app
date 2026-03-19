@@ -15,7 +15,7 @@ kotlin {
             implementation(project(":shared:common"))
             implementation(project(":shared:webview"))
             implementation(project(":shared:designsystem"))
-            implementation(project(":model"))
+            implementation(project(":shared:model"))
             implementation(project(":feature:feed:api"))
             implementation(project(":feature:feed:ui"))
             implementation(project(":feature:scrap:api"))
@@ -29,14 +29,19 @@ kotlin {
             implementation(project(":feature:auth:api"))
             implementation(project(":feature:auth:ui"))
             implementation(project(":feature:auth:domain"))
+            implementation(project(":feature:assistant:api"))
+            implementation(project(":feature:assistant:ui"))
 
             implementation(libs.compose.runtime)
+            implementation(libs.compose.material.icons.extended)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
 
             implementation(libs.jetbrains.navigation.compose)
             implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
         }
         androidMain.dependencies {
             implementation(libs.androidx.appcompat)
@@ -53,6 +58,8 @@ kotlin {
             implementation(project(":feature:auth:data"))
             implementation(project(":feature:notification:domain"))
             implementation(project(":feature:notification:data"))
+            implementation(project(":feature:assistant:domain"))
+            implementation(project(":feature:assistant:data"))
             implementation(libs.koin.core)
             implementation(libs.ktor.client.darwin)
             implementation(libs.ktor.client.content.negotiation)

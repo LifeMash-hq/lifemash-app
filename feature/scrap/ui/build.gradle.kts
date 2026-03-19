@@ -12,7 +12,7 @@ kotlin {
             implementation(project(":feature:scrap:api"))
             implementation(project(":feature:scrap:domain"))
             implementation(project(":shared:designsystem"))
-            implementation(project(":model"))
+            implementation(project(":shared:model"))
 
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
