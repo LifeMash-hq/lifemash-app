@@ -2,6 +2,7 @@ package org.bmsk.lifemash.auth.data.api
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -13,7 +14,7 @@ import org.bmsk.lifemash.auth.data.api.dto.GoogleSignInBody
 import org.bmsk.lifemash.auth.data.api.dto.KakaoSignInBody
 import org.bmsk.lifemash.auth.data.api.dto.RefreshTokenBody
 
-internal class AuthApi(private val client: HttpClient) {
+class AuthApi(private val client: HttpClient) {
 
     private val base = "/api/v1/auth"
 
@@ -38,6 +39,8 @@ internal class AuthApi(private val client: HttpClient) {
     suspend fun signOut(): Unit =
         client.post("$base/signout").body()
 
-    suspend fun getMe(): AuthUserDto =
-        client.get("$base/me").body()
+    suspend fun getMe(accessToken: String): AuthUserDto =
+        client.get("$base/me") {
+            bearerAuth(accessToken)
+        }.body()
 }
