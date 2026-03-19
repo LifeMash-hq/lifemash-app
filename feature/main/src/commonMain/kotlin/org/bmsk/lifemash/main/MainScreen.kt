@@ -1,14 +1,20 @@
 package org.bmsk.lifemash.main
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.bmsk.lifemash.assistant.api.ASSISTANT_ROUTE
+import org.bmsk.lifemash.assistant.api.AssistantNavGraphInfo
+import org.bmsk.lifemash.assistant.api.AssistantRoute
+import org.bmsk.lifemash.assistant.ui.AssistantTab
+import org.bmsk.lifemash.assistant.ui.assistantNavGraph
 import org.bmsk.lifemash.auth.api.AuthNavGraphInfo
 import org.bmsk.lifemash.auth.api.AuthRoute
-import org.bmsk.lifemash.auth.domain.usecase.GetCurrentUserUseCase
 import org.bmsk.lifemash.auth.ui.authNavGraph
 import org.bmsk.lifemash.calendar.api.CALENDAR_ROUTE
 import org.bmsk.lifemash.calendar.api.CalendarNavGraphInfo
@@ -37,17 +43,17 @@ import org.bmsk.lifemash.scrap.ui.scrapNavGraph
 import org.bmsk.lifemash.feature.shared.webview.WebViewNavGraphInfo
 import org.bmsk.lifemash.feature.shared.webview.WebViewRoute
 import org.bmsk.lifemash.feature.shared.webview.webViewNavGraph
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainScreen(
     onShowErrorSnackbar: (Throwable?) -> Unit = {},
 ) {
     val navController = rememberNavController()
-    val tabs = listOf(FeedTab, ScrapTab, HistoryTab, CalendarTab)
+    val tabs = listOf(FeedTab, ScrapTab, HistoryTab, CalendarTab, AssistantTab)
 
-    val getCurrentUserUseCase = koinInject<GetCurrentUserUseCase>()
-    val currentUser by getCurrentUserUseCase().collectAsState(initial = null)
+    val mainViewModel = koinViewModel<MainViewModel>()
+    val currentUser by mainViewModel.currentUser.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val destinationRoute = navBackStackEntry?.destination?.route
@@ -56,6 +62,7 @@ fun MainScreen(
         destinationRoute?.contains("ScrapRoute") == true -> SCRAP_ROUTE
         destinationRoute?.contains("HistoryRoute") == true -> HISTORY_ROUTE
         destinationRoute?.contains("CalendarRoute") == true -> CALENDAR_ROUTE
+        destinationRoute?.contains("AssistantRoute") == true -> ASSISTANT_ROUTE
         else -> null
     }
 
@@ -64,6 +71,7 @@ fun MainScreen(
         SCRAP_ROUTE to ScrapRoute,
         HISTORY_ROUTE to HistoryRoute,
         CALENDAR_ROUTE to CalendarRoute,
+        ASSISTANT_ROUTE to AssistantRoute,
     )
 
     val navigateWebView: (String) -> Unit = { url ->
@@ -78,8 +86,8 @@ fun MainScreen(
         tabs = tabs,
         currentRoute = currentTabRoute,
         onItemClick = { tab ->
-            // 캘린더 탭: 로그인 안 됐으면 로그인 화면으로
-            if (tab.route == CALENDAR_ROUTE && currentUser == null) {
+            // 캘린더/AI 탭: 로그인 안 됐으면 로그인 화면으로
+            if (tab.route in setOf(CALENDAR_ROUTE, ASSISTANT_ROUTE) && currentUser == null) {
                 navController.navigate(AuthRoute)
                 return@AdaptiveNavigation
             }
@@ -90,6 +98,7 @@ fun MainScreen(
                 restoreState = true
             }
         },
+        modifier = Modifier.fillMaxSize(),
     ) {
         NavHost(navController = navController, startDestination = FeedRoute) {
             feedNavGraph(FeedNavGraphInfo(
@@ -105,6 +114,10 @@ fun MainScreen(
             ))
             calendarNavGraph(CalendarNavGraphInfo(
                 onShowErrorSnackbar = onShowErrorSnackbar,
+            ))
+            assistantNavGraph(AssistantNavGraphInfo(
+                onShowErrorSnackbar = onShowErrorSnackbar,
+                onBack = { navController.popBackStack() },
             ))
             authNavGraph(AuthNavGraphInfo(
                 onSignInComplete = {

@@ -54,7 +54,11 @@ private fun CompactLayout(
         Column(modifier = Modifier.weight(1f)) {
             content()
         }
-        LifeMashBottomTabBar(tabs = tabs, currentRoute = currentRoute, onItemClick = onItemClick)
+        LifeMashBottomTabBar(
+            tabs = tabs,
+            currentRoute = currentRoute,
+            onItemClick = onItemClick,
+        )
     }
 }
 
