@@ -66,7 +66,6 @@ fun LifeMashBottomTabBar(
             .navigationBarsPadding()
             .padding(horizontal = LifeMashSpacing.lg, vertical = LifeMashSpacing.xxs)
             .height(48.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         tabs.forEach { tab ->
@@ -90,9 +89,10 @@ fun LifeMashBottomTabBar(
 
             Column(
                 modifier = Modifier
+                    .weight(1f)
                     .clip(RoundedCornerShape(LifeMashRadius.pill))
                     .clickable { onItemClick(tab) }
-                    .padding(horizontal = LifeMashSpacing.md, vertical = LifeMashSpacing.xxs),
+                    .padding(vertical = LifeMashSpacing.xxs),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
