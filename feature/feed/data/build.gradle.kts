@@ -12,7 +12,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.model)
+            implementation(projects.shared.model)
             implementation(projects.shared.network)
             implementation(projects.feature.feed.domain)
             implementation(libs.coroutines.core)

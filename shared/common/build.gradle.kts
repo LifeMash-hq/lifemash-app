@@ -15,7 +15,7 @@ kotlin {
             implementation(libs.compose.material.icons.extended)
             implementation(libs.compose.ui)
             implementation(project(":shared:designsystem"))
-            implementation(project(":model"))
+            implementation(project(":shared:model"))
         }
     }
 }

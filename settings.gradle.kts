@@ -15,6 +15,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://devrepo.kakao.com/nexus/content/groups/public/")
     }
 }
 
@@ -22,7 +23,6 @@ gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:testClasses"
 
 rootProject.name = "LifeMash"
 include(":app")
-include(":model")
 include(":lint")
 
 include(
@@ -70,6 +70,14 @@ include(
 )
 
 include(
+    ":feature:assistant:domain",
+    ":feature:assistant:data",
+    ":feature:assistant:api",
+    ":feature:assistant:ui",
+)
+
+include(
+    ":shared:model",
     ":shared:network",
     ":shared:navigation",
     ":shared:designsystem",

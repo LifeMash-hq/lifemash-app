@@ -20,6 +20,7 @@ internal fun Project.configureComposeAndroid() {
         add("implementation", platform(bom))
         add("androidTestImplementation", platform(bom))
 
+        add("lintChecks", libs.findLibrary("compose-lint-checks").get())
         add("implementation", libs.findLibrary("androidx.compose.material3").get())
         add("implementation", libs.findLibrary("androidx.compose.ui").get())
         add("implementation", libs.findLibrary("androidx.compose.ui.tooling.preview").get())

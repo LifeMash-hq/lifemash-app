@@ -104,7 +104,7 @@ internal fun FeedScreen(
                 if (articles.isEmpty()) {
                     item { Box(modifier = Modifier.fillParentMaxSize()) }
                 } else {
-                    itemsIndexed(items = articles, key = { _, it -> it.article.id }) { index, article ->
+                    itemsIndexed(items = articles, key = { _, it -> it.article.id.toString() }) { index, article ->
                         val variant = when (index) {
                             0 -> ArticleCardStyle.Headline
                             1, 2 -> ArticleCardStyle.Compact

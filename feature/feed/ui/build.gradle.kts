@@ -13,7 +13,7 @@ kotlin {
             implementation(project(":feature:feed:api"))
             implementation(project(":feature:scrap:domain"))
             implementation(project(":shared:designsystem"))
-            implementation(project(":model"))
+            implementation(project(":shared:model"))
 
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -30,6 +30,10 @@ kotlin {
             implementation(libs.coil.network.ktor3)
             implementation(libs.kotlinx.immutable)
             implementation(libs.kotlinx.datetime)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.compose.ui.tooling.preview)
+            implementation(libs.androidx.compose.ui.tooling)
         }
     }
 }

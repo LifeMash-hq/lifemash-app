@@ -10,7 +10,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.model)
+            implementation(projects.shared.model)
             implementation(libs.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.koin.core)
