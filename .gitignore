@@ -124,6 +124,7 @@ out/
 
 # Signing files
 .signing/
+*.pem
 
 # Local configuration file (sdk path, etc)
 
