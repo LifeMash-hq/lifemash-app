@@ -1,12 +1,25 @@
 package org.bmsk.lifemash.fcm
 
-// iOS 타겟 추가(Phase 5) 시 APNs + GitLive Firebase iOS SDK로 구현
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.messaging.messaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+
 actual class PushNotificationService {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     actual fun registerToken(onToken: (String) -> Unit) {
-        // TODO: Phase 5 — APNs 등록 + Firebase iOS SDK 연동
+        scope.launch {
+            runCatching { Firebase.messaging.getToken() }
+                .onSuccess { onToken(it) }
+        }
     }
 
     actual fun unregisterToken() {
-        // TODO: Phase 5
+        scope.launch {
+            runCatching { Firebase.messaging.deleteToken() }
+        }
     }
 }

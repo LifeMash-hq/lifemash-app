@@ -181,6 +181,7 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 gitlive-firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "gitliveFirebase" }
 gitlive-firebase-analytics = { module = "dev.gitlive:firebase-analytics", version.ref = "gitliveFirebase" }
 gitlive-firebase-messaging = { module = "dev.gitlive:firebase-messaging", version.ref = "gitliveFirebase" }
+gitlive-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "gitliveFirebase" }
 
 # Kakao SDK
 kakao-user = { module = "com.kakao.sdk:v2-user", version.ref = "kakaoSdk" }
