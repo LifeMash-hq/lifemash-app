@@ -28,30 +28,28 @@ internal class AssistantViewModel(
     private val homeLayoutRepository: HomeLayoutRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AssistantUiState())
+    private val _uiState = MutableStateFlow<AssistantUiState>(AssistantUiState.Loading)
     val uiState: StateFlow<AssistantUiState> = _uiState.asStateFlow()
 
-    init {
-        loadApiKeyStatus()
-    }
-
     fun updateInputText(text: String) {
-        _uiState.update { it.copy(inputText = text) }
+        updateReady { copy(inputText = text) }
     }
 
     fun sendMessage() {
-        val message = _uiState.value.inputText.trim()
-        if (message.isEmpty() || _uiState.value.isStreaming) return
+        val ready = _uiState.value as? AssistantUiState.Ready ?: return
+        val message = ready.inputText.trim()
+        if (message.isEmpty() || ready.isStreaming) return
 
+        val conversationId = ready.currentConversationId
         val userMessage = ChatMessageUi(
             id = "user_${Clock.System.now().toEpochMilliseconds()}",
             role = "user",
             content = message,
         )
 
-        _uiState.update {
-            it.copy(
-                messages = (it.messages + userMessage).toPersistentList(),
+        updateReady {
+            copy(
+                messages = (messages + userMessage).toPersistentList(),
                 inputText = "",
                 isStreaming = true,
                 streamingText = "",
@@ -68,13 +66,13 @@ internal class AssistantViewModel(
             runCatching {
                 sendMessageUseCase(
                     message = message,
-                    conversationId = _uiState.value.currentConversationId,
+                    conversationId = conversationId,
                     installedBlocks = installedBlocks,
                 ) { event ->
                     when (event.type) {
                         "token" -> {
-                            _uiState.update {
-                                it.copy(streamingText = it.streamingText + (event.content ?: ""))
+                            updateReady {
+                                copy(streamingText = streamingText + (event.content ?: ""))
                             }
                         }
                         "tool_start" -> {
@@ -85,41 +83,40 @@ internal class AssistantViewModel(
                                 "create_event" -> "일정 생성 중..."
                                 else -> "${event.tool} 실행 중..."
                             }
-                            _uiState.update { it.copy(activeToolCall = toolLabel) }
+                            updateReady { copy(activeToolCall = toolLabel) }
                         }
                         "tool_end" -> {
-                            _uiState.update { it.copy(activeToolCall = null) }
+                            updateReady { copy(activeToolCall = null) }
                         }
                         "done" -> {
-                            val assistantMessage = ChatMessageUi(
-                                id = "assistant_${Clock.System.now().toEpochMilliseconds()}",
-                                role = "assistant",
-                                content = _uiState.value.streamingText,
-                            )
-                            _uiState.update {
-                                it.copy(
-                                    messages = (it.messages + assistantMessage).toPersistentList(),
+                            updateReady {
+                                val assistantMessage = ChatMessageUi(
+                                    id = "assistant_${Clock.System.now().toEpochMilliseconds()}",
+                                    role = "assistant",
+                                    content = streamingText,
+                                )
+                                copy(
+                                    messages = (messages + assistantMessage).toPersistentList(),
                                     isStreaming = false,
                                     streamingText = "",
-                                    currentConversationId = event.conversationId ?: it.currentConversationId,
+                                    currentConversationId = event.conversationId ?: currentConversationId,
                                 )
                             }
                         }
                         "error" -> {
-                            _uiState.update { state ->
-                                // 이미 누적된 중간 텍스트가 있으면 메시지로 보존
-                                val messages = if (state.streamingText.isNotBlank()) {
+                            updateReady {
+                                val updatedMessages = if (streamingText.isNotBlank()) {
                                     val partial = ChatMessageUi(
                                         id = "assistant_${Clock.System.now().toEpochMilliseconds()}",
                                         role = "assistant",
-                                        content = state.streamingText,
+                                        content = streamingText,
                                     )
-                                    (state.messages + partial).toPersistentList()
+                                    (messages + partial).toPersistentList()
                                 } else {
-                                    state.messages
+                                    messages
                                 }
-                                state.copy(
-                                    messages = messages,
+                                copy(
+                                    messages = updatedMessages,
                                     isStreaming = false,
                                     streamingText = "",
                                     error = event.content ?: "오류가 발생했습니다.",
@@ -129,19 +126,19 @@ internal class AssistantViewModel(
                     }
                 }
             }.onFailure { e ->
-                _uiState.update { state ->
-                    val messages = if (state.streamingText.isNotBlank()) {
+                updateReady {
+                    val updatedMessages = if (streamingText.isNotBlank()) {
                         val partial = ChatMessageUi(
                             id = "assistant_${Clock.System.now().toEpochMilliseconds()}",
                             role = "assistant",
-                            content = state.streamingText,
+                            content = streamingText,
                         )
-                        (state.messages + partial).toPersistentList()
+                        (messages + partial).toPersistentList()
                     } else {
-                        state.messages
+                        messages
                     }
-                    state.copy(
-                        messages = messages,
+                    copy(
+                        messages = updatedMessages,
                         isStreaming = false,
                         streamingText = "",
                         error = e.message ?: "네트워크 오류가 발생했습니다.",
@@ -155,8 +152,8 @@ internal class AssistantViewModel(
         viewModelScope.launch {
             runCatching { getConversationsUseCase() }
                 .onSuccess { convos ->
-                    _uiState.update {
-                        it.copy(
+                    updateReady {
+                        copy(
                             conversations = convos.map { c ->
                                 ConversationUi(id = c.id, title = c.title)
                             }.toPersistentList(),
@@ -164,7 +161,7 @@ internal class AssistantViewModel(
                     }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message) }
+                    updateReady { copy(error = e.message) }
                 }
         }
     }
@@ -173,8 +170,8 @@ internal class AssistantViewModel(
         viewModelScope.launch {
             runCatching { getConversationUseCase(id) }
                 .onSuccess { (_, messages) ->
-                    _uiState.update {
-                        it.copy(
+                    updateReady {
+                        copy(
                             currentConversationId = id,
                             messages = messages.map { m ->
                                 ChatMessageUi(id = m.id, role = m.role, content = m.content)
@@ -184,7 +181,7 @@ internal class AssistantViewModel(
                     }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message) }
+                    updateReady { copy(error = e.message) }
                 }
         }
     }
@@ -194,14 +191,14 @@ internal class AssistantViewModel(
             runCatching { deleteConversationUseCase(id) }
                 .onSuccess { loadConversations() }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message) }
+                    updateReady { copy(error = e.message) }
                 }
         }
     }
 
     fun newConversation() {
-        _uiState.update {
-            it.copy(
+        updateReady {
+            copy(
                 currentConversationId = null,
                 messages = persistentListOf(),
                 showConversationList = false,
@@ -210,25 +207,33 @@ internal class AssistantViewModel(
     }
 
     fun toggleConversationList() {
-        val show = !_uiState.value.showConversationList
-        _uiState.update { it.copy(showConversationList = show) }
-        if (show) loadConversations()
+        var shouldLoad = false
+        updateReady {
+            val show = !showConversationList
+            shouldLoad = show
+            copy(showConversationList = show)
+        }
+        if (shouldLoad) loadConversations()
     }
 
     fun toggleSettings() {
-        val show = !_uiState.value.showSettings
-        _uiState.update { it.copy(showSettings = show) }
-        if (show) loadUsage()
+        var shouldLoad = false
+        updateReady {
+            val show = !showSettings
+            shouldLoad = show
+            copy(showSettings = show)
+        }
+        if (shouldLoad) loadUsage()
     }
 
     fun saveApiKey(key: String) {
         viewModelScope.launch {
             runCatching { saveApiKeyUseCase(key) }
                 .onSuccess {
-                    _uiState.update { it.copy(hasApiKey = true) }
+                    updateReady { copy(hasApiKey = true) }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message) }
+                    updateReady { copy(error = e.message) }
                 }
         }
     }
@@ -237,23 +242,26 @@ internal class AssistantViewModel(
         viewModelScope.launch {
             runCatching { removeApiKeyUseCase() }
                 .onSuccess {
-                    _uiState.update { it.copy(hasApiKey = false) }
+                    updateReady { copy(hasApiKey = false) }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message) }
+                    updateReady { copy(error = e.message) }
                 }
         }
     }
 
     fun clearError() {
-        _uiState.update { it.copy(error = null) }
+        updateReady { copy(error = null) }
     }
 
-    private fun loadApiKeyStatus() {
+    internal fun loadApiKeyStatus() {
         viewModelScope.launch {
             runCatching { getApiKeyStatusUseCase() }
                 .onSuccess { hasKey ->
-                    _uiState.update { it.copy(hasApiKey = hasKey) }
+                    _uiState.value = AssistantUiState.Ready(hasApiKey = hasKey)
+                }
+                .onFailure {
+                    _uiState.value = AssistantUiState.Ready(hasApiKey = false)
                 }
         }
     }
@@ -262,8 +270,17 @@ internal class AssistantViewModel(
         viewModelScope.launch {
             runCatching { getUsageUseCase() }
                 .onSuccess { usage ->
-                    _uiState.update { it.copy(usage = usage) }
+                    updateReady { copy(usage = usage) }
                 }
+        }
+    }
+
+    private fun updateReady(transform: AssistantUiState.Ready.() -> AssistantUiState.Ready) {
+        _uiState.update { state ->
+            when (state) {
+                is AssistantUiState.Ready -> state.transform()
+                else -> state
+            }
         }
     }
 }

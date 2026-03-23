@@ -7,16 +7,22 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.bmsk.lifemash.assistant.domain.model.AssistantUsage
 import org.bmsk.lifemash.assistant.domain.model.ChatMessage
 import org.bmsk.lifemash.assistant.domain.model.Conversation
+import org.bmsk.lifemash.assistant.domain.model.InstalledBlock
 import org.bmsk.lifemash.assistant.domain.model.SseEvent
 import org.bmsk.lifemash.assistant.domain.usecase.*
+import org.bmsk.lifemash.home.api.HomeBlock
+import org.bmsk.lifemash.home.domain.repository.HomeLayoutRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Clock
 
@@ -34,10 +40,16 @@ class AssistantViewModelTest {
         override suspend fun invoke(
             message: String,
             conversationId: String?,
+            installedBlocks: List<InstalledBlock>,
             onEvent: suspend (SseEvent) -> Unit,
         ) {
             sendMessageEvents.forEach { onEvent(it) }
         }
+    }
+
+    private val fakeHomeLayoutRepository = object : HomeLayoutRepository {
+        override fun getLayout(): Flow<List<HomeBlock>> = flowOf(emptyList())
+        override suspend fun saveLayout(blocks: List<HomeBlock>) {}
     }
 
     private val fakeGetConversations = object : GetConversationsUseCase {
@@ -85,7 +97,7 @@ class AssistantViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel() = AssistantViewModel(
+    private fun createViewModelRaw() = AssistantViewModel(
         sendMessageUseCase = fakeSendMessage,
         getConversationsUseCase = fakeGetConversations,
         getConversationUseCase = fakeGetConversation,
@@ -94,7 +106,36 @@ class AssistantViewModelTest {
         removeApiKeyUseCase = fakeRemoveApiKey,
         getApiKeyStatusUseCase = fakeGetApiKeyStatus,
         getUsageUseCase = fakeGetUsage,
+        homeLayoutRepository = fakeHomeLayoutRepository,
     )
+
+    private fun createViewModel(): AssistantViewModel {
+        val vm = createViewModelRaw()
+        vm.loadApiKeyStatus()
+        return vm
+    }
+
+    @Test
+    fun `초기 상태는 Loading이다`() = runTest {
+        // Given
+        val viewModel = createViewModelRaw()
+
+        // Then
+        assertIs<AssistantUiState.Loading>(viewModel.uiState.value)
+    }
+
+    @Test
+    fun `loadApiKeyStatus 후 Ready 상태가 된다`() = runTest {
+        // Given
+        apiKeyStatus = true
+
+        // When
+        val viewModel = createViewModel()
+
+        // Then
+        val state = assertIs<AssistantUiState.Ready>(viewModel.uiState.value)
+        assertTrue(state.hasApiKey)
+    }
 
     @Test
     fun `빈 메시지는 전송하지 않는다`() = runTest {
@@ -106,8 +147,9 @@ class AssistantViewModelTest {
         viewModel.sendMessage()
 
         // Then
-        assertTrue(viewModel.uiState.value.messages.isEmpty())
-        assertFalse(viewModel.uiState.value.isStreaming)
+        val state = assertIs<AssistantUiState.Ready>(viewModel.uiState.value)
+        assertTrue(state.messages.isEmpty())
+        assertFalse(state.isStreaming)
     }
 
     @Test
@@ -125,39 +167,12 @@ class AssistantViewModelTest {
         job.join()
 
         // Then
-        val messages = viewModel.uiState.value.messages
-        assertEquals(2, messages.size) // user + assistant
-        assertEquals("user", messages[0].role)
-        assertEquals("assistant", messages[1].role)
-        assertEquals("안녕하세요", messages[1].content)
-        assertFalse(viewModel.uiState.value.isStreaming)
-    }
-
-    @Test
-    fun `tool_start 이벤트 시 activeToolCall이 업데이트된다`() = runTest {
-        // Given
-        var capturedState: AssistantUiState? = null
-        sendMessageEvents = listOf(
-            SseEvent(type = "tool_start", tool = "get_today_events"),
-        )
-        // sendMessage will hang since no "done" event, but we can check intermediate state
-        val viewModel = createViewModel()
-
-        val job = launch {
-            viewModel.uiState.collect { state ->
-                if (state.activeToolCall != null) {
-                    capturedState = state
-                }
-            }
-        }
-
-        // When
-        viewModel.updateInputText("오늘 일정")
-        viewModel.sendMessage()
-
-        // Then - intermediate state had activeToolCall
-        // Note: with UnconfinedTestDispatcher, events complete synchronously
-        job.cancel()
+        val state = assertIs<AssistantUiState.Ready>(viewModel.uiState.value)
+        assertEquals(2, state.messages.size) // user + assistant
+        assertEquals("user", state.messages[0].role)
+        assertEquals("assistant", state.messages[1].role)
+        assertEquals("안녕하세요", state.messages[1].content)
+        assertFalse(state.isStreaming)
     }
 
     @Test
@@ -174,7 +189,8 @@ class AssistantViewModelTest {
         job.join()
 
         // Then
-        assertEquals("API 오류", viewModel.uiState.value.error)
-        assertFalse(viewModel.uiState.value.isStreaming)
+        val state = assertIs<AssistantUiState.Ready>(viewModel.uiState.value)
+        assertEquals("API 오류", state.error)
+        assertFalse(state.isStreaming)
     }
 }

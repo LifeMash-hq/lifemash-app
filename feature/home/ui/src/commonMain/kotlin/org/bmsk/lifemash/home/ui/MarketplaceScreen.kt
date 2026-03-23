@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,10 +36,12 @@ internal fun MarketplaceRouteScreen(
     onBack: () -> Unit,
     viewModel: MarketplaceViewModel = koinViewModel(),
 ) {
-    val blocks by viewModel.blocks.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val installedIds by viewModel.installedIds.collectAsState()
-    val installing by viewModel.installing.collectAsState()
-    val error by viewModel.error.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadBlocks()
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
@@ -49,31 +52,43 @@ internal fun MarketplaceRouteScreen(
                 }
             },
         )
-        val errorMessage = error
-        if (errorMessage != null) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(24.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "오류: $errorMessage",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { viewModel.retry() }) { Text("다시 시도") }
+        when (val state = uiState) {
+            is MarketplaceUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
                 }
             }
-        } else {
-            LazyColumn {
-                items(blocks, key = { it.id }) { block ->
-                    MarketplaceBlockItem(
-                        block = block,
-                        isInstalled = block.id in installedIds,
-                        isInstalling = installing == block.id,
-                        onInstall = { viewModel.installBlock(block) },
-                    )
+
+            is MarketplaceUiState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(24.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "오류: ${state.message}",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = { viewModel.retry() }) { Text("다시 시도") }
+                    }
+                }
+            }
+
+            is MarketplaceUiState.Loaded -> {
+                LazyColumn {
+                    items(state.blocks, key = { it.id }) { block ->
+                        MarketplaceBlockItem(
+                            block = block,
+                            isInstalled = block.id in installedIds,
+                            isInstalling = state.installing == block.id,
+                            onInstall = { viewModel.installBlock(block) },
+                        )
+                    }
                 }
             }
         }

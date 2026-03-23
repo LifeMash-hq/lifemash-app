@@ -51,7 +51,7 @@ import org.bmsk.lifemash.assistant.ui.component.TypingIndicator
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun AssistantScreen(
-    uiState: AssistantUiState,
+    uiState: AssistantUiState.Ready,
     onInputChange: (String) -> Unit,
     onSend: () -> Unit,
     onBack: () -> Unit,

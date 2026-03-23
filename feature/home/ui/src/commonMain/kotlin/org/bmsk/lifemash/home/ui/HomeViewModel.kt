@@ -35,7 +35,7 @@ class HomeViewModel(
     private val _accessToken = MutableStateFlow<String?>(null)
     val accessToken: StateFlow<String?> = _accessToken.asStateFlow()
 
-    init {
+    internal fun loadInitialData() {
         viewModelScope.launch {
             runCatching { getTodayData() }
                 .onSuccess { _todayData.value = it }

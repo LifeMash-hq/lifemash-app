@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -22,12 +21,13 @@ import org.bmsk.lifemash.calendar.domain.usecase.GetMonthEventsUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.GetMyGroupsUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.JoinGroupUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.UpdateEventUseCase
+import org.bmsk.lifemash.calendar.domain.usecase.UpdateGroupNameUseCase
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
+import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlin.time.Clock
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -80,6 +80,10 @@ class CalendarViewModelTest {
         override suspend fun invoke(groupId: String, eventId: String) {}
     }
 
+    private val fakeUpdateGroupName = object : UpdateGroupNameUseCase {
+        override suspend fun invoke(groupId: String, name: String): Group = testGroup
+    }
+
     private fun createViewModel() = CalendarViewModel(
         getMonthEventsUseCase = fakeGetMonthEvents,
         getMyGroupsUseCase = fakeGetMyGroups,
@@ -88,6 +92,7 @@ class CalendarViewModelTest {
         createEventUseCase = fakeCreateEvent,
         updateEventUseCase = fakeUpdateEvent,
         deleteEventUseCase = fakeDeleteEvent,
+        updateGroupNameUseCase = fakeUpdateGroupName,
     )
 
     @BeforeTest
@@ -103,51 +108,96 @@ class CalendarViewModelTest {
     }
 
     @Test
-    fun `초기화 시 그룹을 로드하고 Loading이 해제된다`() = runTest(testDispatcher) {
+    fun `초기 상태는 Loading이다`() = runTest(testDispatcher) {
         val viewModel = createViewModel()
 
-        val values = mutableListOf<CalendarUiState>()
-        val job = backgroundScope.launch(testDispatcher) {
-            viewModel.uiState.collect { values.add(it) }
-        }
+        assertIs<CalendarUiState.Loading>(viewModel.uiState.value)
+    }
 
-        assertFalse(values.last().isLoading)
-        assertNotNull(values.last().groups)
-        assertEquals(1, values.last().groups!!.size)
-        job.cancel()
+    @Test
+    fun `loadGroups 호출 시 Loaded 상태가 된다`() = runTest(testDispatcher) {
+        // Given
+        val viewModel = createViewModel()
+
+        // When
+        viewModel.loadGroups()
+
+        // Then
+        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
+        assertEquals(1, state.groups.size)
+        assertEquals(CalendarOverlay.None, state.overlay)
     }
 
     @Test
     fun `그룹이 없으면 selectedGroup이 null이다`() = runTest(testDispatcher) {
+        // Given
         groupsResult = emptyList()
         val viewModel = createViewModel()
 
-        val values = mutableListOf<CalendarUiState>()
-        val job = backgroundScope.launch(testDispatcher) {
-            viewModel.uiState.collect { values.add(it) }
-        }
+        // When
+        viewModel.loadGroups()
 
-        assertEquals(null, values.last().selectedGroup)
-        job.cancel()
+        // Then
+        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
+        assertNull(state.selectedGroup)
     }
 
     @Test
     fun `날짜 선택 시 selectedDate가 업데이트된다`() = runTest(testDispatcher) {
+        // Given
         val viewModel = createViewModel()
+        viewModel.loadGroups()
         val date = LocalDate(2026, 3, 15)
 
+        // When
         viewModel.selectDate(date)
 
-        assertEquals(date, viewModel.uiState.value.selectedDate)
+        // Then
+        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
+        assertEquals(date, state.selectedDate)
     }
 
     @Test
     fun `월 변경 시 currentYear과 currentMonth가 업데이트된다`() = runTest(testDispatcher) {
+        // Given
         val viewModel = createViewModel()
+        viewModel.loadGroups()
 
+        // When
         viewModel.changeMonth(2026, 4)
 
-        assertEquals(2026, viewModel.uiState.value.currentYear)
-        assertEquals(4, viewModel.uiState.value.currentMonth)
+        // Then
+        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
+        assertEquals(2026, state.currentYear)
+        assertEquals(4, state.currentMonth)
+    }
+
+    @Test
+    fun `showOverlay로 EventDetail을 설정하면 overlay가 변경된다`() = runTest(testDispatcher) {
+        // Given
+        val viewModel = createViewModel()
+        viewModel.loadGroups()
+
+        // When
+        viewModel.showOverlay(CalendarOverlay.EventDetail(testEvent))
+
+        // Then
+        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
+        assertIs<CalendarOverlay.EventDetail>(state.overlay)
+    }
+
+    @Test
+    fun `dismissOverlay로 overlay가 None이 된다`() = runTest(testDispatcher) {
+        // Given
+        val viewModel = createViewModel()
+        viewModel.loadGroups()
+        viewModel.showOverlay(CalendarOverlay.GroupRename)
+
+        // When
+        viewModel.dismissOverlay()
+
+        // Then
+        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
+        assertEquals(CalendarOverlay.None, state.overlay)
     }
 }

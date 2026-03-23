@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -22,6 +23,7 @@ import org.bmsk.lifemash.calendar.api.CalendarRoute
 import org.bmsk.lifemash.calendar.ui.CalendarTab
 import org.bmsk.lifemash.calendar.ui.calendarNavGraph
 import org.bmsk.lifemash.feature.designsystem.component.AdaptiveNavigation
+import org.bmsk.lifemash.home.api.BlockSettingsRoute
 import org.bmsk.lifemash.home.api.HOME_ROUTE
 import org.bmsk.lifemash.home.api.HomeRoute
 import org.bmsk.lifemash.home.ui.HomeTab
@@ -45,13 +47,14 @@ fun MainScreen(
     val currentUser by mainViewModel.currentUser.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val destinationRoute = navBackStackEntry?.destination?.route
-    val currentTabRoute = when {
-        destinationRoute?.contains("HomeRoute") == true -> HOME_ROUTE
-        destinationRoute?.contains("BlockSettingsRoute") == true -> HOME_ROUTE
-        destinationRoute?.contains("CalendarRoute") == true -> CALENDAR_ROUTE
-        destinationRoute?.contains("AssistantRoute") == true -> ASSISTANT_ROUTE
-        else -> null
+    val currentTabRoute = navBackStackEntry?.destination?.let { dest ->
+        when {
+            dest.hasRoute<HomeRoute>() -> HOME_ROUTE
+            dest.hasRoute<BlockSettingsRoute>() -> HOME_ROUTE
+            dest.hasRoute<CalendarRoute>() -> CALENDAR_ROUTE
+            dest.hasRoute<AssistantRoute>() -> ASSISTANT_ROUTE
+            else -> null
+        }
     }
 
     val tabRouteMap = mapOf(
