@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -141,8 +142,8 @@ private fun CalendarContent(
     onSelectGroup: (String) -> Unit,
     onShowOverlay: (CalendarOverlay) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().padding(16.dp)) {
+    Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
             if (uiState.groups.size > 1) {
                 GroupSelector(
                     groups = uiState.groups,
