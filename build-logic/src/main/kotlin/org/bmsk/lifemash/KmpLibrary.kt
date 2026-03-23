@@ -6,7 +6,6 @@ import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 internal fun Project.configureKmpLibrary() {
@@ -23,13 +22,7 @@ internal fun Project.configureKmpLibrary() {
             }
         }
 
-        val xcf = XCFramework("LifeMashShared")
-        listOf(iosArm64(), iosSimulatorArm64()).forEach {
-            it.binaries.framework {
-                baseName = "LifeMashShared"
-                isStatic = true
-                xcf.add(this)
-            }
-        }
+        iosArm64()
+        iosSimulatorArm64()
     }
 }

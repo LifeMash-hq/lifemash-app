@@ -15,6 +15,8 @@ kotlin {
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.gitlive.firebase.messaging)
         }
-        // iosMain: GitLive Firebase SDK (iOS 타겟 추가 시 활성화)
+        iosMain.dependencies {
+            implementation(libs.gitlive.firebase.messaging)
+        }
     }
 }

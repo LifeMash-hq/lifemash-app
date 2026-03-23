@@ -1,7 +1,6 @@
-package org.bmsk.lifemash.di
+package org.bmsk.lifemash.main.di
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -15,52 +14,34 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.bmsk.lifemash.auth.data.api.AuthApi
 import org.bmsk.lifemash.auth.data.storage.TokenStorage
+import org.bmsk.lifemash.data.network.engine.createPlatformHttpClientEngine
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-val koinAppModule = module {
-    // Auth API용 (로그인, 토큰 갱신 — Auth 플러그인 없음, 무한 루프 방지)
+fun httpClientModule(backendBaseUrl: String) = module {
     single<HttpClient>(named("auth")) {
-        HttpClient(OkHttp) {
+        HttpClient(createPlatformHttpClientEngine()) {
             defaultRequest {
-                url(BACKEND_BASE_URL)
+                url(backendBaseUrl)
                 contentType(ContentType.Application.Json)
             }
             install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        isLenient = true
-                    },
-                )
+                json(Json { ignoreUnknownKeys = true; isLenient = true })
             }
-            install(Logging) {
-                level = LogLevel.BODY
-            }
+            install(Logging) { level = LogLevel.BODY }
         }
     }
 
-    // 일반 API용 (Bearer + refreshTokens)
     single<HttpClient> {
         val tokenStorage: TokenStorage = get()
         val authApi: AuthApi = get()
-        HttpClient(OkHttp) {
-            engine {
-                config {
-                    readTimeout(90, java.util.concurrent.TimeUnit.SECONDS)
-                }
-            }
+        HttpClient(createPlatformHttpClientEngine()) {
             defaultRequest {
-                url(BACKEND_BASE_URL)
+                url(backendBaseUrl)
                 contentType(ContentType.Application.Json)
             }
             install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        isLenient = true
-                    },
-                )
+                json(Json { ignoreUnknownKeys = true; isLenient = true })
             }
             install(Auth) {
                 bearer {
@@ -83,11 +64,7 @@ val koinAppModule = module {
                     }
                 }
             }
-            install(Logging) {
-                level = LogLevel.BODY
-            }
+            install(Logging) { level = LogLevel.BODY }
         }
     }
 }
-
-private val BACKEND_BASE_URL get() = org.bmsk.lifemash.BuildConfig.BACKEND_BASE_URL
