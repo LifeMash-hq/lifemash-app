@@ -314,7 +314,7 @@ internal fun EventCreateBottomSheet(
             Button(
                 onClick = {
                     val startMs = if (isEdit) {
-                        editingEvent!!.startAt.toEpochMilliseconds()
+                        editingEvent.startAt.toEpochMilliseconds()
                     } else {
                         val date = selectedDate ?: return@Button
                         LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, 0, 0)

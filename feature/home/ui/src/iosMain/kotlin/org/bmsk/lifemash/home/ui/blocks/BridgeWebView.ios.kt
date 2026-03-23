@@ -5,6 +5,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.cValue
+import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSURLRequest
 import platform.Foundation.NSURL
 import platform.WebKit.WKNavigationAction
@@ -37,7 +39,7 @@ actual fun BridgeWebView(
             val config = WKWebViewConfiguration()
             val handler = LifeMashBridgeHandler(tokenProvider)
             config.userContentController.addScriptMessageHandler(handler, name = "LifeMashBridge")
-            WKWebView(frame = platform.CoreGraphics.CGRectZero.readValue(), configuration = config).apply {
+            WKWebView(frame = CGRectMake(0.0, 0.0, 0.0, 0.0), configuration = config).apply {
                 navigationDelegate = ExternalLinkNavigationDelegate()
                 nsUrl?.let { loadRequest(NSURLRequest(uRL = it)) }
             }
@@ -53,7 +55,7 @@ private class ExternalLinkNavigationDelegate : NSObject(), WKNavigationDelegateP
     ) {
         val request = decidePolicyForNavigationAction.request
         val targetUrl = request.URL
-        val isMainFrame = decidePolicyForNavigationAction.targetFrame?.isMainFrame == true
+        val isMainFrame = decidePolicyForNavigationAction.targetFrame?.isMainFrame() == true
 
         if (!isMainFrame && targetUrl != null) {
             UIApplication.sharedApplication.openURL(targetUrl)
