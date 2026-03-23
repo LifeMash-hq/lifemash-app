@@ -1,5 +1,6 @@
 package org.bmsk.lifemash.home.ui
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,12 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,11 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import org.bmsk.lifemash.home.api.BlocksTodayData
 import org.bmsk.lifemash.home.api.HomeBlock
 import org.bmsk.lifemash.home.ui.blocks.AssistantBlock
@@ -37,7 +36,6 @@ import org.bmsk.lifemash.home.ui.blocks.CalendarTodayBlock
 import org.bmsk.lifemash.home.ui.blocks.GroupsBlock
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HomeRouteScreen(
     onNavigateToBlockSettings: () -> Unit,
@@ -79,8 +77,7 @@ internal fun HomeScreen(
     val visibleBlocks = blocks.filter { it.visible }
     val webBlocks = visibleBlocks.filterIsInstance<HomeBlock.WebViewBlock>()
     val pageCount = 1 + webBlocks.size
-    val pagerState = rememberPagerState { pageCount }
-    val coroutineScope = rememberCoroutineScope()
+    var selectedPage by rememberSaveable { mutableIntStateOf(0) }
 
     val pageNames = buildList {
         add("대시보드")
@@ -91,15 +88,13 @@ internal fun HomeScreen(
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
             if (pageCount > 1) {
                 ScrollableTabRow(
-                    selectedTabIndex = pagerState.currentPage,
+                    selectedTabIndex = selectedPage,
                     edgePadding = 16.dp,
                 ) {
                     pageNames.forEachIndexed { index, name ->
                         Tab(
-                            selected = pagerState.currentPage == index,
-                            onClick = {
-                                coroutineScope.launch { pagerState.animateScrollToPage(index) }
-                            },
+                            selected = selectedPage == index,
+                            onClick = { selectedPage = index },
                             text = {
                                 Text(
                                     text = name,
@@ -111,10 +106,9 @@ internal fun HomeScreen(
                 }
             }
 
-            HorizontalPager(
-                state = pagerState,
+            Crossfade(
+                targetState = selectedPage,
                 modifier = Modifier.fillMaxSize(),
-                key = { if (it == 0) "dashboard" else webBlocks[it - 1].id },
             ) { page ->
                 if (page == 0) {
                     DashboardPage(
@@ -122,12 +116,14 @@ internal fun HomeScreen(
                         onNavigateToAssistant = onNavigateToAssistant,
                     )
                 } else {
-                    val block = webBlocks[page - 1]
-                    BridgeWebView(
-                        url = block.url,
-                        tokenProvider = { accessToken },
-                        modifier = Modifier.fillMaxSize(),
-                    )
+                    val block = webBlocks.getOrNull(page - 1)
+                    if (block != null) {
+                        BridgeWebView(
+                            url = block.url,
+                            tokenProvider = { accessToken },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
                 }
             }
         }
