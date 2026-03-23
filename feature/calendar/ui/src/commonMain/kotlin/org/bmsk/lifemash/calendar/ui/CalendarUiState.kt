@@ -20,4 +20,6 @@ internal data class CalendarUiState(
     val selectedEvent: Event? = null,
     val showEventDetail: Boolean = false,
     val editingEvent: Event? = null,
+    val showGroupRename: Boolean = false,
+    val isRenamingGroup: Boolean = false,
 )

@@ -17,6 +17,7 @@ import org.bmsk.lifemash.calendar.data.api.dto.EventDto
 import org.bmsk.lifemash.calendar.data.api.dto.GroupDto
 import org.bmsk.lifemash.calendar.data.api.dto.JoinGroupBody
 import org.bmsk.lifemash.calendar.data.api.dto.UpdateEventBody
+import org.bmsk.lifemash.calendar.data.api.dto.UpdateGroupNameBody
 import org.bmsk.lifemash.calendar.domain.model.GroupType
 
 internal class CalendarApi(private val client: HttpClient) {
@@ -64,6 +65,12 @@ internal class CalendarApi(private val client: HttpClient) {
 
     suspend fun deleteGroup(groupId: String): Unit =
         client.delete("$base/groups/$groupId").body()
+
+    suspend fun updateGroupName(groupId: String, body: UpdateGroupNameBody): GroupDto =
+        client.patch("$base/groups/$groupId") {
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }.body()
 
     suspend fun getComments(groupId: String, eventId: String): List<CommentDto> =
         client.get("$base/$groupId/events/$eventId/comments").body()

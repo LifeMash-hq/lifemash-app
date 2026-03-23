@@ -79,6 +79,9 @@ internal fun CalendarScreen(
     onCreateGroup: (GroupType, String?) -> Unit,
     onJoinGroup: (String) -> Unit,
     onSelectGroup: (String) -> Unit,
+    onShowGroupRename: () -> Unit,
+    onHideGroupRename: () -> Unit,
+    onRenameGroup: (groupId: String, name: String) -> Unit,
     onShowEventCreate: () -> Unit,
     onHideEventCreate: () -> Unit,
     onCreateEvent: (String, String?, Long, Long?, Boolean, String?) -> Unit,
@@ -112,14 +115,13 @@ internal fun CalendarScreen(
         },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
-            if (uiState.groups.size > 1) {
-                GroupSelector(
-                    groups = uiState.groups,
-                    selectedGroup = uiState.selectedGroup,
-                    onSelectGroup = onSelectGroup,
-                )
-                Spacer(Modifier.height(8.dp))
-            }
+            GroupSelector(
+                groups = uiState.groups,
+                selectedGroup = uiState.selectedGroup,
+                onSelectGroup = onSelectGroup,
+                onRenameGroup = { onShowGroupRename() },
+            )
+            Spacer(Modifier.height(8.dp))
 
             MonthHeader(
                 year = uiState.currentYear,
@@ -173,6 +175,15 @@ internal fun CalendarScreen(
             onDismiss = onHideEventCreate,
             onCreate = onCreateEvent,
             onUpdate = onUpdateEvent,
+        )
+    }
+
+    if (uiState.showGroupRename && uiState.selectedGroup != null) {
+        GroupRenameDialog(
+            currentName = uiState.selectedGroup.name ?: "",
+            isLoading = uiState.isRenamingGroup,
+            onDismiss = onHideGroupRename,
+            onConfirm = { name -> onRenameGroup(uiState.selectedGroup.id, name) },
         )
     }
 
@@ -251,6 +262,7 @@ private fun GroupSelector(
     groups: PersistentList<Group>,
     selectedGroup: Group?,
     onSelectGroup: (String) -> Unit,
+    onRenameGroup: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -261,9 +273,50 @@ private fun GroupSelector(
                 selected = group.id == selectedGroup?.id,
                 onClick = { onSelectGroup(group.id) },
                 label = { Text(group.name ?: group.type.name) },
+                trailingIcon = if (group.id == selectedGroup?.id) {
+                    {
+                        Icon(
+                            Icons.Filled.Edit,
+                            contentDescription = "그룹명 변경",
+                            modifier = Modifier.size(16.dp).clickable { onRenameGroup(group.id) },
+                        )
+                    }
+                } else null,
             )
         }
     }
+}
+
+@Composable
+private fun GroupRenameDialog(
+    currentName: String,
+    isLoading: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    var name by remember { mutableStateOf(currentName) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("그룹명 변경") },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("그룹명") },
+                singleLine = true,
+                enabled = !isLoading,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(name) },
+                enabled = name.isNotBlank() && !isLoading,
+            ) { Text("변경") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("취소") }
+        },
+    )
 }
 
 @Composable

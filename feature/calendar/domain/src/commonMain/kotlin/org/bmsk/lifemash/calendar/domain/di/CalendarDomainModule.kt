@@ -14,6 +14,8 @@ import org.bmsk.lifemash.calendar.domain.usecase.JoinGroupUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.JoinGroupUseCaseImpl
 import org.bmsk.lifemash.calendar.domain.usecase.UpdateEventUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.UpdateEventUseCaseImpl
+import org.bmsk.lifemash.calendar.domain.usecase.UpdateGroupNameUseCase
+import org.bmsk.lifemash.calendar.domain.usecase.UpdateGroupNameUseCaseImpl
 import org.koin.dsl.module
 
 val calendarDomainModule = module {
@@ -24,4 +26,5 @@ val calendarDomainModule = module {
     factory<CreateGroupUseCase> { CreateGroupUseCaseImpl(get()) }
     factory<JoinGroupUseCase> { JoinGroupUseCaseImpl(get()) }
     factory<GetMyGroupsUseCase> { GetMyGroupsUseCaseImpl(get()) }
+    factory<UpdateGroupNameUseCase> { UpdateGroupNameUseCaseImpl(get()) }
 }

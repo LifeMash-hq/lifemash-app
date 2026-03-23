@@ -9,4 +9,5 @@ interface GroupRepository {
     suspend fun getMyGroups(): List<Group>
     suspend fun getGroup(groupId: String): Group
     suspend fun deleteGroup(groupId: String)
+    suspend fun updateGroupName(groupId: String, name: String): Group
 }
