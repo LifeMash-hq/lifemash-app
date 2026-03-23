@@ -44,7 +44,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -107,21 +106,17 @@ internal fun CalendarScreen(
         return
     }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = onShowEventCreate) {
-                Icon(Icons.Filled.Add, contentDescription = "일정 추가")
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
+            if (uiState.groups.size > 1) {
+                GroupSelector(
+                    groups = uiState.groups,
+                    selectedGroup = uiState.selectedGroup,
+                    onSelectGroup = onSelectGroup,
+                    onRenameGroup = { onShowGroupRename() },
+                )
+                Spacer(Modifier.height(8.dp))
             }
-        },
-    ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
-            GroupSelector(
-                groups = uiState.groups,
-                selectedGroup = uiState.selectedGroup,
-                onSelectGroup = onSelectGroup,
-                onRenameGroup = { onShowGroupRename() },
-            )
-            Spacer(Modifier.height(8.dp))
 
             MonthHeader(
                 year = uiState.currentYear,
@@ -164,6 +159,12 @@ internal fun CalendarScreen(
                     }
                 }
             }
+        }
+        FloatingActionButton(
+            onClick = onShowEventCreate,
+            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = "일정 추가")
         }
     }
 

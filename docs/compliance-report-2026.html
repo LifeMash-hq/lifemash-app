@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeMash 법제도 컴플라이언스 점검 보고서 (2026)</title>
+  <style>
+    :root {
+      --bg: #0d0f1a;
+      --surface: #13172a;
+      --surface2: #1c2138;
+      --border: #252d4a;
+      --accent: #6c8ef5;
+      --text: #dde4f5;
+      --text-muted: #7e8cad;
+      --text-dim: #3d4870;
+      --red: #f87171;
+      --orange: #fb923c;
+      --yellow: #fbbf24;
+      --green: #34d399;
+      --purple: #a78bfa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(160deg, #14183a 0%, #0d0f1a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 52px 72px 40px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(108,142,245,.12);
+      border: 1px solid rgba(108,142,245,.35);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      padding: 4px 13px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+    header h1 { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .meta { color: var(--text-muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 24px; }
+    .meta span::before { content: ''; margin-right: 6px; opacity: .5; }
+
+    /* ── Layout ── */
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 44px 72px 88px; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 52px; }
+    .sec-title {
+      font-size: 17px; font-weight: 700; color: #fff;
+      margin-bottom: 22px; padding-bottom: 13px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sec-num {
+      background: var(--accent); color: #fff;
+      font-size: 11px; font-weight: 700;
+      width: 22px; height: 22px; border-radius: 6px;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+
+    /* ── Risk Cards ── */
+    .risk-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px; }
+    .rcard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+    .rcard-area { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+    .rcard-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 11px; line-height: 1.45; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 700;
+      padding: 3px 11px; border-radius: 20px;
+    }
+    .chip::before { content: '●'; font-size: 7px; }
+    .c-red    { background: rgba(248,113,113,.14); color: var(--red);    border: 1px solid rgba(248,113,113,.28); }
+    .c-yellow { background: rgba(251,191,36,.10);  color: var(--yellow); border: 1px solid rgba(251,191,36,.26); }
+    .c-green  { background: rgba(52,211,153,.10);  color: var(--green);  border: 1px solid rgba(52,211,153,.24); }
+    .c-blue   { background: rgba(108,142,245,.12); color: var(--accent); border: 1px solid rgba(108,142,245,.26); }
+
+    /* ── Finding Card ── */
+    .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+    .fhead {
+      display: flex; align-items: center; gap: 11px;
+      padding: 13px 20px; background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .ftag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 6px; flex-shrink: 0; }
+    .t-crit { background: rgba(248,113,113,.18); color: var(--red); }
+    .t-warn { background: rgba(251,191,36,.14); color: var(--yellow); }
+    .t-ok   { background: rgba(52,211,153,.14); color: var(--green); }
+    .t-info { background: rgba(108,142,245,.14); color: var(--accent); }
+    .ftitle { font-size: 14px; font-weight: 600; color: var(--text); }
+    .fbody { padding: 16px 20px; }
+    .fbody p { color: var(--text-muted); margin-bottom: 10px; line-height: 1.75; }
+    .fbody p:last-child { margin-bottom: 0; }
+    .fbody strong { color: var(--text); }
+
+    /* ── Code ref ── */
+    .cref {
+      background: rgba(0,0,0,.32); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px; padding: 10px 14px;
+      font-family: 'JetBrains Mono','Fira Code',monospace;
+      font-size: 12px; color: #8fadd4; margin: 10px 0; overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    /* ── Law Quote ── */
+    .lq {
+      background: rgba(108,142,245,.07);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px; margin: 12px 0;
+      color: #9db8f8; font-size: 13px; line-height: 1.75;
+    }
+    .lq-src { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+
+    /* ── Action Items ── */
+    .actions { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .aitem {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; font-size: 13px; color: var(--text-muted);
+    }
+    .ptag { flex-shrink: 0; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 4px; margin-top: 2px; }
+    .p1 { background: rgba(248,113,113,.18); color: var(--red); }
+    .p2 { background: rgba(251,191,36,.14); color: var(--yellow); }
+    .p3 { background: rgba(52,211,153,.12); color: var(--green); }
+
+    /* ── Table ── */
+    .twrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      background: var(--surface2); color: var(--text-muted);
+      font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+      padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    td { padding: 12px 16px; border-bottom: 1px solid rgba(37,45,74,.55); color: var(--text-muted); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+    /* ── Conclusion ── */
+    .conclusion {
+      background: linear-gradient(135deg, #181e44 0%, #0f1228 100%);
+      border: 1px solid rgba(108,142,245,.22);
+      border-radius: 16px; padding: 30px 36px; margin-top: 40px;
+    }
+    .conclusion h3 { color: #fff; font-size: 16px; margin-bottom: 14px; }
+    .conclusion p { color: var(--text-muted); margin-bottom: 10px; line-height: 1.8; }
+
+    .footer { margin-top: 36px; text-align: center; color: var(--text-dim); font-size: 12px; }
+
+    @media (max-width: 860px) {
+      header { padding: 32px 24px; }
+      .wrap { padding: 28px 24px 60px; }
+      .risk-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Legal Compliance Report · LifeMash-hq</div>
+  <h1>LifeMash 법제도 컴플라이언스 점검 보고서</h1>
+  <div class="meta">
+    <span>기준일: 2026년 3월 20일</span>
+    <span>검토 조직: LifeMash-hq (전체 레포지터리)</span>
+    <span>참조 법령: 저작권법 · 부정경쟁방지법 · 개인정보보호법</span>
+    <span>참조 기관: KPF · 한국저작권위원회 · 개인정보보호위원회</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ── 0. 검토 범위 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">0</span>검토 범위 — 전체 레포지터리</div>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>레포지터리</th><th>역할</th><th>법적 관련성</th></tr></thead>
+        <tbody>
+          <tr><td><strong>LifeMash-NewsCollector</strong></td><td>RSS 수집 파이프라인 (Python, GitHub Actions 자동화)</td><td>저작권법·부정경쟁방지법·KPF 징수규정 — 핵심</td></tr>
+          <tr><td><strong>LifeMash-Backend</strong></td><td>Ktor API 서버 (인증·그룹·일정·AI 어시스턴트)</td><td>개인정보보호법·Anthropic API 처리</td></tr>
+          <tr><td><strong>LifeMash-Functions</strong></td><td>Firebase Cloud Functions (검색·FCM 키워드 알림·Algolia)</td><td>개인정보보호법 (FCM 토큰·Algolia 연동)</td></tr>
+          <tr><td><strong>LifeMash-App</strong></td><td>Android/iOS 앱 (Compose Multiplatform)</td><td>개인정보보호법 (동의 UI·Analytics·Crashlytics)</td></tr>
+          <tr><td><strong>LifeMash-Legal</strong></td><td>개인정보처리방침 (Firebase Hosting 배포)</td><td>개인정보보호법 제30조 (처리방침 공개 의무)</td></tr>
+          <tr><td><strong>LifeMash-App-Private</strong></td><td>서명 파일 등 비공개 자산</td><td>해당 없음</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 1. 전체 리스크 현황 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">1</span>전체 리스크 현황</div>
+
+    <div class="risk-grid">
+      <div class="rcard">
+        <div class="rcard-area">NewsCollector · 저작권법 · KPF</div>
+        <div class="rcard-label">100+ 한국 언론사<br>RSS 무허가 수집</div>
+        <span class="chip c-red">높음</span>
+      </div>
+      <div class="rcard">
+        <div class="rcard-area">NewsCollector · 부정경쟁방지법</div>
+        <div class="rcard-label">robots.txt 미확인<br>크롤링 에티켓</div>
+        <span class="chip c-yellow">중간</span>
+      </div>
+      <div class="rcard">
+        <div class="rcard-area">LifeMash-App · 개인정보보호법</div>
+        <div class="rcard-label">동의 화면 없음<br>Analytics·Crashlytics 수집 중</div>
+        <span class="chip c-red">높음</span>
+      </div>
+      <div class="rcard">
+        <div class="rcard-area">LifeMash-Backend · 개인정보보호법</div>
+        <div class="rcard-label">Claude API로<br>대화 내역 해외 전송</div>
+        <span class="chip c-yellow">중간</span>
+      </div>
+      <div class="rcard">
+        <div class="rcard-area">LifeMash-Legal · 개인정보보호법</div>
+        <div class="rcard-label">처리방침 발행됨<br>앱 내 연결 없음</div>
+        <span class="chip c-yellow">중간</span>
+      </div>
+      <div class="rcard">
+        <div class="rcard-area">LifeMash-App · 저작권법</div>
+        <div class="rcard-label">AI 어시스턴트<br>기사 컨텍스트 미사용</div>
+        <span class="chip c-green">낮음 (양호)</span>
+      </div>
+    </div>
+
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th>영역</th><th>레포</th><th>관련 법령·기관</th><th>현황 요약</th><th>위험도</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RSS 수집 — 언론사 허가</strong></td>
+            <td>NewsCollector</td>
+            <td>저작권법, 부정경쟁방지법, KPF 징수규정</td>
+            <td>100+ 한국 언론사 RSS 자동 수집. 개별 라이선스 계약 없음.</td>
+            <td><span class="chip c-red">높음</span></td>
+          </tr>
+          <tr>
+            <td><strong>Firebase Analytics·Crashlytics 동의</strong></td>
+            <td>App</td>
+            <td>개인정보보호법 제22조, 표준지침 2025-4호</td>
+            <td>Crashlytics 활성 사용 중. 앱 내 동의 화면 없음.</td>
+            <td><span class="chip c-red">높음</span></td>
+          </tr>
+          <tr>
+            <td><strong>robots.txt 미확인</strong></td>
+            <td>NewsCollector</td>
+            <td>부정경쟁방지법, 형법 업무방해</td>
+            <td>ETag·지연은 구현됨. robots.txt 파싱·준수 코드 없음.</td>
+            <td><span class="chip c-yellow">중간</span></td>
+          </tr>
+          <tr>
+            <td><strong>Claude API 대화 해외 전송</strong></td>
+            <td>Backend</td>
+            <td>개인정보보호법 제28조의8 (국외 이전)</td>
+            <td>처리방침에 Anthropic PBC 공개됨. 동의·고지는 충족.</td>
+            <td><span class="chip c-yellow">중간</span></td>
+          </tr>
+          <tr>
+            <td><strong>개인정보처리방침 앱 내 미연결</strong></td>
+            <td>App, Legal</td>
+            <td>개인정보보호법 제30조</td>
+            <td>방침은 발행됨. 앱 로그인·설정 화면에 링크 없음.</td>
+            <td><span class="chip c-yellow">중간</span></td>
+          </tr>
+          <tr>
+            <td><strong>FCM 토큰 파기 정책</strong></td>
+            <td>App, Functions</td>
+            <td>개인정보보호법 제21조</td>
+            <td>Functions에서 invalid 토큰 자동 삭제 구현됨. 계정 탈퇴 시 연동 필요.</td>
+            <td><span class="chip c-yellow">중간</span></td>
+          </tr>
+          <tr>
+            <td><strong>AI 어시스턴트 기사 컨텍스트 미사용</strong></td>
+            <td>App, Backend</td>
+            <td>저작권법 제35조의5 (공정이용)</td>
+            <td>ChatRequestDto에 기사 필드 없음. RAG 구조 아님.</td>
+            <td><span class="chip c-green">낮음</span></td>
+          </tr>
+          <tr>
+            <td><strong>딥링크·썸네일 구조</strong></td>
+            <td>App</td>
+            <td>저작권법 (전시권·공중송신권)</td>
+            <td>기사 전문은 외부 WebView 전환. 대법원 판례 부합.</td>
+            <td><span class="chip c-green">낮음</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 2. NewsCollector ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">2</span>LifeMash-NewsCollector — 저작권법 · 부정경쟁방지법 · KPF</div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-crit">Critical</span><span class="ftitle">100+ 한국 언론사 RSS 무허가 상업적 수집</span></div>
+      <div class="fbody">
+        <p>NewsCollector는 <code>feeds.csv</code>에 등록된 <strong>경향신문·동아일보·조선일보·중앙일보·한겨레·KBS·SBS·JTBC·MBC 등 100여 개 한국 언론사</strong>의 RSS 피드를 GitHub Actions(하루 2회, UTC 09:30·21:30)로 자동 수집하여 Firestore <code>articles</code> 컬렉션에 저장합니다.</p>
+        <div class="cref">
+          LifeMash-NewsCollector/news_collector_rss/feeds.csv  ← 100+ 피드 목록<br>
+          LifeMash-NewsCollector/.github/workflows/collect_rss_news_to_firestore.yml  ← 자동화 스케줄<br>
+          LifeMash-NewsCollector/news_collector_rss/collector.py  ← 수집 로직
+        </div>
+        <p><strong>저장 필드:</strong> publisher, title, summary, link, image, publishedAt, categories, keywords — 이 중 <strong>title·summary·image는 언론사 저작물</strong>에 해당하는 정보입니다.</p>
+
+        <div class="lq">
+          "뉴스저작물을 서버에 저장하고 게시하는 사업자에게 적용되는 징수율: 뉴스저작물 개수 × 단일 판매가격의 <strong>75%</strong>"
+          <div class="lq-src">— 한국언론진흥재단 뉴스저작물 사용료 징수규정 (2026년 기준)</div>
+        </div>
+
+        <p>RSS는 공개 배포 형식이나, 이를 <strong>상업적 플랫폼에서 대량으로 재가공·큐레이션하는 것</strong>은 RSS 이용약관 및 저작권법의 허용 범위를 초과합니다. 대부분의 한국 언론사 RSS 이용약관은 개인·비상업적 이용으로 제한합니다. 현재 상태는 KPF 저작권 침해 경고 및 손해배상 청구 대상이 될 수 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-warn">주의</span><span class="ftitle">robots.txt 미확인 — 부정경쟁방지법·업무방해 리스크</span></div>
+      <div class="fbody">
+        <p>수집기는 <strong>robots.txt를 파싱하거나 Disallow 규칙을 확인하지 않습니다.</strong> 일부 언론사는 robots.txt에서 자동화 봇의 RSS 경로 접근을 차단하고 있습니다. 이를 무시한 수집은 법적으로 두 가지 위험을 초래합니다.</p>
+        <p>① 잡코리아-사람인 판례(대법원 2017)에서 법원이 집중한 것은 <em>기술적 차단을 우회하는 악의적 행위</em>였습니다. robots.txt 무시는 이와 유사하게 평가될 수 있습니다.<br>
+        ② 무차별 요청이 서버 부하를 유발하면 형법상 업무방해죄 및 정보통신망법 위반 문제가 발생합니다.</p>
+        <div class="cref">
+          collector.py 현재 구현:<br>
+          ✓ If-None-Match (ETag) 헤더 — 구현됨<br>
+          ✓ If-Modified-Since 헤더 — 구현됨<br>
+          ✓ 도메인별 2~3초 지연(throttle_host) — 구현됨<br>
+          ✓ User-Agent: LifeMashNewsBot/1.0 — 구현됨<br>
+          ✗ robots.txt 파싱·준수 — 미구현
+        </div>
+
+        <div class="lq">
+          ETag를 준수하는 크롤러는 추후 소송에서 "원저작권자 서버 자원을 존중했다"는 선의(Good Faith)를 입증하는 물적 증거로 작용하여 부정경쟁행위의 고의성을 조각하는 데 유리하다.
+          <div class="lq-src">— 본 검토 참조 문서, 6장 크롤링 기술 에티켓</div>
+        </div>
+        <p>ETag·지연·식별 User-Agent 구현은 선의 입증에 유리한 강점입니다. robots.txt 준수를 추가하면 기술적 에티켓이 완성됩니다.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-ok">양호</span><span class="ftitle">ETag · Rate Limit · 식별 User-Agent — 기술적 선의 입증 요소 충족</span></div>
+      <div class="fbody">
+        <p>수집기는 조건부 HTTP 요청(ETag·If-Modified-Since), 도메인별 랜덤 2~3초 지연, 3회 재시도 지수 백오프, 피드당 50건 상한을 구현하고 있습니다. 이는 잡코리아-사람인 사건에서 제재받은 VPN 우회·무차별 수집과 정반대의 기술적 구조이며, 법적 분쟁 시 선의를 입증하는 핵심 근거가 됩니다.</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="aitem"><span class="ptag p1">즉시</span>주요 수집 대상 언론사 상위 20개사에 RSS 상업적 이용 허가 또는 KPF 라이선스 계약 협의 착수</div>
+      <div class="aitem"><span class="ptag p1">즉시</span>KPF 미디어 스타트업 지원사업 신청 검토 (2026년 3~4월 공모 중) — 빅카인즈 API 2년 무상 제공으로 데이터 합법화</div>
+      <div class="aitem"><span class="ptag p2">단기</span><code>collector.py</code>에 <code>urllib.robotparser</code> 기반 robots.txt 파싱·Disallow 확인 로직 추가</div>
+      <div class="aitem"><span class="ptag p2">단기</span>NewsAPI 사용 여부 최종 확인 → 사용 시 처리방침에 NewsAPI 추가 공개</div>
+    </div>
+  </div>
+
+  <!-- ── 3. 개인정보보호법 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">3</span>개인정보보호법 — 동의·파기·국외 이전</div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-crit">Critical</span><span class="ftitle">Firebase Analytics · Crashlytics — 동의 화면 없이 수집 중 (App)</span></div>
+      <div class="fbody">
+        <p>앱은 <code>firebase.analytics</code>·<code>firebase.crashlytics</code> 의존성을 선언하고 있으며, Crashlytics는 <code>CrashlyticsErrorReporter.kt</code>에서 예외와 에러 로그를 Anthropic 서버로 실제 전송 중입니다. 그러나 <strong>앱 어디에도 동의 수집 화면이 없습니다.</strong></p>
+        <div class="cref">
+          LifeMash-App/app/src/main/kotlin/org/bmsk/lifemash/error/CrashlyticsErrorReporter.kt<br>
+          LifeMash-App/feature/auth/ui/.../AuthScreen.kt  ← 동의 링크·팝업 없음
+        </div>
+        <div class="lq">
+          개인정보처리자는 동의를 받을 때 ① 강압 없는 자유로운 의사 결정 ② 목적·내용 명확한 고지 ③ 평이한 문구 ④ 명확한 수락/거절 UI를 모두 갖추어야 한다.
+          <div class="lq-src">— 개인정보보호법 제22조, 표준 개인정보 보호지침 고시 제2025-4호 (2025.04.11 시행)</div>
+        </div>
+        <p>4가지 요건 모두 미충족. 개인정보보호위원회 과징금 처분 대상입니다.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-warn">주의</span><span class="ftitle">개인정보처리방침 발행됨 — 앱 내 연결 없음 (Legal → App)</span></div>
+      <div class="fbody">
+        <p><code>LifeMash-Legal/privacy-policy.html</code>이 Firebase Hosting에 발행되어 있습니다(<code>https://lifemash-e79c5.web.app/privacy-policy.html</code>). Analytics·Crashlytics·FCM·Anthropic·Algolia·Neon 등 주요 제3자 처리자가 모두 공개되어 있습니다.</p>
+        <p>그러나 개인정보보호법 제30조는 처리방침을 <strong>정보주체가 언제든지 쉽게 확인할 수 있도록</strong> 공개하도록 규정합니다. 앱 로그인 화면과 설정 화면 모두 처리방침 링크가 없어 법적 공개 의무를 충족하지 못합니다.</p>
+        <div class="cref">
+          LifeMash-Legal/privacy-policy.html  ← 발행됨 (최종 수정: 2026-03-20)<br>
+          LifeMash-App/feature/auth/ui/.../AuthScreen.kt  ← 처리방침 링크 없음<br>
+          설정 화면 전반  ← 처리방침·계정 삭제 기능 없음
+        </div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-warn">주의</span><span class="ftitle">FCM 토큰 Firestore 저장 — 계정 탈퇴 시 파기 연동 필요</span></div>
+      <div class="fbody">
+        <p>FCM 토큰은 <code>userId</code>·<code>keywords</code>와 함께 Firestore <code>fcm_tokens</code> 컬렉션에 저장됩니다. Firebase Functions의 <code>notifyKeywordMatch</code>는 FCM 등록 해제된(unregistered) 토큰을 자동 삭제합니다 — 이 부분은 양호합니다.</p>
+        <p>그러나 <strong>계정 탈퇴 시 fcm_tokens 문서 삭제가 Backend API와 연동되어 있는지 확인이 필요</strong>합니다. 탈퇴 후에도 토큰이 잔류하면 개인정보보호법 제21조(파기 의무) 위반이 됩니다.</p>
+        <div class="cref">
+          LifeMash-Functions/functions/src/index.ts (notifyKeywordMatch)  ← invalid 토큰 자동 삭제 ✓<br>
+          LifeMash-Backend/src/.../auth  ← 탈퇴 API와 fcm_tokens 삭제 연동 여부 확인 필요
+        </div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-warn">주의</span><span class="ftitle">Claude API 대화 내역 해외 전송 — 처리방침 공개 충족, 동의 UI 보완 필요</span></div>
+      <div class="fbody">
+        <p>Backend의 <code>AssistantService</code>는 사용자 대화 메시지를 Anthropic Claude API로 전송합니다. <strong>처리방침에 Anthropic PBC(미국)로의 국외 이전이 이미 공개되어 있어</strong> 고지 의무는 충족됩니다. 다만 앱 내에서 AI 어시스턴트 기능 사용 전 별도 동의·안내를 받는 것이 더 안전합니다.</p>
+        <div class="cref">
+          LifeMash-Backend/src/.../assistant/HttpClaudeApiClient.kt<br>
+          LifeMash-Legal/privacy-policy.html (Line ~69): Anthropic PBC 공개 ✓<br>
+          ChatRequestDto(message: String, conversationId: String?)  ← 기사 내용 미포함 ✓
+        </div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-ok">양호</span><span class="ftitle">AI 어시스턴트 — 기사 원문 컨텍스트 미사용 확인</span></div>
+      <div class="fbody">
+        <p>Backend의 <code>ChatRequestDto</code>에는 기사 관련 필드가 없으며, 어시스턴트 도구는 <code>get_today_events</code>·<code>get_month_events</code>·<code>get_my_groups</code>(캘린더·그룹)만 사용합니다. 2026년 2월 문체부·저작권위원회 가이드라인이 경고하는 <strong>RAG 기반 뉴스 요약 서비스 구조에 해당하지 않습니다.</strong></p>
+        <p>향후 기사를 AI 컨텍스트에 주입하는 기능 추가 시, 해당 언론사와 라이선스 계약 체결 후 진행해야 합니다.</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="aitem"><span class="ptag p1">즉시</span>앱 최초 실행 시 개인정보 처리방침 동의 화면 구현 — Analytics·Crashlytics opt-in 포함, 거절 시 SDK 초기화 지연</div>
+      <div class="aitem"><span class="ptag p1">즉시</span>앱 로그인 화면·설정 화면에 처리방침 링크 추가 (개인정보보호법 제30조)</div>
+      <div class="aitem"><span class="ptag p2">단기</span>계정 탈퇴 API 호출 시 Firestore fcm_tokens 문서 삭제 연동 여부 확인 및 구현</div>
+      <div class="aitem"><span class="ptag p2">단기</span>설정 화면에 '계정 및 데이터 삭제' 기능 추가 (정보주체 권리 보장)</div>
+      <div class="aitem"><span class="ptag p3">중기</span>읽기 이력(Room DB) 보유기간 정책 수립 (예: 90일) 및 자동 파기 로직 구현</div>
+      <div class="aitem"><span class="ptag p3">중기</span>프로덕션 빌드 HTTP body 로깅(<code>LogLevel.BODY</code>) 비활성화 확인</div>
+    </div>
+  </div>
+
+  <!-- ── 4. 저작권 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">4</span>저작권법 — 썸네일·딥링크·공정이용 (양호)</div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-ok">양호</span><span class="ftitle">기사 전문 — 외부 WebView 전환 (딥링크 구조)</span></div>
+      <div class="fbody">
+        <p>앱 피드에서 기사 탭 시 원본 언론사 URL을 외부 WebView로 전환합니다. 이는 대법원이 확립한 딥링크 비침해 원칙에 부합하며, 트래픽을 언론사로 유도하는 올바른 구조입니다. AI 요약으로 원본 접근을 차단하는 제로 클릭 구조와 정반대입니다.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-ok">양호</span><span class="ftitle">썸네일 이미지 — URL 참조 방식, 원본 서버 복제 최소화</span></div>
+      <div class="fbody">
+        <p>Firestore에 이미지 URL만 저장하고 앱에서 원본 서버로 직접 로딩하는 구조는 대법원 2006년 판결(썸네일 검색 공정이용 — 변형적 목적, 트래픽 유도)에 부합합니다. 타 서버 이미지를 자사 화면에 인라인링크(IMG 태그)로 전체 크기 표출하는 방식은 전시권 침해로 판단된 사례가 있으므로, 현재 구조(Coil/Glide로 원본 서버에서 로딩)가 유지되는지 확인이 필요합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. 운영 관리 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">5</span>운영 관리 — 법적 문서·인프라</div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-warn">주의</span><span class="ftitle">처리방침 배포 — 수동 복사 프로세스, 버전 불일치 위험</span></div>
+      <div class="fbody">
+        <p>현재 프로세스: <code>LifeMash-Legal</code>에서 편집 → <code>LifeMash-Functions/hosting/</code>으로 수동 복사 → <code>firebase deploy</code>. 이 프로세스는 배포 누락이나 버전 불일치를 유발할 수 있습니다.</p>
+        <div class="cref">
+          LifeMash-Legal/README.md  ← 수동 배포 절차 명시
+        </div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-ok">양호</span><span class="ftitle">Firestore FCM invalid 토큰 자동 정리 (Functions)</span></div>
+      <div class="fbody">
+        <p><code>notifyKeywordMatch</code> 함수가 FCM 응답에서 <code>messaging/registration-token-not-registered</code> 에러를 감지하면 해당 fcm_tokens 문서를 자동 삭제합니다. 불필요한 개인정보 보존을 방지하는 올바른 설계입니다.</p>
+        <div class="cref">LifeMash-Functions/functions/src/index.ts (Line ~165)</div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead"><span class="ftag t-ok">양호</span><span class="ftitle">Algolia 검색 — 처리방침에 이미 공개됨</span></div>
+      <div class="fbody">
+        <p>Functions의 <code>getAlgoliaSearchKey</code>가 Algolia 임시 검색 키를 발급합니다. Algolia Inc.는 <code>LifeMash-Legal/privacy-policy.html</code>의 제3자 제공 목록에 이미 포함되어 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="aitem"><span class="ptag p2">단기</span>처리방침 배포를 GitHub Actions로 자동화 — LifeMash-Legal push 시 LifeMash-Functions/hosting/ 자동 동기화 후 firebase deploy</div>
+      <div class="aitem"><span class="ptag p3">중기</span>Firestore security rules 검토 — articles 컬렉션 public read, fcm_tokens 쓰기 전용 제한 확인</div>
+    </div>
+  </div>
+
+  <!-- ── 6. 종합 로드맵 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">6</span>종합 조치 로드맵</div>
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th>우선순위</th><th>조치 항목</th><th>레포</th><th>관련 법령</th><th>기한</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="chip c-red">즉시</span></td>
+            <td>주요 언론사 20개사 RSS 라이선스 협의 착수 / KPF 빅카인즈 공모 신청</td>
+            <td>NewsCollector</td>
+            <td>저작권법, KPF 징수규정</td>
+            <td>이번 주</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-red">즉시</span></td>
+            <td>앱 최초 실행 시 개인정보 동의 화면 구현 (Analytics·Crashlytics opt-in)</td>
+            <td>App</td>
+            <td>개인정보보호법 제22조</td>
+            <td>이번 주</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-red">즉시</span></td>
+            <td>로그인·설정 화면에 처리방침 URL 링크 추가</td>
+            <td>App</td>
+            <td>개인정보보호법 제30조</td>
+            <td>이번 주</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-yellow">단기</span></td>
+            <td>NewsCollector에 robots.txt 파싱·Disallow 준수 로직 추가</td>
+            <td>NewsCollector</td>
+            <td>부정경쟁방지법, 업무방해</td>
+            <td>2주 이내</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-yellow">단기</span></td>
+            <td>계정 탈퇴 시 Firestore fcm_tokens 삭제 연동 확인 및 구현</td>
+            <td>App, Backend</td>
+            <td>개인정보보호법 제21조</td>
+            <td>2주 이내</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-yellow">단기</span></td>
+            <td>설정 화면에 계정·데이터 삭제 기능 추가</td>
+            <td>App</td>
+            <td>개인정보보호법 (정보주체 권리)</td>
+            <td>30일</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-yellow">단기</span></td>
+            <td>처리방침 배포 GitHub Actions 자동화</td>
+            <td>Legal, Functions</td>
+            <td>개인정보보호법 제30조</td>
+            <td>30일</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-green">중기</span></td>
+            <td>읽기 이력 보유기간 정책 수립 및 자동 파기 구현</td>
+            <td>App</td>
+            <td>개인정보보호법 제21조</td>
+            <td>60일</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-green">중기</span></td>
+            <td>Firestore security rules 검토 (fcm_tokens 쓰기 전용 제한)</td>
+            <td>Functions</td>
+            <td>개인정보보호법 안전조치</td>
+            <td>60일</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-green">중기</span></td>
+            <td>프로덕션 빌드 HTTP body 로깅 비활성화 확인</td>
+            <td>App</td>
+            <td>개인정보 안전조치</td>
+            <td>60일</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Conclusion ── -->
+  <div class="conclusion">
+    <h3>종합 평가</h3>
+    <p>LifeMash-hq 전체 레포지터리 검토 결과, <strong>두 가지 즉각적인 법적 위반 상태</strong>가 확인됩니다. 첫째, <code>LifeMash-NewsCollector</code>가 100여 개 한국 언론사의 RSS를 개별 라이선스 계약 없이 상업적 서비스에 수집·저장하고 있습니다. 이는 KPF 징수 규정 및 저작권법 위반의 직접 대상입니다. 둘째, 앱에서 Firebase Analytics·Crashlytics를 사용자 동의 없이 수집 중입니다.</p>
+    <p><strong>양호한 구조도 확인됩니다.</strong> AI 어시스턴트는 기사 내용을 컨텍스트로 사용하지 않아 RAG 저작권 침해 위험이 없습니다. 기사 전문은 외부 WebView로 전환하는 딥링크 구조이며, NewsCollector는 ETag·지연·식별 User-Agent 등 기술적 선의를 갖추고 있습니다. 개인정보처리방침도 이미 발행되어 주요 제3자 처리자가 공개되어 있습니다.</p>
+    <p>KPF 미디어 스타트업 지원사업(2026년 3~4월 공모 중)은 뉴스 데이터 라이선스 문제를 구조적으로 해결하면서 3,000만 원의 자금 지원과 빅카인즈 API 2년 무상 사용이라는 이점을 동시에 제공합니다. 데이터 출처 합법화를 위한 최우선 경로로 검토를 권장합니다.</p>
+  </div>
+
+  <div class="footer">
+    본 보고서는 LifeMash-hq 전체 레포지터리 (NewsCollector · Backend · Functions · App · Legal) 기반으로 작성되었습니다.<br>
+    기준일: 2026년 3월 20일 · 브랜치: main-2026
+  </div>
+
+</div>
+</body>
+</html>

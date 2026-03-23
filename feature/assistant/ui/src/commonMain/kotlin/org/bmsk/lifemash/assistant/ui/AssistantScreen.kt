@@ -30,7 +30,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -46,6 +46,7 @@ import org.bmsk.lifemash.assistant.ui.component.ChatInput
 import org.bmsk.lifemash.assistant.ui.component.ChatMessageBubble
 import org.bmsk.lifemash.assistant.ui.component.StreamingBubble
 import org.bmsk.lifemash.assistant.ui.component.ToolCallChip
+import org.bmsk.lifemash.assistant.ui.component.TypingIndicator
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -120,39 +121,26 @@ internal fun AssistantScreen(
             }
         },
     ) {
-        Scaffold(
-            modifier = modifier.fillMaxSize(),
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text("AI 어시스턴트") },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "뒤로가기")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, "대화 목록")
-                        }
-                        IconButton(onClick = onToggleSettings) {
-                            Icon(Icons.Default.Settings, "설정")
-                        }
-                    },
-                )
-            },
-            bottomBar = {
-                ChatInput(
-                    text = uiState.inputText,
-                    onTextChange = onInputChange,
-                    onSend = onSend,
-                    isStreaming = uiState.isStreaming,
-                )
-            },
-        ) { padding ->
+        Column(modifier = modifier.fillMaxSize()) {
+            CenterAlignedTopAppBar(
+                title = { Text("AI 어시스턴트") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "뒤로가기")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(Icons.Default.Menu, "대화 목록")
+                    }
+                    IconButton(onClick = onToggleSettings) {
+                        Icon(Icons.Default.Settings, "설정")
+                    }
+                },
+            )
             if (uiState.messages.isEmpty() && !uiState.isStreaming) {
-                // Empty state
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(padding),
+                    modifier = Modifier.weight(1f).fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(
@@ -187,7 +175,7 @@ internal fun AssistantScreen(
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(padding),
+                    modifier = Modifier.weight(1f).fillMaxSize(),
                     state = listState,
                 ) {
                     items(uiState.messages, key = { it.id }) { message ->
@@ -200,13 +188,25 @@ internal fun AssistantScreen(
                         }
                     }
 
-                    if (uiState.isStreaming && uiState.streamingText.isNotEmpty()) {
-                        item(key = "streaming") {
-                            StreamingBubble(text = uiState.streamingText)
+                    if (uiState.isStreaming) {
+                        if (uiState.streamingText.isNotEmpty()) {
+                            item(key = "streaming") {
+                                StreamingBubble(text = uiState.streamingText)
+                            }
+                        } else if (uiState.activeToolCall == null) {
+                            item(key = "loading") {
+                                TypingIndicator()
+                            }
                         }
                     }
                 }
             }
+            ChatInput(
+                text = uiState.inputText,
+                onTextChange = onInputChange,
+                onSend = onSend,
+                isStreaming = uiState.isStreaming,
+            )
         }
     }
 

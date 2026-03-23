@@ -16,6 +16,8 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":feature:assistant:api"))
             implementation(project(":feature:assistant:domain"))
+            implementation(project(":feature:home:api"))
+            implementation(project(":feature:home:domain"))
             implementation(project(":shared:designsystem"))
 
             implementation(libs.compose.runtime)

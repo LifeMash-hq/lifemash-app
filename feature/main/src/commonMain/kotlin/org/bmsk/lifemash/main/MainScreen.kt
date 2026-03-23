@@ -22,24 +22,13 @@ import org.bmsk.lifemash.calendar.api.CalendarRoute
 import org.bmsk.lifemash.calendar.ui.CalendarTab
 import org.bmsk.lifemash.calendar.ui.calendarNavGraph
 import org.bmsk.lifemash.feature.designsystem.component.AdaptiveNavigation
-import org.bmsk.lifemash.feed.api.FEED_ROUTE
-import org.bmsk.lifemash.feed.api.FeedNavGraphInfo
-import org.bmsk.lifemash.feed.api.FeedRoute
-import org.bmsk.lifemash.feed.ui.FeedTab
-import org.bmsk.lifemash.feed.ui.feedNavGraph
-import org.bmsk.lifemash.history.api.HISTORY_ROUTE
-import org.bmsk.lifemash.history.api.HistoryNavGraphInfo
-import org.bmsk.lifemash.history.api.HistoryRoute
-import org.bmsk.lifemash.history.ui.HistoryTab
-import org.bmsk.lifemash.history.ui.historyNavGraph
+import org.bmsk.lifemash.home.api.HOME_ROUTE
+import org.bmsk.lifemash.home.api.HomeRoute
+import org.bmsk.lifemash.home.ui.HomeTab
+import org.bmsk.lifemash.home.ui.homeNavGraph
 import org.bmsk.lifemash.notification.api.NotificationNavGraphInfo
 import org.bmsk.lifemash.notification.api.NotificationRoute
 import org.bmsk.lifemash.notification.ui.notificationNavGraph
-import org.bmsk.lifemash.scrap.api.SCRAP_ROUTE
-import org.bmsk.lifemash.scrap.api.ScrapNavGraphInfo
-import org.bmsk.lifemash.scrap.api.ScrapRoute
-import org.bmsk.lifemash.scrap.ui.ScrapTab
-import org.bmsk.lifemash.scrap.ui.scrapNavGraph
 import org.bmsk.lifemash.feature.shared.webview.WebViewNavGraphInfo
 import org.bmsk.lifemash.feature.shared.webview.WebViewRoute
 import org.bmsk.lifemash.feature.shared.webview.webViewNavGraph
@@ -50,7 +39,7 @@ fun MainScreen(
     onShowErrorSnackbar: (Throwable?) -> Unit = {},
 ) {
     val navController = rememberNavController()
-    val tabs = listOf(FeedTab, ScrapTab, HistoryTab, CalendarTab, AssistantTab)
+    val tabs = listOf(HomeTab, CalendarTab, AssistantTab)
 
     val mainViewModel = koinViewModel<MainViewModel>()
     val currentUser by mainViewModel.currentUser.collectAsState()
@@ -58,18 +47,15 @@ fun MainScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val destinationRoute = navBackStackEntry?.destination?.route
     val currentTabRoute = when {
-        destinationRoute?.contains("FeedRoute") == true -> FEED_ROUTE
-        destinationRoute?.contains("ScrapRoute") == true -> SCRAP_ROUTE
-        destinationRoute?.contains("HistoryRoute") == true -> HISTORY_ROUTE
+        destinationRoute?.contains("HomeRoute") == true -> HOME_ROUTE
+        destinationRoute?.contains("BlockSettingsRoute") == true -> HOME_ROUTE
         destinationRoute?.contains("CalendarRoute") == true -> CALENDAR_ROUTE
         destinationRoute?.contains("AssistantRoute") == true -> ASSISTANT_ROUTE
         else -> null
     }
 
     val tabRouteMap = mapOf(
-        FEED_ROUTE to FeedRoute,
-        SCRAP_ROUTE to ScrapRoute,
-        HISTORY_ROUTE to HistoryRoute,
+        HOME_ROUTE to HomeRoute,
         CALENDAR_ROUTE to CalendarRoute,
         ASSISTANT_ROUTE to AssistantRoute,
     )
@@ -86,7 +72,6 @@ fun MainScreen(
         tabs = tabs,
         currentRoute = currentTabRoute,
         onItemClick = { tab ->
-            // 캘린더/AI 탭: 로그인 안 됐으면 로그인 화면으로
             if (tab.route in setOf(CALENDAR_ROUTE, ASSISTANT_ROUTE) && currentUser == null) {
                 navController.navigate(AuthRoute)
                 return@AdaptiveNavigation
@@ -100,13 +85,20 @@ fun MainScreen(
         },
         modifier = Modifier.fillMaxSize(),
     ) {
-        NavHost(navController = navController, startDestination = FeedRoute) {
-            feedNavGraph(FeedNavGraphInfo(
-                onArticleOpen = navigateWebView,
-                onNotificationClick = navigateNotification,
-            ))
-            scrapNavGraph(ScrapNavGraphInfo(onClickNews = navigateWebView, onShowErrorSnackbar = onShowErrorSnackbar))
-            historyNavGraph(HistoryNavGraphInfo(onClickArticle = navigateWebView, onShowErrorSnackbar = onShowErrorSnackbar))
+        NavHost(navController = navController, startDestination = HomeRoute) {
+            homeNavGraph(
+                navController = navController,
+                onNavigateToAssistant = {
+                    if (currentUser == null) {
+                        navController.navigate(AuthRoute)
+                    } else {
+                        navController.navigate(AssistantRoute) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                        }
+                    }
+                },
+            )
             webViewNavGraph(WebViewNavGraphInfo(onShowErrorSnackbar))
             notificationNavGraph(NotificationNavGraphInfo(
                 onShowErrorSnackbar = onShowErrorSnackbar,

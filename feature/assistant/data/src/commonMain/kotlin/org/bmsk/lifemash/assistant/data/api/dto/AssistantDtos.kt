@@ -8,9 +8,13 @@ import org.bmsk.lifemash.assistant.domain.model.Conversation
 import org.bmsk.lifemash.assistant.domain.model.SseEvent
 
 @Serializable
+internal data class InstalledBlockDto(val id: String, val url: String)
+
+@Serializable
 internal data class ChatRequestDto(
     val message: String,
     val conversationId: String? = null,
+    val installedBlocks: List<InstalledBlockDto> = emptyList(),
 )
 
 @Serializable

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeMash 수익화 방안 — 1인·겸직 불가 조건</title>
+  <style>
+    :root {
+      --bg: #0d0f1a;
+      --surface: #13172a;
+      --surface2: #1c2138;
+      --border: #252d4a;
+      --accent: #6c8ef5;
+      --text: #dde4f5;
+      --text-muted: #7e8cad;
+      --text-dim: #3d4870;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --green: #34d399;
+      --purple: #a78bfa;
+      --teal: #2dd4bf;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    header {
+      background: linear-gradient(160deg, #14183a 0%, #0d0f1a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 50px 72px 38px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(52,211,153,.12);
+      border: 1px solid rgba(52,211,153,.3);
+      color: var(--green);
+      font-size: 11px; font-weight: 700; letter-spacing: .1em;
+      padding: 4px 13px; border-radius: 20px;
+      margin-bottom: 18px; text-transform: uppercase;
+    }
+    header h1 { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .meta { color: var(--text-muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 44px 72px 88px; }
+
+    /* insight box */
+    .insight {
+      background: rgba(52,211,153,.06);
+      border: 1px solid rgba(52,211,153,.2);
+      border-left: 4px solid var(--green);
+      border-radius: 0 12px 12px 0;
+      padding: 20px 24px; margin-bottom: 44px;
+    }
+    .insight h3 { color: var(--green); font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .insight p { color: var(--text-muted); font-size: 13px; line-height: 1.85; margin-bottom: 8px; }
+    .insight p:last-child { margin-bottom: 0; }
+    .insight strong { color: var(--text); }
+
+    .warn-box {
+      background: rgba(251,191,36,.06);
+      border: 1px solid rgba(251,191,36,.2);
+      border-left: 4px solid var(--yellow);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px; margin: 16px 0;
+    }
+    .warn-box p { color: var(--text-muted); font-size: 13px; line-height: 1.8; }
+    .warn-box strong { color: var(--yellow); }
+
+    /* section */
+    .section { margin-bottom: 52px; }
+    .sec-title {
+      font-size: 17px; font-weight: 700; color: #fff;
+      margin-bottom: 22px; padding-bottom: 13px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sec-num {
+      background: var(--accent); color: #fff;
+      font-size: 11px; font-weight: 700;
+      width: 22px; height: 22px; border-radius: 6px;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+
+    /* method card */
+    .method {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .method.top-pick { border-color: rgba(52,211,153,.35); }
+    .method-head {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 22px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .method.top-pick .method-head { background: rgba(52,211,153,.06); border-bottom-color: rgba(52,211,153,.2); }
+    .method-icon { font-size: 24px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+    .method-meta { flex: 1; }
+    .method-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+    .tag {
+      font-size: 11px; font-weight: 700; padding: 2px 9px;
+      border-radius: 5px; display: inline-block;
+    }
+    .t-now    { background: rgba(248,113,113,.16); color: var(--red); }
+    .t-easy   { background: rgba(52,211,153,.14); color: var(--green); }
+    .t-mid    { background: rgba(251,191,36,.12); color: var(--yellow); }
+    .t-pick   { background: rgba(52,211,153,.2);  color: var(--green); border: 1px solid rgba(52,211,153,.4); }
+    .t-caution{ background: rgba(248,113,113,.12); color: var(--red); }
+    .t-nob    { background: rgba(108,142,245,.14); color: var(--accent); }
+    .method-title { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.4; }
+    .method-body { padding: 18px 22px; }
+    .method-body p { color: var(--text-muted); margin-bottom: 10px; line-height: 1.8; }
+    .method-body p:last-child { margin-bottom: 0; }
+    .method-body strong { color: var(--text); }
+
+    /* kv row */
+    .kv { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
+    .kv-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      flex: 1; min-width: 150px;
+    }
+    .kv-label { font-size: 11px; color: var(--text-dim); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; }
+    .kv-value { font-size: 13px; font-weight: 700; color: var(--text); }
+
+    /* steps */
+    .steps { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .step {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px; color: var(--text-muted);
+    }
+    .step-num {
+      flex-shrink: 0; background: var(--surface2);
+      color: var(--accent); font-size: 11px; font-weight: 700;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: grid; place-items: center; margin-top: 1px;
+      border: 1px solid var(--border);
+    }
+
+    /* cref */
+    .cref {
+      background: rgba(0,0,0,.32); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px; padding: 10px 14px;
+      font-family: 'JetBrains Mono','Fira Code',monospace;
+      font-size: 12px; color: #8fadd4; margin: 10px 0; overflow-x: auto; line-height: 1.6;
+    }
+
+    /* comparison table */
+    .twrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      background: var(--surface2); color: var(--text-muted);
+      font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+      padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    td { padding: 12px 16px; border-bottom: 1px solid rgba(37,45,74,.55); color: var(--text-muted); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+
+    /* roadmap */
+    .roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .rm-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .rm-phase { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    .rm-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; line-height: 1.4; }
+    .rm-items { display: flex; flex-direction: column; gap: 6px; }
+    .rm-item {
+      font-size: 12px; color: var(--text-muted);
+      padding: 6px 10px;
+      background: rgba(0,0,0,.2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      line-height: 1.5;
+    }
+
+    .conclusion {
+      background: linear-gradient(135deg, #181e44 0%, #0f1228 100%);
+      border: 1px solid rgba(52,211,153,.2);
+      border-radius: 16px; padding: 30px 36px; margin-top: 40px;
+    }
+    .conclusion h3 { color: #fff; font-size: 16px; margin-bottom: 14px; }
+    .conclusion p { color: var(--text-muted); margin-bottom: 10px; line-height: 1.8; }
+
+    .footer { margin-top: 36px; text-align: center; color: var(--text-dim); font-size: 12px; }
+
+    @media (max-width: 860px) {
+      header { padding: 32px 24px; }
+      .wrap { padding: 28px 24px 60px; }
+      .roadmap { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Monetization Plan · 1인 개발 · 겸직 불가 조건</div>
+  <h1>LifeMash 수익화 방안</h1>
+  <div class="meta">
+    <span>기준일: 2026년 3월 20일</span>
+    <span>전제: 사업자 등록 불가 / 수익은 필요</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ── 핵심 인사이트 ── -->
+  <div class="insight">
+    <h3>💡 먼저 알아야 할 것 — "사업자 등록 불가" ≠ "수익화 불가"</h3>
+    <p>많은 분들이 혼동하지만, <strong>앱 수익화에 사업자 등록은 법적 필수 요건이 아닙니다.</strong> 구글 플레이·앱스토어 개발자 계정은 개인 자격으로 개설 가능하고, AdMob 광고 수익은 개인 계좌로 받을 수 있습니다. 수익은 <strong>기타소득 또는 사업소득으로 연말에 종합소득세 신고</strong>하면 됩니다.</p>
+    <p>문제는 <strong>겸직 금지 조항</strong>입니다. 대부분 회사의 겸직 금지는 "타 회사 취업" 또는 "본업에 지장을 주는 활동"을 금지하는 것이지, <strong>개인 앱 출시 자체를 금지하는 경우는 많지 않습니다.</strong> 회사 HR 또는 취업규칙을 직접 확인하는 것이 먼저입니다. 소규모 개인 앱 운영을 문제 삼는 경우는 현실적으로 드뭅니다.</p>
+    <p>단, 광고 수익이 생기는 순간 "비상업적 서비스" 방패는 사라지므로, <strong>뉴스 콘텐츠 저작권 문제를 동시에 해결</strong>해야 합니다. 이 두 가지를 묶어서 해결하는 방안을 아래에 제시합니다.</p>
+  </div>
+
+  <!-- ── 1. 수익화 수단 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">1</span>수익화 수단 비교 — 사업자 없이 가능한 것들</div>
+
+    <div class="twrap" style="margin-bottom:24px">
+      <table>
+        <thead>
+          <tr><th>수단</th><th>사업자 등록</th><th>월 예상 수익 (초기)</th><th>구현 난이도</th><th>저작권 영향</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>AdMob 배너·전면 광고</strong></td>
+            <td><span style="color:var(--green)">불필요</span></td>
+            <td>DAU 1,000 기준 월 3~10만원</td>
+            <td>낮음 (SDK 1일)</td>
+            <td>상업적 서비스로 전환 → 라이선스 필요</td>
+          </tr>
+          <tr>
+            <td><strong>AI 어시스턴트 인앱결제</strong></td>
+            <td><span style="color:var(--green)">불필요</span></td>
+            <td>유저당 월 2,900~4,900원</td>
+            <td>중간 (2~3일)</td>
+            <td>뉴스와 무관 — 영향 없음</td>
+          </tr>
+          <tr>
+            <td><strong>GitHub Sponsors / 카카오페이 후원</strong></td>
+            <td><span style="color:var(--green)">불필요</span></td>
+            <td>소규모 (수만원~)</td>
+            <td>매우 낮음 (링크)</td>
+            <td>기부 형태 — 영향 최소</td>
+          </tr>
+          <tr>
+            <td><strong>KPF 지원사업 (보조금)</strong></td>
+            <td><span style="color:var(--red)">필요</span></td>
+            <td>3,000만원 (1회성)</td>
+            <td>서류 심사</td>
+            <td>데이터 합법화 동시 해결</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- AdMob -->
+    <div class="method top-pick">
+      <div class="method-head">
+        <div class="method-icon">📱</div>
+        <div class="method-meta">
+          <div class="method-tags">
+            <span class="tag t-pick">최우선 추천</span>
+            <span class="tag t-nob">사업자 불필요</span>
+            <span class="tag t-easy">구현 1일</span>
+          </div>
+          <div class="method-title">AdMob 광고 — 개인 계좌로 바로 수익</div>
+        </div>
+      </div>
+      <div class="method-body">
+        <p>Google AdMob은 <strong>개인 개발자 계정으로 바로 가입</strong> 가능합니다. 수익은 달러로 받아 원화 환전하며, 연간 수익이 100만원 초과 시 종합소득세 신고 대상이 됩니다.</p>
+        <div class="kv">
+          <div class="kv-item"><div class="kv-label">최소 지급</div><div class="kv-value">$100 (약 13만원)</div></div>
+          <div class="kv-item"><div class="kv-label">지급 주기</div><div class="kv-value">월 1회</div></div>
+          <div class="kv-item"><div class="kv-label">사업자</div><div class="kv-value">불필요</div></div>
+          <div class="kv-item"><div class="kv-label">세금</div><div class="kv-value">종합소득세 신고</div></div>
+        </div>
+        <p><strong>단, AdMob 수익이 발생하는 순간 상업적 서비스로 분류됩니다.</strong> 이 시점부터 뉴스 콘텐츠에 대한 저작권 라이선스가 필요해집니다. 아래 섹션 2의 뉴스 소스 교체를 AdMob 도입과 동시에 진행해야 합니다.</p>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span>admob.google.com 에서 개인 계정으로 가입 (구글 계정 사용)</span></div>
+          <div class="step"><span class="step-num">2</span><span>앱 등록 → 광고 단위 생성 (배너 권장 — UX 침해 최소)</span></div>
+          <div class="step"><span class="step-num">3</span><span>LifeMash-App에 AdMob SDK 추가 → 피드 하단 또는 설정 화면에 배너 배치</span></div>
+          <div class="step"><span class="step-num">4</span><span>처리방침에 "광고 서비스 제공을 위해 Google AdMob이 광고 식별자를 수집할 수 있습니다" 추가</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI 어시스턴트 인앱결제 -->
+    <div class="method top-pick">
+      <div class="method-head">
+        <div class="method-icon">🤖</div>
+        <div class="method-meta">
+          <div class="method-tags">
+            <span class="tag t-pick">강력 추천</span>
+            <span class="tag t-nob">사업자 불필요</span>
+            <span class="tag t-mid">구현 2~3일</span>
+          </div>
+          <div class="method-title">AI 어시스턴트 프리미엄 — 이미 서버 비용이 드는 기능</div>
+        </div>
+      </div>
+      <div class="method-body">
+        <p>AI 어시스턴트는 Claude API 호출 비용이 실제로 발생하는 기능입니다. <strong>이 기능을 프리미엄으로 만드는 것이 가장 논리적인 수익화</strong>입니다. 뉴스 저작권과 완전히 무관하며, 사용자에게도 자연스럽게 납득됩니다.</p>
+        <div class="kv">
+          <div class="kv-item"><div class="kv-label">추천 가격</div><div class="kv-value">월 2,900원</div></div>
+          <div class="kv-item"><div class="kv-label">손익분기</div><div class="kv-value">~10명 구독</div></div>
+          <div class="kv-item"><div class="kv-label">플랫폼 수수료</div><div class="kv-value">구글 15%, 애플 15%</div></div>
+          <div class="kv-item"><div class="kv-label">사업자</div><div class="kv-value">불필요</div></div>
+        </div>
+        <p><strong>무료 플랜:</strong> 월 20회 AI 대화 / <strong>프리미엄 플랜:</strong> 무제한 + 대화 이력 30일 보관</p>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span>Google Play Billing Library 또는 RevenueCat SDK 연동 (RevenueCat이 iOS/Android 동시 처리로 훨씬 편함)</span></div>
+          <div class="step"><span class="step-num">2</span><span>Backend에 구독 상태 검증 엔드포인트 추가 → AI 어시스턴트 호출 전 확인</span></div>
+          <div class="step"><span class="step-num">3</span><span>무료 사용자는 일일/월간 토큰 사용량 제한 (이미 Backend에 <code>daily limits</code> 필드 존재)</span></div>
+        </div>
+        <div class="cref">
+          // Backend AssistantService.kt — 이미 토큰 사용량 추적 중<br>
+          // inputTokens, outputTokens, daily limits 필드 활용<br>
+          // 무료: dailyTokenLimit = 5000 / 프리미엄: unlimited
+        </div>
+      </div>
+    </div>
+
+    <!-- 후원 -->
+    <div class="method">
+      <div class="method-head">
+        <div class="method-icon">☕</div>
+        <div class="method-meta">
+          <div class="method-tags">
+            <span class="tag t-easy">즉시 가능</span>
+            <span class="tag t-nob">사업자 불필요</span>
+          </div>
+          <div class="method-title">후원 링크 — 부담 없이 지금 당장</div>
+        </div>
+      </div>
+      <div class="method-body">
+        <p>수익은 크지 않지만 <strong>구현이 링크 하나</strong>입니다. 개발자 후원 문화가 형성된 커뮤니티에 앱을 알리면서 운영비 일부를 충당할 수 있습니다.</p>
+        <div class="kv">
+          <div class="kv-item"><div class="kv-label">Buy Me a Coffee</div><div class="kv-value">글로벌, 달러 수취</div></div>
+          <div class="kv-item"><div class="kv-label">카카오페이 후원</div><div class="kv-value">국내, 즉시 설정</div></div>
+          <div class="kv-item"><div class="kv-label">토스 링크</div><div class="kv-value">국내, 간편 이체</div></div>
+        </div>
+        <p>앱 설정 화면 하단 또는 GitHub README에 링크 추가. 저작권 이슈와 무관합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. 뉴스 소스 교체 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">2</span>수익화와 동시에 해결 — 뉴스 소스 교체 (저작권 클리어)</div>
+
+    <p style="color:var(--text-muted); margin-bottom:20px; line-height:1.8">AdMob이나 인앱결제를 도입하면 상업적 서비스가 됩니다. 이 시점에 현재 RSS 수집 구조는 저작권 리스크를 수반합니다. 아래 두 가지 방법으로 비용 없이 해결할 수 있습니다.</p>
+
+    <div class="method top-pick">
+      <div class="method-head">
+        <div class="method-icon">🏛️</div>
+        <div class="method-meta">
+          <div class="method-tags">
+            <span class="tag t-pick">최우선 추천</span>
+            <span class="tag t-easy">무료·상업 이용 가능</span>
+            <span class="tag t-nob">사업자 불필요</span>
+          </div>
+          <div class="method-title">공공저작물 뉴스 API — 무료이면서 상업적 이용 완전 허용</div>
+        </div>
+      </div>
+      <div class="method-body">
+        <p>대한민국 공공저작물은 <strong>출처 표기만 하면 상업적 이용이 자유롭습니다</strong> (공공누리 1유형). 개인 신청 가능하며 별도 계약이 필요 없습니다.</p>
+
+        <div class="kv">
+          <div class="kv-item">
+            <div class="kv-label">연합뉴스 공공 API</div>
+            <div class="kv-value" style="font-size:12px">data.go.kr 등록. 연합뉴스 공식 기사. 하루 수천 건.</div>
+          </div>
+          <div class="kv-item">
+            <div class="kv-label">뉴스 빅데이터 (공공)</div>
+            <div class="kv-value" style="font-size:12px">한국언론진흥재단 공공 API. 정부 신청으로 무료.</div>
+          </div>
+        </div>
+
+        <div class="warn-box">
+          <p><strong>⚠️ 단기 현실:</strong> 공공 API의 기사 종류와 양은 현재 RSS 100+ 언론사보다 적습니다. 그러나 <strong>법적으로 완전히 클리어된 상태에서 수익화가 가능</strong>하다는 것이 핵심입니다. 사용자 수가 적은 초기에 소스를 교체해두면 나중에 훨씬 편합니다.</p>
+        </div>
+
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span><strong>data.go.kr</strong>에서 "뉴스" 검색 → 연합뉴스, 뉴시스 등 공공 뉴스 API 신청 (개인 신청 가능, 1~2일 승인)</span></div>
+          <div class="step"><span class="step-num">2</span><span>NewsCollector의 RSS 수집 로직을 공공 API 호출로 교체 (이미 추상화 준비 중)</span></div>
+          <div class="step"><span class="step-num">3</span><span>기사 표출 시 "출처: 연합뉴스" 등 공공누리 출처 표기 추가</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="method">
+      <div class="method-head">
+        <div class="method-icon">⚡</div>
+        <div class="method-meta">
+          <div class="method-tags">
+            <span class="tag t-easy">즉시 적용 가능</span>
+            <span class="tag t-mid">기존 구조 유지</span>
+          </div>
+          <div class="method-title">Firestore summary·image 제거 + 원본 링크만 표시 — 복제 최소화</div>
+        </div>
+      </div>
+      <div class="method-body">
+        <p>공공 API 전환 전 임시 방편으로, <strong>Firestore에서 summary와 image를 삭제</strong>하고 피드에는 제목+언론사+날짜+링크만 표시합니다. 클릭 시 원본 기사로 이동. 저장되는 저작물이 최소화되고, 원본 서버로 트래픽을 100% 유도하는 구조가 됩니다.</p>
+        <p>이 구조에서는 <strong>서버에 복제된 저작물이 사실상 없으므로</strong> 법적 공세 자체가 성립하기 어렵습니다. 완벽한 해결책은 아니지만 공공 API 전환 전까지의 현실적인 완충재입니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. 겸직 문제 실용 조언 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">3</span>겸직 문제 실용 조언 — 확인하고 넘어가야 할 것</div>
+
+    <div class="method">
+      <div class="method-head">
+        <div class="method-icon">📋</div>
+        <div class="method-meta">
+          <div class="method-tags">
+            <span class="tag t-caution">먼저 확인 필수</span>
+          </div>
+          <div class="method-title">취업규칙·근로계약서에서 확인해야 할 것</div>
+        </div>
+      </div>
+      <div class="method-body">
+        <p>겸직 금지 조항의 실제 내용이 중요합니다. 대부분 아래 중 하나입니다:</p>
+        <div class="steps">
+          <div class="step"><span class="step-num">A</span><span><strong>"타 회사에 취업하거나 임원이 될 수 없다"</strong> → 개인 앱 수익은 해당 없음. 수익화 가능.</span></div>
+          <div class="step"><span class="step-num">B</span><span><strong>"회사의 사전 허락 없이 영리 활동을 할 수 없다"</strong> → HR에 앱 개인 프로젝트 운영 의향 비공식 문의. 대부분 허용.</span></div>
+          <div class="step"><span class="step-num">C</span><span><strong>"어떠한 형태의 부업도 금지"</strong> → 배우자 명의 사업자 등록 검토. 또는 수익화를 사업자 등록 가능 시점까지 보류하고 AI 어시스턴트 무료 → 사용자 확보 우선.</span></div>
+        </div>
+        <div class="warn-box" style="margin-top:12px">
+          <p><strong>현실적으로:</strong> 소규모 개인 앱으로 월 수십만원 수준의 부수입을 얻는 것을 문제 삼아 징계하는 회사는 극히 드뭅니다. 법적으로도 근로자의 퇴근 후 활동은 원칙적으로 자유입니다. 단, 회사 기밀이나 본업 경쟁 서비스에 해당한다면 별개입니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. 수익화 로드맵 ── -->
+  <div class="section">
+    <div class="sec-title"><span class="sec-num">4</span>현실적 수익화 로드맵</div>
+    <div class="roadmap">
+      <div class="rm-card">
+        <div class="rm-phase" style="color:var(--red)">이번 달</div>
+        <div class="rm-title">서버비·분유값 최소 확보</div>
+        <div class="rm-items">
+          <div class="rm-item">후원 링크 설정 화면에 추가 (카카오페이 / Buy Me a Coffee)</div>
+          <div class="rm-item">Firestore summary·image 제거 → 저작권 리스크 즉시 경감</div>
+          <div class="rm-item">겸직 조항 내용 확인</div>
+        </div>
+      </div>
+      <div class="rm-card">
+        <div class="rm-phase" style="color:var(--yellow)">다음 달</div>
+        <div class="rm-title">수익 구조 본격화</div>
+        <div class="rm-items">
+          <div class="rm-item">AdMob 배너 광고 도입 (피드 하단)</div>
+          <div class="rm-item">공공데이터 뉴스 API 신청 및 전환</div>
+          <div class="rm-item">동의 화면 + 처리방침 AdMob 내용 추가</div>
+        </div>
+      </div>
+      <div class="rm-card">
+        <div class="rm-phase" style="color:var(--green)">2~3개월 후</div>
+        <div class="rm-title">안정적 수익 모델</div>
+        <div class="rm-items">
+          <div class="rm-item">AI 어시스턴트 프리미엄 인앱결제 (RevenueCat)</div>
+          <div class="rm-item">광고 + 구독 하이브리드 모델 정착</div>
+          <div class="rm-item">사업자 등록 가능 시점 재검토 → KPF 공모 신청</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conclusion">
+    <h3>결론</h3>
+    <p><strong>지금 당장 할 수 있는 것:</strong> 설정 화면에 후원 링크 하나 추가하는 것부터 시작하세요. 이건 오늘 30분이면 됩니다.</p>
+    <p><strong>한 달 안에 의미 있는 수익을 만들려면:</strong> Firestore summary·image 제거(저작권 리스크 제거) → AdMob 도입 → 공공 뉴스 API 전환, 이 순서가 가장 현실적입니다.</p>
+    <p><strong>중장기 수익 핵심:</strong> AI 어시스턴트 프리미엄이 가장 명분 있는 수익화입니다. "Claude API 비용이 드니까 유료"라는 논리가 사용자에게도, 법적으로도 가장 깔끔합니다. 뉴스는 사용자 유입 채널로 두고, 수익은 AI 기능으로 얻는 구조가 LifeMash의 방향성과도 맞습니다.</p>
+  </div>
+
+  <div class="footer">
+    기준일: 2026년 3월 20일 · 전제: 1인 개발, 현직장 겸직 불가, 수익 필요
+  </div>
+
+</div>
+</body>
+</html>

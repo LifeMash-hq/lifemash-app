@@ -45,6 +45,11 @@ val koinAppModule = module {
         val tokenStorage: TokenStorage = get()
         val authApi: AuthApi = get()
         HttpClient(OkHttp) {
+            engine {
+                config {
+                    readTimeout(90, java.util.concurrent.TimeUnit.SECONDS)
+                }
+            }
             defaultRequest {
                 url(BACKEND_BASE_URL)
                 contentType(ContentType.Application.Json)

@@ -5,5 +5,5 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val assistantUiModule = module {
-    viewModel { AssistantViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { AssistantViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
