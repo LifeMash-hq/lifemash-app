@@ -18,18 +18,9 @@ import org.bmsk.lifemash.calendar.data.di.calendarDataModule
 import org.bmsk.lifemash.calendar.domain.di.calendarDomainModule
 import org.bmsk.lifemash.data.network.di.iosNetworkKoinModule
 import org.bmsk.lifemash.feature.designsystem.theme.LifeMashTheme
-import org.bmsk.lifemash.feed.data.di.feedDataModule
-import org.bmsk.lifemash.feed.data.history.db.getReadingHistoryDBBuilder
-import org.bmsk.lifemash.feed.domain.di.feedDomainModule
-import org.bmsk.lifemash.feed.ui.di.feedUiModule
-import org.bmsk.lifemash.history.ui.di.historyUiModule
 import org.bmsk.lifemash.notification.data.db.getNotificationKeywordDBBuilder
 import org.bmsk.lifemash.notification.data.di.notificationDataModule
 import org.bmsk.lifemash.notification.domain.di.notificationDomainModule
-import org.bmsk.lifemash.scrap.data.db.getScrapArticleDBBuilder
-import org.bmsk.lifemash.scrap.data.di.scrapDataModule
-import org.bmsk.lifemash.scrap.domain.di.scrapDomainModule
-import org.bmsk.lifemash.scrap.ui.di.scrapUiModule
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import platform.Foundation.NSHomeDirectory
@@ -41,6 +32,11 @@ private val iosDataStore: DataStore<Preferences> = PreferenceDataStoreFactory.cr
 private val iosAppModule = module {
     single<HttpClient> {
         HttpClient(Darwin) {
+            engine {
+                configureRequest {
+                    setTimeoutInterval(90.0)
+                }
+            }
             install(ContentNegotiation) {
                 json(Json { ignoreUnknownKeys = true; isLenient = true })
             }
@@ -55,13 +51,6 @@ fun initKoin() {
         modules(
             iosAppModule,
             iosNetworkKoinModule,
-            feedDomainModule,
-            feedDataModule(getReadingHistoryDBBuilder()),
-            feedUiModule,
-            scrapDomainModule,
-            scrapDataModule(getScrapArticleDBBuilder()),
-            scrapUiModule,
-            historyUiModule,
             authDomainModule,
             authDataModule(iosDataStore),
             calendarDomainModule,

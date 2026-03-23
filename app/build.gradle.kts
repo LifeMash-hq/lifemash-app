@@ -8,13 +8,31 @@ plugins {
 
 val localProps = gradleLocalProperties(rootDir, providers)
 val kakaoNativeAppKey: String = localProps.getProperty("KAKAO_NATIVE_APP_KEY", "")
-val backendBaseUrl: String = localProps.getProperty("BACKEND_BASE_URL", "https://lifemash-backend.onrender.com")
+val debugBackendUrl: String = localProps.getProperty("BACKEND_BASE_URL", "http://10.0.2.2:8080")
+val releaseBackendUrl = "https://lifemash-backend.onrender.com"
 
 android {
     defaultConfig {
         manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoNativeAppKey
         buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
-        buildConfigField("String", "BACKEND_BASE_URL", "\"$backendBaseUrl\"")
+    }
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file(localProps.getProperty("RELEASE_STORE_FILE", ""))
+            storePassword = localProps.getProperty("RELEASE_STORE_PASSWORD", "")
+            keyAlias = localProps.getProperty("RELEASE_KEY_ALIAS", "")
+            keyPassword = localProps.getProperty("RELEASE_KEY_PASSWORD", "")
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            buildConfigField("String", "BACKEND_BASE_URL", "\"$debugBackendUrl\"")
+        }
+        release {
+            signingConfig = signingConfigs.getByName("release")
+            buildConfigField("String", "BACKEND_BASE_URL", "\"$releaseBackendUrl\"")
+        }
     }
     buildFeatures {
         buildConfig = true
@@ -24,19 +42,6 @@ android {
 dependencies {
     implementation(projects.shared.model)
     implementation(projects.feature.main)
-
-    implementation(projects.feature.feed.domain)
-    implementation(projects.feature.feed.data)
-    implementation(projects.feature.feed.api)
-    implementation(projects.feature.feed.ui)
-
-    implementation(projects.feature.scrap.domain)
-    implementation(projects.feature.scrap.data)
-    implementation(projects.feature.scrap.api)
-    implementation(projects.feature.scrap.ui)
-
-    implementation(projects.feature.history.api)
-    implementation(projects.feature.history.ui)
 
     implementation(projects.feature.calendar.domain)
     implementation(projects.feature.calendar.data)
@@ -54,6 +59,10 @@ dependencies {
     implementation(projects.feature.assistant.data)
     implementation(projects.feature.assistant.api)
     implementation(projects.feature.assistant.ui)
+    implementation(projects.feature.home.api)
+    implementation(projects.feature.home.domain)
+    implementation(projects.feature.home.data)
+    implementation(projects.feature.home.ui)
     implementation(projects.shared.fcm)
 
     implementation(projects.shared.common)

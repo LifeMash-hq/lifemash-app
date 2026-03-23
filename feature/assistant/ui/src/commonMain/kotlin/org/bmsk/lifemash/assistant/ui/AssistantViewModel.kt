@@ -7,10 +7,14 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
+import org.bmsk.lifemash.assistant.domain.model.InstalledBlock
 import org.bmsk.lifemash.assistant.domain.usecase.*
+import org.bmsk.lifemash.home.api.HomeBlock
+import org.bmsk.lifemash.home.domain.repository.HomeLayoutRepository
 
 internal class AssistantViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
@@ -21,6 +25,7 @@ internal class AssistantViewModel(
     private val removeApiKeyUseCase: RemoveApiKeyUseCase,
     private val getApiKeyStatusUseCase: GetApiKeyStatusUseCase,
     private val getUsageUseCase: GetUsageUseCase,
+    private val homeLayoutRepository: HomeLayoutRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AssistantUiState())
@@ -56,10 +61,15 @@ internal class AssistantViewModel(
         }
 
         viewModelScope.launch {
+            val installedBlocks = homeLayoutRepository.getLayout().first()
+                .filterIsInstance<HomeBlock.WebViewBlock>()
+                .map { InstalledBlock(id = it.blockId, url = it.url) }
+
             runCatching {
                 sendMessageUseCase(
                     message = message,
                     conversationId = _uiState.value.currentConversationId,
+                    installedBlocks = installedBlocks,
                 ) { event ->
                     when (event.type) {
                         "token" -> {
@@ -72,6 +82,7 @@ internal class AssistantViewModel(
                                 "get_today_events" -> "캘린더 조회 중..."
                                 "get_month_events" -> "월간 일정 조회 중..."
                                 "get_my_groups" -> "그룹 조회 중..."
+                                "create_event" -> "일정 생성 중..."
                                 else -> "${event.tool} 실행 중..."
                             }
                             _uiState.update { it.copy(activeToolCall = toolLabel) }
@@ -95,8 +106,20 @@ internal class AssistantViewModel(
                             }
                         }
                         "error" -> {
-                            _uiState.update {
-                                it.copy(
+                            _uiState.update { state ->
+                                // 이미 누적된 중간 텍스트가 있으면 메시지로 보존
+                                val messages = if (state.streamingText.isNotBlank()) {
+                                    val partial = ChatMessageUi(
+                                        id = "assistant_${Clock.System.now().toEpochMilliseconds()}",
+                                        role = "assistant",
+                                        content = state.streamingText,
+                                    )
+                                    (state.messages + partial).toPersistentList()
+                                } else {
+                                    state.messages
+                                }
+                                state.copy(
+                                    messages = messages,
                                     isStreaming = false,
                                     streamingText = "",
                                     error = event.content ?: "오류가 발생했습니다.",
@@ -106,8 +129,19 @@ internal class AssistantViewModel(
                     }
                 }
             }.onFailure { e ->
-                _uiState.update {
-                    it.copy(
+                _uiState.update { state ->
+                    val messages = if (state.streamingText.isNotBlank()) {
+                        val partial = ChatMessageUi(
+                            id = "assistant_${Clock.System.now().toEpochMilliseconds()}",
+                            role = "assistant",
+                            content = state.streamingText,
+                        )
+                        (state.messages + partial).toPersistentList()
+                    } else {
+                        state.messages
+                    }
+                    state.copy(
+                        messages = messages,
                         isStreaming = false,
                         streamingText = "",
                         error = e.message ?: "네트워크 오류가 발생했습니다.",

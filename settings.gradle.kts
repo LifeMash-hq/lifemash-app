@@ -26,25 +26,6 @@ include(":app")
 include(":lint")
 
 include(
-    ":feature:feed:domain",
-    ":feature:feed:data",
-    ":feature:feed:api",
-    ":feature:feed:ui",
-)
-
-include(
-    ":feature:scrap:domain",
-    ":feature:scrap:data",
-    ":feature:scrap:api",
-    ":feature:scrap:ui",
-)
-
-include(
-    ":feature:history:api",
-    ":feature:history:ui",
-)
-
-include(
     ":feature:main",
 )
 
@@ -74,6 +55,13 @@ include(
     ":feature:assistant:data",
     ":feature:assistant:api",
     ":feature:assistant:ui",
+)
+
+include(
+    ":feature:home:api",
+    ":feature:home:domain",
+    ":feature:home:data",
+    ":feature:home:ui",
 )
 
 include(

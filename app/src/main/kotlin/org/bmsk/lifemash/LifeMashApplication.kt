@@ -9,11 +9,6 @@ import org.bmsk.lifemash.calendar.data.di.calendarDataModule
 import org.bmsk.lifemash.calendar.domain.di.calendarDomainModule
 import org.bmsk.lifemash.data.network.di.networkKoinModule
 import org.bmsk.lifemash.di.koinAppModule
-import org.bmsk.lifemash.feed.data.di.feedDataModule
-import org.bmsk.lifemash.feed.data.history.db.getReadingHistoryDBBuilder
-import org.bmsk.lifemash.feed.domain.di.feedDomainModule
-import org.bmsk.lifemash.feed.ui.di.feedUiModule
-import org.bmsk.lifemash.history.ui.di.historyUiModule
 import org.bmsk.lifemash.notification.data.db.getNotificationKeywordDBBuilder
 import org.bmsk.lifemash.notification.data.di.notificationDataModule
 import org.bmsk.lifemash.notification.domain.di.notificationDomainModule
@@ -22,13 +17,12 @@ import org.bmsk.lifemash.assistant.data.di.assistantDataModule
 import org.bmsk.lifemash.assistant.domain.di.assistantDomainModule
 import org.bmsk.lifemash.assistant.ui.di.assistantUiModule
 import org.bmsk.lifemash.auth.ui.di.authUiModule
+import org.bmsk.lifemash.home.data.di.homeDataModule
+import org.bmsk.lifemash.home.ui.di.homeDomainModule
+import org.bmsk.lifemash.home.ui.di.homeUiModule
 import org.bmsk.lifemash.calendar.ui.di.calendarUiModule
 import org.bmsk.lifemash.error.CrashlyticsErrorReporter
 import org.bmsk.lifemash.feature.shared.error.ErrorReporter
-import org.bmsk.lifemash.scrap.data.db.getScrapArticleDBBuilder
-import org.bmsk.lifemash.scrap.data.di.scrapDataModule
-import org.bmsk.lifemash.scrap.domain.di.scrapDomainModule
-import org.bmsk.lifemash.scrap.ui.di.scrapUiModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,13 +59,6 @@ class LifeMashApplication : Application() {
                 calendarDataModule,
                 authDomainModule,
                 authDataModule(dataStore),
-                feedDomainModule,
-                feedDataModule(getReadingHistoryDBBuilder(this@LifeMashApplication)),
-                feedUiModule,
-                scrapDomainModule,
-                scrapDataModule(getScrapArticleDBBuilder(this@LifeMashApplication)),
-                scrapUiModule,
-                historyUiModule,
                 notificationDomainModule,
                 notificationDataModule(getNotificationKeywordDBBuilder(this@LifeMashApplication)),
                 notificationUiModule,
@@ -81,6 +68,9 @@ class LifeMashApplication : Application() {
                 assistantDomainModule,
                 assistantDataModule,
                 assistantUiModule,
+                homeDomainModule,
+                homeDataModule,
+                homeUiModule,
             )
         }
 

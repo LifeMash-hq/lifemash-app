@@ -1,10 +1,16 @@
 package org.bmsk.lifemash.assistant.domain.usecase
 
+import org.bmsk.lifemash.assistant.domain.model.InstalledBlock
 import org.bmsk.lifemash.assistant.domain.model.SseEvent
 import org.bmsk.lifemash.assistant.domain.repository.AssistantRepository
 
 interface SendMessageUseCase {
-    suspend operator fun invoke(message: String, conversationId: String?, onEvent: suspend (SseEvent) -> Unit)
+    suspend operator fun invoke(
+        message: String,
+        conversationId: String?,
+        installedBlocks: List<InstalledBlock>,
+        onEvent: suspend (SseEvent) -> Unit,
+    )
 }
 
 class SendMessageUseCaseImpl(
@@ -13,6 +19,7 @@ class SendMessageUseCaseImpl(
     override suspend operator fun invoke(
         message: String,
         conversationId: String?,
+        installedBlocks: List<InstalledBlock>,
         onEvent: suspend (SseEvent) -> Unit,
-    ) = repository.sendMessage(message, conversationId, onEvent)
+    ) = repository.sendMessage(message, conversationId, installedBlocks, onEvent)
 }

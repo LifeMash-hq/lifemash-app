@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="feature_history_header">읽기 기록</string>
-    <string name="feature_history_count">%d개</string>
-    <string name="feature_history_empty_title">읽은 기사가 없습니다</string>
-    <string name="feature_history_empty_body">기사를 열람하면 여기에 표시됩니다</string>
-    <string name="feature_history_error_occurrence">오류가 발생했습니다</string>
-    <string name="feature_history_retry">잠시 후 다시 시도해 주세요</string>
-</resources>

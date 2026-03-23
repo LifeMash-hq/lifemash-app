@@ -4,5 +4,5 @@
     <string name="core_designsystem_retry">다시 시도해주세요.</string>
 
     <string name="core_designsystem_app_name">LifeMash</string>
-    <string name="core_designsystem_loading">뉴스를 수집하는 중…</string>
+    <string name="core_designsystem_loading">로딩 중…</string>
 </resources>

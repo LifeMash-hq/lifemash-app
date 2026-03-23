@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,23 +26,20 @@ internal fun AllRoute() {
 @Composable
 private fun AllScreen() {
     val scrollState = rememberScrollState()
-    Scaffold(
+    Column(
         modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = { TopBar() },
-        content = { contentPadding ->
-            Column(
-                Modifier
-                    .padding(contentPadding)
-                    .padding(horizontal = 8.dp)
-                    .verticalScroll(scrollState)
-                    .padding(bottom = 4.dp),
-            ) {
-                Title()
-                BookmarkMenu()
-            }
-        },
-    )
+    ) {
+        TopBar()
+        Column(
+            Modifier
+                .padding(horizontal = 8.dp)
+                .verticalScroll(scrollState)
+                .padding(bottom = 4.dp),
+        ) {
+            Title()
+            BookmarkMenu()
+        }
+    }
 }
 
 @Composable
