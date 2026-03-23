@@ -1,5 +1,6 @@
 package org.bmsk.lifemash.home.ui.blocks
 
+import android.content.Intent
 import android.net.Uri
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
@@ -24,29 +25,32 @@ actual fun BridgeWebView(
                         view: WebView?,
                         request: WebResourceRequest?,
                     ): Boolean {
-                        val scheme = request?.url?.scheme?.lowercase()
-                        return scheme != "https" && scheme != "http"
+                        val requestUrl = request?.url ?: return true
+                        val scheme = requestUrl.scheme?.lowercase()
+                        if (scheme == "https" || scheme == "http") {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, requestUrl))
+                        }
+                        return true
                     }
                 }
                 with(settings) {
                     loadWithOverviewMode = true
                     useWideViewPort = true
-                    setSupportZoom(true)
+                    setSupportZoom(false)
                     javaScriptEnabled = true
                     domStorageEnabled = true
                     allowFileAccess = false
                     allowContentAccess = false
                 }
+                isNestedScrollingEnabled = true
                 addJavascriptInterface(
                     LifeMashBridge(tokenProvider),
                     "LifeMashBridge",
                 )
-            }
-        },
-        update = { webView ->
-            val scheme = Uri.parse(url).scheme?.lowercase()
-            if (scheme == "https" || scheme == "http") {
-                webView.loadUrl(url)
+                val scheme = Uri.parse(url).scheme?.lowercase()
+                if (scheme == "https" || scheme == "http") {
+                    loadUrl(url)
+                }
             }
         },
     )

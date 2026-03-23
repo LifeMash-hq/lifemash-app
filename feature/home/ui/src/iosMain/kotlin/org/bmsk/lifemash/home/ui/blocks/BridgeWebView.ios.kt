@@ -7,11 +7,15 @@ import androidx.compose.ui.interop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSURLRequest
 import platform.Foundation.NSURL
+import platform.WebKit.WKNavigationAction
+import platform.WebKit.WKNavigationActionPolicy
+import platform.WebKit.WKNavigationDelegateProtocol
 import platform.WebKit.WKScriptMessage
 import platform.WebKit.WKScriptMessageHandlerProtocol
 import platform.WebKit.WKUserContentController
 import platform.WebKit.WKWebView
 import platform.WebKit.WKWebViewConfiguration
+import platform.UIKit.UIApplication
 import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class)
@@ -34,13 +38,30 @@ actual fun BridgeWebView(
             val handler = LifeMashBridgeHandler(tokenProvider)
             config.userContentController.addScriptMessageHandler(handler, name = "LifeMashBridge")
             WKWebView(frame = platform.CoreGraphics.CGRectZero.readValue(), configuration = config).apply {
+                navigationDelegate = ExternalLinkNavigationDelegate()
                 nsUrl?.let { loadRequest(NSURLRequest(uRL = it)) }
             }
         },
-        update = { webView ->
-            nsUrl?.let { webView.loadRequest(NSURLRequest(uRL = it)) }
-        },
     )
+}
+
+private class ExternalLinkNavigationDelegate : NSObject(), WKNavigationDelegateProtocol {
+    override fun webView(
+        webView: WKWebView,
+        decidePolicyForNavigationAction: WKNavigationAction,
+        decisionHandler: (WKNavigationActionPolicy) -> Unit,
+    ) {
+        val request = decidePolicyForNavigationAction.request
+        val targetUrl = request.URL
+        val isMainFrame = decidePolicyForNavigationAction.targetFrame?.isMainFrame == true
+
+        if (!isMainFrame && targetUrl != null) {
+            UIApplication.sharedApplication.openURL(targetUrl)
+            decisionHandler(WKNavigationActionPolicy.WKNavigationActionPolicyCancel)
+            return
+        }
+        decisionHandler(WKNavigationActionPolicy.WKNavigationActionPolicyAllow)
+    }
 }
 
 private class LifeMashBridgeHandler(
@@ -50,10 +71,9 @@ private class LifeMashBridgeHandler(
         userContentController: WKUserContentController,
         didReceiveScriptMessage: WKScriptMessage,
     ) {
-        // iOS: JS calls window.webkit.messageHandlers.LifeMashBridge.postMessage('getToken')
-        // Response is sent back via evaluateJavaScript
         val webView = didReceiveScriptMessage.webView ?: return
         val token = tokenProvider() ?: ""
-        webView.evaluateJavaScript("window.__lifemashToken = '$token';", completionHandler = null)
+        val escaped = token.replace("\\", "\\\\").replace("'", "\\'")
+        webView.evaluateJavaScript("window.__lifemashToken = '$escaped';", completionHandler = null)
     }
 }
