@@ -24,6 +24,7 @@ import org.bmsk.lifemash.calendar.domain.usecase.GetMonthEventsUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.GetMyGroupsUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.JoinGroupUseCase
 import org.bmsk.lifemash.calendar.domain.usecase.UpdateEventUseCase
+import org.bmsk.lifemash.calendar.domain.usecase.UpdateGroupNameUseCase
 
 internal class CalendarViewModel(
     private val getMonthEventsUseCase: GetMonthEventsUseCase,
@@ -33,6 +34,7 @@ internal class CalendarViewModel(
     private val createEventUseCase: CreateEventUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
+    private val updateGroupNameUseCase: UpdateGroupNameUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(initialState())
@@ -185,6 +187,37 @@ internal class CalendarViewModel(
                 }
                 .onFailure { e ->
                     _uiState.update { it.copy(error = e.message) }
+                }
+        }
+    }
+
+    fun showGroupRenameDialog() {
+        _uiState.update { it.copy(showGroupRename = true) }
+    }
+
+    fun hideGroupRenameDialog() {
+        _uiState.update { it.copy(showGroupRename = false) }
+    }
+
+    fun updateGroupName(groupId: String, name: String) {
+        _uiState.update { it.copy(isRenamingGroup = true) }
+        viewModelScope.launch {
+            runCatching { updateGroupNameUseCase(groupId, name) }
+                .onSuccess { updatedGroup ->
+                    _uiState.update { state ->
+                        val updatedGroups = state.groups?.map {
+                            if (it.id == updatedGroup.id) updatedGroup else it
+                        }?.toPersistentList()
+                        state.copy(
+                            groups = updatedGroups,
+                            selectedGroup = updatedGroup,
+                            showGroupRename = false,
+                            isRenamingGroup = false,
+                        )
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.update { it.copy(error = e.message, isRenamingGroup = false) }
                 }
         }
     }

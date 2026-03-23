@@ -50,3 +50,6 @@ data class CreateGroupBody(val type: GroupType, val name: String?)
 
 @Serializable
 data class JoinGroupBody(val inviteCode: String)
+
+@Serializable
+data class UpdateGroupNameBody(val name: String)

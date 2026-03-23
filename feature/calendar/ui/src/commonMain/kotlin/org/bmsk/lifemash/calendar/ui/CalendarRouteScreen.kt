@@ -43,6 +43,9 @@ internal fun CalendarRouteScreen(
         onCreateGroup = viewModel::createGroup,
         onJoinGroup = viewModel::joinGroup,
         onSelectGroup = viewModel::selectGroup,
+        onShowGroupRename = viewModel::showGroupRenameDialog,
+        onHideGroupRename = viewModel::hideGroupRenameDialog,
+        onRenameGroup = { groupId, name -> viewModel.updateGroupName(groupId, name) },
         onShowEventCreate = viewModel::showEventCreate,
         onHideEventCreate = viewModel::hideEventCreate,
         onCreateEvent = { title, desc, startMs, endMs, isAllDay, color ->
