@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.home.api.HomeBlock
 import org.bmsk.lifemash.home.api.MarketplaceBlockInfo
@@ -20,8 +21,8 @@ class MarketplaceViewModel(
     private val getLayout: GetHomeLayoutUseCase,
 ) : ViewModel() {
 
-    private val _blocks = MutableStateFlow<List<MarketplaceBlockInfo>>(emptyList())
-    val blocks: StateFlow<List<MarketplaceBlockInfo>> = _blocks
+    private val _uiState = MutableStateFlow<MarketplaceUiState>(MarketplaceUiState.Loading)
+    val uiState: StateFlow<MarketplaceUiState> = _uiState
 
     val installedIds: StateFlow<Set<String>> = getLayout()
         .map { layout ->
@@ -29,44 +30,46 @@ class MarketplaceViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
-    private val _installing = MutableStateFlow<String?>(null)
-    val installing: StateFlow<String?> = _installing
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
-
-    init {
-        loadBlocks()
-    }
-
     fun retry() {
-        _error.value = null
+        _uiState.value = MarketplaceUiState.Loading
         loadBlocks()
     }
 
-    private fun loadBlocks() {
+    internal fun loadBlocks() {
         viewModelScope.launch {
             runCatching { getBlocks() }
-                .onSuccess { _blocks.value = it }
-                .onFailure {
-                    println("[MarketplaceViewModel] 마켓플레이스 블록 로드 실패: $it")
-                    it.printStackTrace()
-                    _error.value = it.message ?: it::class.simpleName ?: "알 수 없는 오류"
+                .onSuccess { _uiState.value = MarketplaceUiState.Loaded(blocks = it) }
+                .onFailure { e ->
+                    println("[MarketplaceViewModel] 마켓플레이스 블록 로드 실패: $e")
+                    e.printStackTrace()
+                    _uiState.value = MarketplaceUiState.Error(
+                        e.message ?: e::class.simpleName ?: "알 수 없는 오류",
+                    )
                 }
         }
     }
 
     fun installBlock(block: MarketplaceBlockInfo) {
         viewModelScope.launch {
-            _installing.value = block.id
+            updateLoaded { copy(installing = block.id) }
             runCatching { install(block) }
-                .onFailure {
-                    println("[MarketplaceViewModel] 블록 설치 실패 (${block.id}): $it")
-                    it.printStackTrace()
-                    _error.value = it.message ?: it::class.simpleName ?: "설치 실패"
+                .onFailure { e ->
+                    println("[MarketplaceViewModel] 블록 설치 실패 (${block.id}): $e")
+                    e.printStackTrace()
+                    _uiState.value = MarketplaceUiState.Error(
+                        e.message ?: e::class.simpleName ?: "설치 실패",
+                    )
                 }
-            _installing.value = null
+            updateLoaded { copy(installing = null) }
         }
     }
 
+    private fun updateLoaded(transform: MarketplaceUiState.Loaded.() -> MarketplaceUiState.Loaded) {
+        _uiState.update { state ->
+            when (state) {
+                is MarketplaceUiState.Loaded -> state.transform()
+                else -> state
+            }
+        }
+    }
 }

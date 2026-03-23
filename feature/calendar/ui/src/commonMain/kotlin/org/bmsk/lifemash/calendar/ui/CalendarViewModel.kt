@@ -13,7 +13,6 @@ import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.bmsk.lifemash.calendar.domain.model.Event
 import org.bmsk.lifemash.calendar.domain.model.GroupType
 import org.bmsk.lifemash.calendar.domain.repository.CreateEventRequest
 import org.bmsk.lifemash.calendar.domain.repository.UpdateEventRequest
@@ -37,36 +36,36 @@ internal class CalendarViewModel(
     private val updateGroupNameUseCase: UpdateGroupNameUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(initialState())
+    private val _uiState = MutableStateFlow<CalendarUiState>(CalendarUiState.Loading)
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
 
-    init {
-        loadGroups()
-    }
-
     fun selectDate(date: LocalDate) {
-        _uiState.update { it.copy(selectedDate = date) }
+        updateLoaded { copy(selectedDate = date) }
     }
 
     fun changeMonth(year: Int, month: Int) {
-        _uiState.update { it.copy(currentYear = year, currentMonth = month) }
-        loadEvents()
+        updateLoaded { copy(currentYear = year, currentMonth = month) }
+        val groupId = (_uiState.value as? CalendarUiState.Loaded)?.selectedGroup?.id ?: return
+        loadEvents(groupId, year, month)
     }
 
     fun selectGroup(groupId: String) {
-        val group = _uiState.value.groups?.find { it.id == groupId }
-        _uiState.update { it.copy(selectedGroup = group) }
-        loadEvents()
+        updateLoaded {
+            val group = groups.find { it.id == groupId }
+            copy(selectedGroup = group)
+        }
+        val loaded = _uiState.value as? CalendarUiState.Loaded ?: return
+        loadEvents(groupId, loaded.currentYear, loaded.currentMonth)
     }
 
     fun createGroup(type: GroupType = GroupType.COUPLE, name: String? = null) {
-        _uiState.update { it.copy(isCreatingGroup = true) }
+        updateLoaded { copy(isCreatingGroup = true) }
         viewModelScope.launch {
             runCatching { createGroupUseCase(type, name) }
                 .onSuccess { group ->
-                    _uiState.update {
-                        val updatedGroups = (it.groups?.toList().orEmpty() + group).toPersistentList()
-                        it.copy(
+                    updateLoaded {
+                        val updatedGroups = (groups.toList() + group).toPersistentList()
+                        copy(
                             groups = updatedGroups,
                             selectedGroup = group,
                             isCreatingGroup = false,
@@ -75,19 +74,20 @@ internal class CalendarViewModel(
                     loadEvents()
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message, isCreatingGroup = false) }
+                    updateLoaded { copy(isCreatingGroup = false) }
+                    _uiState.value = CalendarUiState.Error(e.message ?: "그룹 생성 실패")
                 }
         }
     }
 
     fun joinGroup(inviteCode: String) {
-        _uiState.update { it.copy(isCreatingGroup = true) }
+        updateLoaded { copy(isCreatingGroup = true) }
         viewModelScope.launch {
             runCatching { joinGroupUseCase(inviteCode) }
                 .onSuccess { group ->
-                    _uiState.update {
-                        val updatedGroups = (it.groups?.toList().orEmpty() + group).toPersistentList()
-                        it.copy(
+                    updateLoaded {
+                        val updatedGroups = (groups.toList() + group).toPersistentList()
+                        copy(
                             groups = updatedGroups,
                             selectedGroup = group,
                             isCreatingGroup = false,
@@ -96,173 +96,153 @@ internal class CalendarViewModel(
                     loadEvents()
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message, isCreatingGroup = false) }
+                    updateLoaded { copy(isCreatingGroup = false) }
+                    _uiState.value = CalendarUiState.Error(e.message ?: "그룹 참여 실패")
                 }
         }
     }
 
-    fun showEventCreate() {
-        _uiState.update { it.copy(showEventCreate = true, editingEvent = null) }
+    fun showOverlay(overlay: CalendarOverlay) {
+        updateLoaded { copy(overlay = overlay) }
     }
 
-    fun hideEventCreate() {
-        _uiState.update { it.copy(showEventCreate = false, editingEvent = null) }
+    fun dismissOverlay() {
+        updateLoaded { copy(overlay = CalendarOverlay.None) }
     }
 
-    fun showEventDetail(event: Event) {
-        _uiState.update { it.copy(selectedEvent = event, showEventDetail = true) }
-    }
-
-    fun hideEventDetail() {
-        _uiState.update { it.copy(selectedEvent = null, showEventDetail = false) }
-    }
-
-    fun startEditEvent(event: Event) {
-        _uiState.update { it.copy(showEventDetail = false, showEventCreate = true, editingEvent = event) }
-    }
-
-    fun createEvent(
-        title: String,
-        description: String?,
-        startAt: Instant,
-        endAt: Instant?,
-        isAllDay: Boolean,
-        color: String?,
-    ) {
-        val groupId = _uiState.value.selectedGroup?.id ?: return
-        _uiState.update { it.copy(isCreatingEvent = true) }
+    fun createEvent(groupId: String, form: EventFormData) {
+        updateLoaded { copy(isCreatingEvent = true) }
         viewModelScope.launch {
             runCatching {
                 createEventUseCase(
                     groupId,
-                    CreateEventRequest(title, description, startAt, endAt, isAllDay, color),
+                    CreateEventRequest(
+                        title = form.title,
+                        description = form.description,
+                        startAt = Instant.fromEpochMilliseconds(form.startAt),
+                        endAt = form.endAt?.let { Instant.fromEpochMilliseconds(it) },
+                        isAllDay = form.isAllDay,
+                        color = form.color,
+                    ),
                 )
             }
                 .onSuccess {
-                    _uiState.update { it.copy(isCreatingEvent = false, showEventCreate = false) }
+                    updateLoaded { copy(isCreatingEvent = false, overlay = CalendarOverlay.None) }
                     loadEvents()
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message, isCreatingEvent = false) }
+                    updateLoaded { copy(isCreatingEvent = false) }
+                    _uiState.value = CalendarUiState.Error(e.message ?: "일정 생성 실패")
                 }
         }
     }
 
-    fun updateEvent(
-        eventId: String,
-        title: String?,
-        description: String?,
-        startAt: Instant?,
-        endAt: Instant?,
-        isAllDay: Boolean?,
-        color: String?,
-    ) {
-        val groupId = _uiState.value.selectedGroup?.id ?: return
-        _uiState.update { it.copy(isCreatingEvent = true) }
+    fun updateEvent(groupId: String, eventId: String, form: EventFormData) {
+        updateLoaded { copy(isCreatingEvent = true) }
         viewModelScope.launch {
             runCatching {
                 updateEventUseCase(
                     groupId,
                     eventId,
-                    UpdateEventRequest(title, description, startAt, endAt, isAllDay, color),
+                    UpdateEventRequest(
+                        title = form.title,
+                        description = form.description,
+                        startAt = Instant.fromEpochMilliseconds(form.startAt),
+                        endAt = form.endAt?.let { Instant.fromEpochMilliseconds(it) },
+                        isAllDay = form.isAllDay,
+                        color = form.color,
+                    ),
                 )
             }
                 .onSuccess {
-                    _uiState.update { it.copy(isCreatingEvent = false, showEventCreate = false, editingEvent = null) }
+                    updateLoaded { copy(isCreatingEvent = false, overlay = CalendarOverlay.None) }
                     loadEvents()
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message, isCreatingEvent = false) }
+                    updateLoaded { copy(isCreatingEvent = false) }
+                    _uiState.value = CalendarUiState.Error(e.message ?: "일정 수정 실패")
                 }
         }
     }
 
-    fun deleteEvent(eventId: String) {
-        val groupId = _uiState.value.selectedGroup?.id ?: return
+    fun deleteEvent(groupId: String, eventId: String) {
         viewModelScope.launch {
             runCatching { deleteEventUseCase(groupId, eventId) }
                 .onSuccess {
-                    _uiState.update { it.copy(showEventDetail = false, selectedEvent = null) }
+                    updateLoaded { copy(overlay = CalendarOverlay.None) }
                     loadEvents()
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message) }
+                    _uiState.value = CalendarUiState.Error(e.message ?: "일정 삭제 실패")
                 }
         }
     }
 
-    fun showGroupRenameDialog() {
-        _uiState.update { it.copy(showGroupRename = true) }
-    }
-
-    fun hideGroupRenameDialog() {
-        _uiState.update { it.copy(showGroupRename = false) }
-    }
-
     fun updateGroupName(groupId: String, name: String) {
-        _uiState.update { it.copy(isRenamingGroup = true) }
+        updateLoaded { copy(isRenamingGroup = true) }
         viewModelScope.launch {
             runCatching { updateGroupNameUseCase(groupId, name) }
                 .onSuccess { updatedGroup ->
-                    _uiState.update { state ->
-                        val updatedGroups = state.groups?.map {
+                    updateLoaded {
+                        val updatedGroups = groups.map {
                             if (it.id == updatedGroup.id) updatedGroup else it
-                        }?.toPersistentList()
-                        state.copy(
+                        }.toPersistentList()
+                        copy(
                             groups = updatedGroups,
                             selectedGroup = updatedGroup,
-                            showGroupRename = false,
+                            overlay = CalendarOverlay.None,
                             isRenamingGroup = false,
                         )
                     }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message, isRenamingGroup = false) }
+                    updateLoaded { copy(isRenamingGroup = false) }
+                    _uiState.value = CalendarUiState.Error(e.message ?: "그룹명 변경 실패")
                 }
         }
     }
 
-    fun clearError() {
-        _uiState.update { it.copy(error = null) }
-    }
-
-    private fun loadGroups() {
+    internal fun loadGroups() {
         viewModelScope.launch {
             runCatching { getMyGroupsUseCase() }
                 .onSuccess { groups ->
-                    _uiState.update {
-                        it.copy(
-                            groups = groups.toPersistentList(),
-                            selectedGroup = groups.firstOrNull(),
-                            isLoading = false,
-                        )
-                    }
+                    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                    _uiState.value = CalendarUiState.Loaded(
+                        currentYear = now.year,
+                        currentMonth = now.monthNumber,
+                        selectedDate = LocalDate(now.year, now.monthNumber, now.dayOfMonth),
+                        groups = groups.toPersistentList(),
+                        selectedGroup = groups.firstOrNull(),
+                    )
                     loadEvents()
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = e.message, isLoading = false) }
+                    _uiState.value = CalendarUiState.Error(e.message ?: "그룹 로드 실패")
                 }
         }
     }
 
     private fun loadEvents() {
-        val state = _uiState.value
-        val group = state.selectedGroup ?: return
+        val loaded = _uiState.value as? CalendarUiState.Loaded ?: return
+        val group = loaded.selectedGroup ?: return
+        loadEvents(group.id, loaded.currentYear, loaded.currentMonth)
+    }
 
+    private fun loadEvents(groupId: String, year: Int, month: Int) {
         viewModelScope.launch {
-            getMonthEventsUseCase(group.id, state.currentYear, state.currentMonth)
+            getMonthEventsUseCase(groupId, year, month)
                 .collect { events ->
-                    _uiState.update { it.copy(events = events.toPersistentList()) }
+                    updateLoaded { copy(events = events.toPersistentList()) }
                 }
         }
     }
 
-    private fun initialState(): CalendarUiState {
-        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-        return CalendarUiState(
-            currentYear = now.year,
-            currentMonth = now.monthNumber,
-            selectedDate = LocalDate(now.year, now.monthNumber, now.dayOfMonth),
-        )
+    private fun updateLoaded(transform: CalendarUiState.Loaded.() -> CalendarUiState.Loaded) {
+        _uiState.update { state ->
+            when (state) {
+                is CalendarUiState.Loaded -> state.transform()
+                else -> state
+            }
+        }
     }
 }

@@ -68,44 +68,79 @@ import org.bmsk.lifemash.calendar.domain.model.Event
 import org.bmsk.lifemash.calendar.domain.model.Group
 import org.bmsk.lifemash.calendar.domain.model.GroupType
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CalendarScreen(
     uiState: CalendarUiState,
     onDateSelect: (LocalDate) -> Unit,
-    onPrevMonth: () -> Unit,
-    onNextMonth: () -> Unit,
+    onChangeMonth: (year: Int, month: Int) -> Unit,
+    onSelectGroup: (String) -> Unit,
+    onShowOverlay: (CalendarOverlay) -> Unit,
     onCreateGroup: (GroupType, String?) -> Unit,
     onJoinGroup: (String) -> Unit,
-    onSelectGroup: (String) -> Unit,
-    onShowGroupRename: () -> Unit,
-    onHideGroupRename: () -> Unit,
-    onRenameGroup: (groupId: String, name: String) -> Unit,
-    onShowEventCreate: () -> Unit,
-    onHideEventCreate: () -> Unit,
-    onCreateEvent: (String, String?, Long, Long?, Boolean, String?) -> Unit,
-    onShowEventDetail: (Event) -> Unit,
-    onHideEventDetail: () -> Unit,
-    onStartEditEvent: (Event) -> Unit,
-    onUpdateEvent: (String, String?, String?, Long?, Long?, Boolean?, String?) -> Unit,
-    onDeleteEvent: (String) -> Unit,
 ) {
-    if (uiState.isLoading) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+    when (uiState) {
+        is CalendarUiState.Loading -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
         }
-        return
-    }
 
-    if (uiState.groups.isNullOrEmpty()) {
-        NoGroupContent(
+        is CalendarUiState.Error -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = uiState.message,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        }
+
+        is CalendarUiState.Loaded -> CalendarLoadedContent(
+            uiState = uiState,
+            onDateSelect = onDateSelect,
+            onChangeMonth = onChangeMonth,
+            onSelectGroup = onSelectGroup,
+            onShowOverlay = onShowOverlay,
+            onCreateGroup = onCreateGroup,
+            onJoinGroup = onJoinGroup,
+        )
+    }
+}
+
+@Composable
+private fun CalendarLoadedContent(
+    uiState: CalendarUiState.Loaded,
+    onDateSelect: (LocalDate) -> Unit,
+    onChangeMonth: (year: Int, month: Int) -> Unit,
+    onSelectGroup: (String) -> Unit,
+    onShowOverlay: (CalendarOverlay) -> Unit,
+    onCreateGroup: (GroupType, String?) -> Unit,
+    onJoinGroup: (String) -> Unit,
+) {
+    when {
+        uiState.groups.isEmpty() -> NoGroupContent(
             isCreating = uiState.isCreatingGroup,
             onCreateGroup = onCreateGroup,
             onJoinGroup = onJoinGroup,
         )
-        return
-    }
 
+        else -> CalendarContent(
+            uiState = uiState,
+            onDateSelect = onDateSelect,
+            onChangeMonth = onChangeMonth,
+            onSelectGroup = onSelectGroup,
+            onShowOverlay = onShowOverlay,
+        )
+    }
+}
+
+@Composable
+private fun CalendarContent(
+    uiState: CalendarUiState.Loaded,
+    onDateSelect: (LocalDate) -> Unit,
+    onChangeMonth: (year: Int, month: Int) -> Unit,
+    onSelectGroup: (String) -> Unit,
+    onShowOverlay: (CalendarOverlay) -> Unit,
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().padding(16.dp)) {
             if (uiState.groups.size > 1) {
@@ -113,7 +148,7 @@ internal fun CalendarScreen(
                     groups = uiState.groups,
                     selectedGroup = uiState.selectedGroup,
                     onSelectGroup = onSelectGroup,
-                    onRenameGroup = { onShowGroupRename() },
+                    onRenameGroup = { onShowOverlay(CalendarOverlay.GroupRename) },
                 )
                 Spacer(Modifier.height(8.dp))
             }
@@ -121,8 +156,22 @@ internal fun CalendarScreen(
             MonthHeader(
                 year = uiState.currentYear,
                 month = uiState.currentMonth,
-                onPrev = onPrevMonth,
-                onNext = onNextMonth,
+                onPrev = {
+                    val (y, m) = if (uiState.currentMonth == 1) {
+                        uiState.currentYear - 1 to 12
+                    } else {
+                        uiState.currentYear to uiState.currentMonth - 1
+                    }
+                    onChangeMonth(y, m)
+                },
+                onNext = {
+                    val (y, m) = if (uiState.currentMonth == 12) {
+                        uiState.currentYear + 1 to 1
+                    } else {
+                        uiState.currentYear to uiState.currentMonth + 1
+                    }
+                    onChangeMonth(y, m)
+                },
             )
 
             MonthGrid(
@@ -136,357 +185,49 @@ internal fun CalendarScreen(
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
 
             val selectedEvents = uiState.events
-                ?.filter { event ->
+                .filter { event ->
                     uiState.selectedDate?.let { date ->
                         event.startAt.toString().startsWith(date.toString())
                     } == true
                 }
 
-            if (selectedEvents.isNullOrEmpty()) {
-                Text(
+            when {
+                selectedEvents.isEmpty() -> Text(
                     text = "선택한 날짜에 일정이 없습니다",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 16.dp),
                 )
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
+                else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(selectedEvents) { event ->
                         EventItem(
                             event = event,
-                            onClick = { onShowEventDetail(event) },
+                            onClick = { onShowOverlay(CalendarOverlay.EventDetail(event)) },
                         )
                     }
                 }
             }
         }
         FloatingActionButton(
-            onClick = onShowEventCreate,
+            onClick = { onShowOverlay(CalendarOverlay.EventCreate(uiState.selectedDate)) },
             modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
         ) {
             Icon(Icons.Filled.Add, contentDescription = "일정 추가")
         }
     }
-
-    if (uiState.showEventCreate) {
-        EventCreateBottomSheet(
-            editingEvent = uiState.editingEvent,
-            isLoading = uiState.isCreatingEvent,
-            selectedDate = uiState.selectedDate,
-            onDismiss = onHideEventCreate,
-            onCreate = onCreateEvent,
-            onUpdate = onUpdateEvent,
-        )
-    }
-
-    if (uiState.showGroupRename && uiState.selectedGroup != null) {
-        GroupRenameDialog(
-            currentName = uiState.selectedGroup.name ?: "",
-            isLoading = uiState.isRenamingGroup,
-            onDismiss = onHideGroupRename,
-            onConfirm = { name -> onRenameGroup(uiState.selectedGroup.id, name) },
-        )
-    }
-
-    if (uiState.showEventDetail && uiState.selectedEvent != null) {
-        EventDetailBottomSheet(
-            event = uiState.selectedEvent,
-            onDismiss = onHideEventDetail,
-            onEdit = { onStartEditEvent(uiState.selectedEvent) },
-            onDelete = { onDeleteEvent(uiState.selectedEvent.id) },
-        )
-    }
 }
 
-@Composable
-private fun NoGroupContent(
-    isCreating: Boolean,
-    onCreateGroup: (GroupType, String?) -> Unit,
-    onJoinGroup: (String) -> Unit,
-) {
-    var inviteCode by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = "공유 캘린더를 시작하세요",
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = "그룹을 만들거나 초대 코드로 참여하세요",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(32.dp))
-
-        Button(
-            onClick = { onCreateGroup(GroupType.COUPLE, null) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isCreating,
-        ) {
-            if (isCreating) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                Spacer(Modifier.width(8.dp))
-            }
-            Text("그룹 만들기")
-        }
-
-        Spacer(Modifier.height(24.dp))
-        HorizontalDivider()
-        Spacer(Modifier.height(24.dp))
-
-        OutlinedTextField(
-            value = inviteCode,
-            onValueChange = { inviteCode = it },
-            label = { Text("초대 코드") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            enabled = !isCreating,
-        )
-        Spacer(Modifier.height(12.dp))
-        OutlinedButton(
-            onClick = { onJoinGroup(inviteCode) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = inviteCode.isNotBlank() && !isCreating,
-        ) {
-            Text("초대 코드로 참여")
-        }
-    }
-}
-
-@Composable
-private fun GroupSelector(
-    groups: PersistentList<Group>,
-    selectedGroup: Group?,
-    onSelectGroup: (String) -> Unit,
-    onRenameGroup: (String) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        groups.forEach { group ->
-            FilterChip(
-                selected = group.id == selectedGroup?.id,
-                onClick = { onSelectGroup(group.id) },
-                label = { Text(group.name ?: group.type.name) },
-                trailingIcon = if (group.id == selectedGroup?.id) {
-                    {
-                        Icon(
-                            Icons.Filled.Edit,
-                            contentDescription = "그룹명 변경",
-                            modifier = Modifier.size(16.dp).clickable { onRenameGroup(group.id) },
-                        )
-                    }
-                } else null,
-            )
-        }
-    }
-}
-
-@Composable
-private fun GroupRenameDialog(
-    currentName: String,
-    isLoading: Boolean,
-    onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit,
-) {
-    var name by remember { mutableStateOf(currentName) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("그룹명 변경") },
-        text = {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("그룹명") },
-                singleLine = true,
-                enabled = !isLoading,
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(name) },
-                enabled = name.isNotBlank() && !isLoading,
-            ) { Text("변경") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("취소") }
-        },
-    )
-}
-
-@Composable
-private fun MonthHeader(year: Int, month: Int, onPrev: () -> Unit, onNext: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(onClick = onPrev) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "이전 달")
-        }
-        Text(
-            text = "${year}년 ${month}월",
-            style = MaterialTheme.typography.titleLarge,
-        )
-        IconButton(onClick = onNext) {
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "다음 달")
-        }
-    }
-}
-
-@Composable
-private fun MonthGrid(
-    year: Int,
-    month: Int,
-    selectedDate: LocalDate?,
-    events: PersistentList<Event>?,
-    onDateSelect: (LocalDate) -> Unit,
-) {
-    val daysInMonth = LocalDate(year, month, 1).let {
-        when (month) {
-            2 -> if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) 29 else 28
-            4, 6, 9, 11 -> 30
-            else -> 31
-        }
-    }
-    val firstDayOfWeek = LocalDate(year, month, 1).dayOfWeek.ordinal // 0=Monday
-
-    val days = (1..daysInMonth).map { day -> LocalDate(year, month, day) }
-    val paddedDays: List<LocalDate?> = List(firstDayOfWeek) { null } + days
-
-    // 요일 헤더
-    Row(Modifier.fillMaxWidth()) {
-        listOf("월", "화", "수", "목", "금", "토", "일").forEach {
-            Text(
-                text = it,
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(7),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        items(paddedDays) { date ->
-            if (date == null) {
-                Box(Modifier.aspectRatio(1f))
-            } else {
-                val isSelected = date == selectedDate
-                val hasEvent = events?.any { it.startAt.toString().startsWith(date.toString()) } == true
-
-                Box(
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .clip(CircleShape)
-                        .then(
-                            if (isSelected) {
-                                Modifier.background(MaterialTheme.colorScheme.primary)
-                            } else {
-                                Modifier
-                            }
-                        )
-                        .clickable { onDateSelect(date) },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "${date.dayOfMonth}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimary
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            },
-                        )
-                        if (hasEvent) {
-                            Box(
-                                Modifier.size(4.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (isSelected) {
-                                            MaterialTheme.colorScheme.onPrimary
-                                        } else {
-                                            MaterialTheme.colorScheme.primary
-                                        }
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EventItem(event: Event, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp, horizontal = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        val dotColor = event.color?.let { parseEventColor(it) } ?: MaterialTheme.colorScheme.primary
-        Box(
-            Modifier.size(8.dp)
-                .clip(CircleShape)
-                .background(dotColor)
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = event.title, style = MaterialTheme.typography.bodyMedium)
-            val desc = event.description
-            if (!desc.isNullOrBlank()) {
-                Text(
-                    text = desc,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                )
-            }
-        }
-    }
-}
-
-private val EVENT_COLORS = listOf(
-    "#FF6B6B" to Color(0xFFFF6B6B),
-    "#4ECDC4" to Color(0xFF4ECDC4),
-    "#45B7D1" to Color(0xFF45B7D1),
-    "#96CEB4" to Color(0xFF96CEB4),
-    "#FFEAA7" to Color(0xFFFFEAA7),
-    "#DDA0DD" to Color(0xFFDDA0DD),
-)
-
-private fun parseEventColor(hex: String): Color {
-    return EVENT_COLORS.find { it.first.equals(hex, ignoreCase = true) }?.second
-        ?: try {
-            Color(hex.removePrefix("#").toLong(16) or 0xFF000000)
-        } catch (_: Exception) {
-            Color.Unspecified
-        }
-}
+// region BottomSheet / Dialog (internal — RouteScreen에서 사용)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun EventCreateBottomSheet(
+internal fun EventCreateBottomSheet(
     editingEvent: Event?,
     isLoading: Boolean,
     selectedDate: LocalDate?,
     onDismiss: () -> Unit,
-    onCreate: (String, String?, Long, Long?, Boolean, String?) -> Unit,
-    onUpdate: (String, String?, String?, Long?, Long?, Boolean?, String?) -> Unit,
+    onSubmit: (EventFormData) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isEdit = editingEvent != null
@@ -571,29 +312,24 @@ private fun EventCreateBottomSheet(
 
             Button(
                 onClick = {
-                    if (isEdit && editingEvent != null) {
-                        onUpdate(
-                            editingEvent.id,
-                            title.ifBlank { null },
-                            description.ifBlank { null },
-                            null,
-                            null,
-                            isAllDay,
-                            selectedColor,
-                        )
+                    val startMs = if (isEdit) {
+                        editingEvent!!.startAt.toEpochMilliseconds()
                     } else {
                         val date = selectedDate ?: return@Button
-                        val startInstant = LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, 0, 0)
+                        LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, 0, 0)
                             .toInstant(TimeZone.currentSystemDefault())
-                        onCreate(
-                            title,
-                            description.ifBlank { null },
-                            startInstant.toEpochMilliseconds(),
-                            null,
-                            isAllDay,
-                            selectedColor,
-                        )
+                            .toEpochMilliseconds()
                     }
+                    onSubmit(
+                        EventFormData(
+                            title = title.ifBlank { editingEvent?.title ?: "" },
+                            description = description.ifBlank { null },
+                            startAt = startMs,
+                            endAt = null,
+                            isAllDay = isAllDay,
+                            color = selectedColor,
+                        ),
+                    )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = title.isNotBlank() && !isLoading,
@@ -612,7 +348,7 @@ private fun EventCreateBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EventDetailBottomSheet(
+internal fun EventDetailBottomSheet(
     event: Event,
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
@@ -709,3 +445,292 @@ private fun EventDetailBottomSheet(
         )
     }
 }
+
+@Composable
+internal fun GroupRenameDialog(
+    currentName: String,
+    isLoading: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    var name by remember { mutableStateOf(currentName) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("그룹명 변경") },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("그룹명") },
+                singleLine = true,
+                enabled = !isLoading,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(name) },
+                enabled = name.isNotBlank() && !isLoading,
+            ) { Text("변경") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("취소") }
+        },
+    )
+}
+
+// endregion
+
+// region Private composables
+
+@Composable
+private fun NoGroupContent(
+    isCreating: Boolean,
+    onCreateGroup: (GroupType, String?) -> Unit,
+    onJoinGroup: (String) -> Unit,
+) {
+    var inviteCode by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = "공유 캘린더를 시작하세요",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = "그룹을 만들거나 초대 코드로 참여하세요",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(32.dp))
+
+        Button(
+            onClick = { onCreateGroup(GroupType.COUPLE, null) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isCreating,
+        ) {
+            if (isCreating) {
+                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                Spacer(Modifier.width(8.dp))
+            }
+            Text("그룹 만들기")
+        }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(24.dp))
+
+        OutlinedTextField(
+            value = inviteCode,
+            onValueChange = { inviteCode = it },
+            label = { Text("초대 코드") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            enabled = !isCreating,
+        )
+        Spacer(Modifier.height(12.dp))
+        OutlinedButton(
+            onClick = { onJoinGroup(inviteCode) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = inviteCode.isNotBlank() && !isCreating,
+        ) {
+            Text("초대 코드로 참여")
+        }
+    }
+}
+
+@Composable
+private fun GroupSelector(
+    groups: PersistentList<Group>,
+    selectedGroup: Group?,
+    onSelectGroup: (String) -> Unit,
+    onRenameGroup: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        groups.forEach { group ->
+            FilterChip(
+                selected = group.id == selectedGroup?.id,
+                onClick = { onSelectGroup(group.id) },
+                label = { Text(group.name ?: group.type.name) },
+                trailingIcon = if (group.id == selectedGroup?.id) {
+                    {
+                        Icon(
+                            Icons.Filled.Edit,
+                            contentDescription = "그룹명 변경",
+                            modifier = Modifier.size(16.dp).clickable { onRenameGroup(group.id) },
+                        )
+                    }
+                } else null,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MonthHeader(year: Int, month: Int, onPrev: () -> Unit, onNext: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = onPrev) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "이전 달")
+        }
+        Text(
+            text = "${year}년 ${month}월",
+            style = MaterialTheme.typography.titleLarge,
+        )
+        IconButton(onClick = onNext) {
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "다음 달")
+        }
+    }
+}
+
+@Composable
+private fun MonthGrid(
+    year: Int,
+    month: Int,
+    selectedDate: LocalDate?,
+    events: PersistentList<Event>,
+    onDateSelect: (LocalDate) -> Unit,
+) {
+    val daysInMonth = LocalDate(year, month, 1).let {
+        when (month) {
+            2 -> if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) 29 else 28
+            4, 6, 9, 11 -> 30
+            else -> 31
+        }
+    }
+    val firstDayOfWeek = LocalDate(year, month, 1).dayOfWeek.ordinal
+
+    val days = (1..daysInMonth).map { day -> LocalDate(year, month, day) }
+    val paddedDays: List<LocalDate?> = List(firstDayOfWeek) { null } + days
+
+    Row(Modifier.fillMaxWidth()) {
+        listOf("월", "화", "수", "목", "금", "토", "일").forEach {
+            Text(
+                text = it,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(7),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        items(paddedDays) { date ->
+            if (date == null) {
+                Box(Modifier.aspectRatio(1f))
+            } else {
+                val isSelected = date == selectedDate
+                val hasEvent = events.any { it.startAt.toString().startsWith(date.toString()) }
+
+                Box(
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .clip(CircleShape)
+                        .then(
+                            if (isSelected) {
+                                Modifier.background(MaterialTheme.colorScheme.primary)
+                            } else {
+                                Modifier
+                            }
+                        )
+                        .clickable { onDateSelect(date) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "${date.dayOfMonth}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (isSelected) {
+                                MaterialTheme.colorScheme.onPrimary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                        )
+                        if (hasEvent) {
+                            Box(
+                                Modifier.size(4.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (isSelected) {
+                                            MaterialTheme.colorScheme.onPrimary
+                                        } else {
+                                            MaterialTheme.colorScheme.primary
+                                        }
+                                    )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EventItem(event: Event, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        val dotColor = event.color?.let { parseEventColor(it) } ?: MaterialTheme.colorScheme.primary
+        Box(
+            Modifier.size(8.dp)
+                .clip(CircleShape)
+                .background(dotColor)
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = event.title, style = MaterialTheme.typography.bodyMedium)
+            val desc = event.description
+            if (!desc.isNullOrBlank()) {
+                Text(
+                    text = desc,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                )
+            }
+        }
+    }
+}
+
+// endregion
+
+// region Color utils
+
+internal val EVENT_COLORS = listOf(
+    "#FF6B6B" to Color(0xFFFF6B6B),
+    "#4ECDC4" to Color(0xFF4ECDC4),
+    "#45B7D1" to Color(0xFF45B7D1),
+    "#96CEB4" to Color(0xFF96CEB4),
+    "#FFEAA7" to Color(0xFFFFEAA7),
+    "#DDA0DD" to Color(0xFFDDA0DD),
+)
+
+internal fun parseEventColor(hex: String): Color {
+    return EVENT_COLORS.find { it.first.equals(hex, ignoreCase = true) }?.second
+        ?: try {
+            Color(hex.removePrefix("#").toLong(16) or 0xFF000000)
+        } catch (_: Exception) {
+            Color.Unspecified
+        }
+}
+
+// endregion

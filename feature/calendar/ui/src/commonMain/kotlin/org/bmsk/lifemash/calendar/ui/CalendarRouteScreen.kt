@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import kotlin.time.Instant
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -14,64 +13,78 @@ internal fun CalendarRouteScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let {
-            onShowErrorSnackbar(Exception(it))
-            viewModel.clearError()
+    LaunchedEffect(Unit) {
+        viewModel.loadGroups()
+    }
+
+    LaunchedEffect(uiState) {
+        val error = (uiState as? CalendarUiState.Error)?.message
+        if (error != null) {
+            onShowErrorSnackbar(Exception(error))
         }
     }
 
     CalendarScreen(
         uiState = uiState,
         onDateSelect = viewModel::selectDate,
-        onPrevMonth = {
-            val (y, m) = if (uiState.currentMonth == 1) {
-                uiState.currentYear - 1 to 12
-            } else {
-                uiState.currentYear to uiState.currentMonth - 1
-            }
-            viewModel.changeMonth(y, m)
-        },
-        onNextMonth = {
-            val (y, m) = if (uiState.currentMonth == 12) {
-                uiState.currentYear + 1 to 1
-            } else {
-                uiState.currentYear to uiState.currentMonth + 1
-            }
-            viewModel.changeMonth(y, m)
-        },
+        onChangeMonth = viewModel::changeMonth,
+        onSelectGroup = viewModel::selectGroup,
+        onShowOverlay = viewModel::showOverlay,
         onCreateGroup = viewModel::createGroup,
         onJoinGroup = viewModel::joinGroup,
-        onSelectGroup = viewModel::selectGroup,
-        onShowGroupRename = viewModel::showGroupRenameDialog,
-        onHideGroupRename = viewModel::hideGroupRenameDialog,
-        onRenameGroup = { groupId, name -> viewModel.updateGroupName(groupId, name) },
-        onShowEventCreate = viewModel::showEventCreate,
-        onHideEventCreate = viewModel::hideEventCreate,
-        onCreateEvent = { title, desc, startMs, endMs, isAllDay, color ->
-            viewModel.createEvent(
-                title = title,
-                description = desc,
-                startAt = Instant.fromEpochMilliseconds(startMs),
-                endAt = endMs?.let { Instant.fromEpochMilliseconds(it) },
-                isAllDay = isAllDay,
-                color = color,
-            )
-        },
-        onShowEventDetail = viewModel::showEventDetail,
-        onHideEventDetail = viewModel::hideEventDetail,
-        onStartEditEvent = viewModel::startEditEvent,
-        onUpdateEvent = { eventId, title, desc, startMs, endMs, isAllDay, color ->
-            viewModel.updateEvent(
-                eventId = eventId,
-                title = title,
-                description = desc,
-                startAt = startMs?.let { Instant.fromEpochMilliseconds(it) },
-                endAt = endMs?.let { Instant.fromEpochMilliseconds(it) },
-                isAllDay = isAllDay,
-                color = color,
-            )
-        },
-        onDeleteEvent = viewModel::deleteEvent,
     )
+
+    val loaded = uiState as? CalendarUiState.Loaded ?: return
+    val groupId = loaded.selectedGroup?.id
+
+    when (val overlay = loaded.overlay) {
+        is CalendarOverlay.EventCreate -> {
+            if (groupId != null) {
+                EventCreateBottomSheet(
+                    editingEvent = null,
+                    isLoading = loaded.isCreatingEvent,
+                    selectedDate = overlay.selectedDate,
+                    onDismiss = viewModel::dismissOverlay,
+                    onSubmit = { form -> viewModel.createEvent(groupId, form) },
+                )
+            }
+        }
+
+        is CalendarOverlay.EventEdit -> {
+            if (groupId != null) {
+                EventCreateBottomSheet(
+                    editingEvent = overlay.event,
+                    isLoading = loaded.isCreatingEvent,
+                    selectedDate = null,
+                    onDismiss = viewModel::dismissOverlay,
+                    onSubmit = { form -> viewModel.updateEvent(groupId, overlay.event.id, form) },
+                )
+            }
+        }
+
+        is CalendarOverlay.EventDetail -> {
+            if (groupId != null) {
+                EventDetailBottomSheet(
+                    event = overlay.event,
+                    onDismiss = viewModel::dismissOverlay,
+                    onEdit = { viewModel.showOverlay(CalendarOverlay.EventEdit(overlay.event)) },
+                    onDelete = { viewModel.deleteEvent(groupId, overlay.event.id) },
+                )
+            }
+        }
+
+        is CalendarOverlay.GroupRename -> {
+            val group = loaded.selectedGroup
+            if (group != null) {
+                GroupRenameDialog(
+                    currentName = group.name ?: "",
+                    isLoading = loaded.isRenamingGroup,
+                    onDismiss = viewModel::dismissOverlay,
+                    onConfirm = { name -> viewModel.updateGroupName(group.id, name) },
+                )
+            }
+        }
+
+        CalendarOverlay.None -> {}
+    }
 }
