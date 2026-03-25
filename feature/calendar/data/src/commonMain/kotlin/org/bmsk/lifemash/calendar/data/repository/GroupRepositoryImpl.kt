@@ -1,20 +1,21 @@
 package org.bmsk.lifemash.calendar.data.repository
 
 import org.bmsk.lifemash.calendar.data.api.CalendarApi
-import org.bmsk.lifemash.calendar.data.api.dto.CreateGroupBody
-import org.bmsk.lifemash.calendar.data.api.dto.JoinGroupBody
-import org.bmsk.lifemash.calendar.data.api.dto.UpdateGroupNameBody
+import org.bmsk.lifemash.calendar.data.api.dto.toDomain
 import org.bmsk.lifemash.calendar.domain.model.Group
 import org.bmsk.lifemash.calendar.domain.model.GroupType
 import org.bmsk.lifemash.calendar.domain.repository.GroupRepository
+import org.bmsk.lifemash.model.calendar.CreateGroupRequest
+import org.bmsk.lifemash.model.calendar.JoinGroupRequest
+import org.bmsk.lifemash.model.calendar.UpdateGroupRequest
 
 internal class GroupRepositoryImpl(private val api: CalendarApi) : GroupRepository {
 
     override suspend fun createGroup(type: GroupType, name: String?): Group =
-        api.createGroup(CreateGroupBody(type = type, name = name)).toDomain()
+        api.createGroup(CreateGroupRequest(type = type.name, name = name)).toDomain()
 
     override suspend fun joinGroup(inviteCode: String): Group =
-        api.joinGroup(JoinGroupBody(inviteCode = inviteCode)).toDomain()
+        api.joinGroup(JoinGroupRequest(inviteCode = inviteCode)).toDomain()
 
     override suspend fun getMyGroups(): List<Group> =
         api.getMyGroups().map { it.toDomain() }
@@ -26,5 +27,5 @@ internal class GroupRepositoryImpl(private val api: CalendarApi) : GroupReposito
         api.deleteGroup(groupId)
 
     override suspend fun updateGroupName(groupId: String, name: String): Group =
-        api.updateGroupName(groupId, UpdateGroupNameBody(name)).toDomain()
+        api.updateGroupName(groupId, UpdateGroupRequest(name)).toDomain()
 }

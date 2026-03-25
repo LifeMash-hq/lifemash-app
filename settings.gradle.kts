@@ -73,3 +73,8 @@ include(
     ":shared:webview",
     ":shared:fcm",
 )
+
+// Backend
+include(":backend:api")
+include(":backend:stub")
+include(":backend:server")

@@ -10,6 +10,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.shared.model)
             implementation(projects.feature.auth.domain)
             implementation(libs.coroutines.core)
             implementation(libs.kotlinx.serialization.json)

@@ -8,11 +8,11 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import org.bmsk.lifemash.assistant.data.api.dto.ApiKeyStatusResponseDto
-import org.bmsk.lifemash.assistant.data.api.dto.ConversationDetailDto
-import org.bmsk.lifemash.assistant.data.api.dto.ConversationDto
-import org.bmsk.lifemash.assistant.data.api.dto.SaveApiKeyRequestDto
-import org.bmsk.lifemash.assistant.data.api.dto.UsageResponseDto
+import org.bmsk.lifemash.model.assistant.ApiKeyStatusResponse
+import org.bmsk.lifemash.model.assistant.ConversationDetailDto
+import org.bmsk.lifemash.model.assistant.ConversationDto
+import org.bmsk.lifemash.model.assistant.SaveApiKeyRequest
+import org.bmsk.lifemash.model.assistant.UsageResponse
 
 internal class AssistantApi(private val client: HttpClient) {
 
@@ -33,16 +33,16 @@ internal class AssistantApi(private val client: HttpClient) {
     suspend fun saveApiKey(apiKey: String): Unit =
         client.put("$base/api-key") {
             contentType(ContentType.Application.Json)
-            setBody(SaveApiKeyRequestDto(apiKey))
+            setBody(SaveApiKeyRequest(apiKey))
         }.body()
 
     suspend fun deleteApiKey(): Unit =
         client.delete("$base/api-key").body()
 
-    suspend fun getApiKeyStatus(): ApiKeyStatusResponseDto =
+    suspend fun getApiKeyStatus(): ApiKeyStatusResponse =
         client.get("$base/api-key/status").body()
 
-    suspend fun getUsage(date: String?): UsageResponseDto =
+    suspend fun getUsage(date: String?): UsageResponse =
         client.get("$base/usage") {
             date?.let { url.parameters.append("date", it) }
         }.body()

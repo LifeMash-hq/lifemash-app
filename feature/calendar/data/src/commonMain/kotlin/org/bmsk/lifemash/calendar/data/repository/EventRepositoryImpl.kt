@@ -3,12 +3,13 @@ package org.bmsk.lifemash.calendar.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.bmsk.lifemash.calendar.data.api.CalendarApi
-import org.bmsk.lifemash.calendar.data.api.dto.CreateEventBody
-import org.bmsk.lifemash.calendar.data.api.dto.UpdateEventBody
+import org.bmsk.lifemash.calendar.data.api.dto.toDomain
 import org.bmsk.lifemash.calendar.domain.model.Event
 import org.bmsk.lifemash.calendar.domain.repository.CreateEventRequest
 import org.bmsk.lifemash.calendar.domain.repository.EventRepository
 import org.bmsk.lifemash.calendar.domain.repository.UpdateEventRequest
+import org.bmsk.lifemash.model.calendar.CreateEventRequest as CreateEventBody
+import org.bmsk.lifemash.model.calendar.UpdateEventRequest as UpdateEventBody
 
 internal class EventRepositoryImpl(private val api: CalendarApi) : EventRepository {
 

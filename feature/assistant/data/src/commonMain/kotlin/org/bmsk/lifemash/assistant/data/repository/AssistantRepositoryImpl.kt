@@ -2,14 +2,15 @@ package org.bmsk.lifemash.assistant.data.repository
 
 import org.bmsk.lifemash.assistant.data.api.AssistantApi
 import org.bmsk.lifemash.assistant.data.api.SseClient
-import org.bmsk.lifemash.assistant.data.api.dto.ChatRequestDto
-import org.bmsk.lifemash.assistant.data.api.dto.InstalledBlockDto
+import org.bmsk.lifemash.assistant.data.api.dto.toDomain
+import org.bmsk.lifemash.assistant.data.api.dto.toRequest
 import org.bmsk.lifemash.assistant.domain.model.AssistantUsage
 import org.bmsk.lifemash.assistant.domain.model.ChatMessage
 import org.bmsk.lifemash.assistant.domain.model.Conversation
 import org.bmsk.lifemash.assistant.domain.model.InstalledBlock
 import org.bmsk.lifemash.assistant.domain.model.SseEvent
 import org.bmsk.lifemash.assistant.domain.repository.AssistantRepository
+import org.bmsk.lifemash.model.assistant.ChatRequest
 
 internal class AssistantRepositoryImpl(
     private val api: AssistantApi,
@@ -23,10 +24,10 @@ internal class AssistantRepositoryImpl(
         onEvent: suspend (SseEvent) -> Unit,
     ) {
         sseClient.streamChat(
-            ChatRequestDto(
+            ChatRequest(
                 message = message,
                 conversationId = conversationId,
-                installedBlocks = installedBlocks.map { InstalledBlockDto(it.id, it.url) },
+                installedBlocks = installedBlocks.map { it.toRequest() },
             ),
         ) { dto ->
             onEvent(dto.toDomain())

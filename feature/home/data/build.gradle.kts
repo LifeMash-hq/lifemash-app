@@ -10,6 +10,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.shared.model)
             implementation(projects.feature.home.api)
             implementation(projects.feature.home.domain)
             implementation(libs.coroutines.core)

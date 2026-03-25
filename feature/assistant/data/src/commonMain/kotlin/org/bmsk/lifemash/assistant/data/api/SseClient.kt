@@ -13,14 +13,14 @@ import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.serialization.json.Json
-import org.bmsk.lifemash.assistant.data.api.dto.ChatRequestDto
-import org.bmsk.lifemash.assistant.data.api.dto.SseEventDto
+import org.bmsk.lifemash.model.assistant.ChatRequest
+import org.bmsk.lifemash.model.assistant.SseEvent
 
 internal class SseClient(private val client: HttpClient) {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun streamChat(request: ChatRequestDto, onEvent: suspend (SseEventDto) -> Unit) {
+    suspend fun streamChat(request: ChatRequest, onEvent: suspend (SseEvent) -> Unit) {
         client.preparePost("/api/v1/assistant/chat") {
             contentType(ContentType.Application.Json)
             setBody(request)
@@ -38,7 +38,7 @@ internal class SseClient(private val client: HttpClient) {
                 if (line.startsWith("data: ")) {
                     val data = line.removePrefix("data: ")
                     if (data == "[DONE]") break
-                    val event = runCatching { json.decodeFromString<SseEventDto>(data) }.getOrNull()
+                    val event = runCatching { json.decodeFromString<SseEvent>(data) }.getOrNull()
                     if (event != null) {
                         onEvent(event)
                     }

@@ -2,6 +2,7 @@ package org.bmsk.lifemash.auth.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import org.bmsk.lifemash.auth.data.api.AuthApi
+import org.bmsk.lifemash.auth.data.api.dto.toDomain
 import org.bmsk.lifemash.auth.data.storage.TokenStorage
 import org.bmsk.lifemash.auth.domain.model.AuthToken
 import org.bmsk.lifemash.auth.domain.model.AuthUser

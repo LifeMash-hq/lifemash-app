@@ -9,16 +9,15 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import org.bmsk.lifemash.calendar.data.api.dto.CommentDto
-import org.bmsk.lifemash.calendar.data.api.dto.CreateCommentBody
-import org.bmsk.lifemash.calendar.data.api.dto.CreateEventBody
-import org.bmsk.lifemash.calendar.data.api.dto.CreateGroupBody
-import org.bmsk.lifemash.calendar.data.api.dto.EventDto
-import org.bmsk.lifemash.calendar.data.api.dto.GroupDto
-import org.bmsk.lifemash.calendar.data.api.dto.JoinGroupBody
-import org.bmsk.lifemash.calendar.data.api.dto.UpdateEventBody
-import org.bmsk.lifemash.calendar.data.api.dto.UpdateGroupNameBody
-import org.bmsk.lifemash.calendar.domain.model.GroupType
+import org.bmsk.lifemash.model.calendar.CommentDto
+import org.bmsk.lifemash.model.calendar.CreateCommentRequest
+import org.bmsk.lifemash.model.calendar.CreateEventRequest
+import org.bmsk.lifemash.model.calendar.CreateGroupRequest
+import org.bmsk.lifemash.model.calendar.EventDto
+import org.bmsk.lifemash.model.calendar.GroupDto
+import org.bmsk.lifemash.model.calendar.JoinGroupRequest
+import org.bmsk.lifemash.model.calendar.UpdateEventRequest
+import org.bmsk.lifemash.model.calendar.UpdateGroupRequest
 
 internal class CalendarApi(private val client: HttpClient) {
 
@@ -30,13 +29,13 @@ internal class CalendarApi(private val client: HttpClient) {
             url.parameters.append("month", month.toString())
         }.body()
 
-    suspend fun createEvent(groupId: String, body: CreateEventBody): EventDto =
+    suspend fun createEvent(groupId: String, body: CreateEventRequest): EventDto =
         client.post("$base/$groupId/events") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }.body()
 
-    suspend fun updateEvent(groupId: String, eventId: String, body: UpdateEventBody): EventDto =
+    suspend fun updateEvent(groupId: String, eventId: String, body: UpdateEventRequest): EventDto =
         client.patch("$base/$groupId/events/$eventId") {
             contentType(ContentType.Application.Json)
             setBody(body)
@@ -45,13 +44,13 @@ internal class CalendarApi(private val client: HttpClient) {
     suspend fun deleteEvent(groupId: String, eventId: String): Unit =
         client.delete("$base/$groupId/events/$eventId").body()
 
-    suspend fun createGroup(body: CreateGroupBody): GroupDto =
+    suspend fun createGroup(body: CreateGroupRequest): GroupDto =
         client.post("$base/groups") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }.body()
 
-    suspend fun joinGroup(body: JoinGroupBody): GroupDto =
+    suspend fun joinGroup(body: JoinGroupRequest): GroupDto =
         client.post("$base/groups/join") {
             contentType(ContentType.Application.Json)
             setBody(body)
@@ -66,7 +65,7 @@ internal class CalendarApi(private val client: HttpClient) {
     suspend fun deleteGroup(groupId: String): Unit =
         client.delete("$base/groups/$groupId").body()
 
-    suspend fun updateGroupName(groupId: String, body: UpdateGroupNameBody): GroupDto =
+    suspend fun updateGroupName(groupId: String, body: UpdateGroupRequest): GroupDto =
         client.patch("$base/groups/$groupId") {
             contentType(ContentType.Application.Json)
             setBody(body)
@@ -75,7 +74,7 @@ internal class CalendarApi(private val client: HttpClient) {
     suspend fun getComments(groupId: String, eventId: String): List<CommentDto> =
         client.get("$base/$groupId/events/$eventId/comments").body()
 
-    suspend fun createComment(groupId: String, eventId: String, body: CreateCommentBody): CommentDto =
+    suspend fun createComment(groupId: String, eventId: String, body: CreateCommentRequest): CommentDto =
         client.post("$base/$groupId/events/$eventId/comments") {
             contentType(ContentType.Application.Json)
             setBody(body)

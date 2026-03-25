@@ -3,20 +3,9 @@ package org.bmsk.lifemash.home.data.repository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import kotlinx.serialization.Serializable
 import org.bmsk.lifemash.home.api.MarketplaceBlockInfo
 import org.bmsk.lifemash.home.domain.repository.MarketplaceRepository
-
-@Serializable
-private data class MarketplaceBlockDto(
-    val id: String,
-    val name: String,
-    val url: String,
-    val description: String?,
-    val iconUrl: String?,
-    val status: String,
-    val createdAt: Long,
-)
+import org.bmsk.lifemash.model.marketplace.MarketplaceBlockDto
 
 class MarketplaceRepositoryImpl(
     private val client: HttpClient,

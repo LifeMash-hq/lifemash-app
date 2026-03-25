@@ -1,0 +1,23 @@
+name: Backend CI
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - 'shared/model/**'
+    branches: [main]
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'shared/model/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :shared:model:build :backend:api:build :backend:stub:build :backend:server:build
