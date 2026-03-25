@@ -1,85 +1,139 @@
-# 🚀 LifeMash News App
+# LifeMash
 
-[![](https://img.shields.io/badge/Android-11.0%2B-green)]()
-[![](https://img.shields.io/badge/license-MIT-lightgrey)]()
+KMP(Kotlin Multiplatform) 기반 모바일 앱 + Ktor 백엔드를 하나의 모노레포로 관리하는 프로젝트입니다.
 
-다양한 언론사의 뉴스를 모아보고, 관심 있는 기사를 스크랩할 수 있는 뉴스 앱입니다.
+## Architecture
 
-<br>
+### Module Structure
 
-## 📱 스크린샷 & 주요 기능
+```mermaid
+flowchart LR
+    subgraph SHARED["Shared Layer"]
+        MODEL["shared:model\nKMP DTO"]
+    end
 
-|                              홈 (피드)                               | 검색 | 스크랩 |
-|:-----------------------------------------------------------------:|:---:|:---:|
-| <img src=".README_images/screen_recording_feed.gif" width="250"/> | | |
+    subgraph BACKEND["Backend Layer"]
+        API["backend:api\nInterfaces"]
+        STUB["backend:stub\nDemo"]
+        SERVER["backend:server\nKtor"]
+    end
 
-*   **뉴스 피드**: 주요 언론사의 최신 뉴스를 받아볼 수 있습니다.
-*   **기사 검색**: 키워드를 통해 원하는 뉴스를 빠르게 검색할 수 있습니다.
-*   **스크랩**: 나중에 다시 보고 싶은 기사를 저장하고 관리할 수 있습니다.
-*   **웹뷰**: 앱 내에서 편안하게 기사 원문을 확인할 수 있습니다.
+    subgraph PRIVATE["Private"]
+        CORE["lifemash-core\nImplementations"]
+    end
 
-<br>
+    subgraph CLIENT["App Layer"]
+        DATA["feature:*/data"]
+        DOMAIN["feature:*/domain"]
+        UI["feature:*/ui"]
+        MAIN["feature:main"]
+        TARGETS{{"Android / iOS"}}
+    end
 
-## 🏛️ 기술 스택 및 아키텍처
+    MODEL --> API
+    MODEL --> DATA
 
-이 프로젝트는 **Android Clean Architecture**와 **Domain-Driven Design (DDD)** 원칙을 기반으로 한 **Multi-Module** 구조로 설계되었습니다.
+    API --> STUB
+    API --> CORE
+    API --> SERVER
 
-*   **Architecture**:
-    *   MVVM (Model-View-ViewModel)
-    *   Clean Architecture & Domain-Driven Design (DDD)
-    *   Dependency Injection (Hilt)
-*   **UI**:
-    *   Jetpack Compose & Material Design 3
-    *   Coroutines & Flow for Asynchronous tasks
-*   **Libraries**:
-    *   Retrofit2 & OkHttp3 for Networking
-    *   Room for Local Database
-*   **Static Analysis**:
-    *   Detekt
-*   **CI/CD**:
-    *   GitHub Actions
+    STUB -.->|"fallback"| SERVER
+    CORE -.->|"production"| SERVER
 
-<br>
+    DATA --> DOMAIN --> UI --> MAIN --> TARGETS
 
-## 📂 모듈 구조
+    style MODEL fill:#4CAF50,color:#fff,stroke:#388E3C
+    style API fill:#2196F3,color:#fff,stroke:#1565C0
+    style STUB fill:#FF9800,color:#fff,stroke:#E65100
+    style SERVER fill:#9C27B0,color:#fff,stroke:#6A1B9A
+    style CORE fill:#F44336,color:#fff,stroke:#C62828
+    style DATA fill:#455A64,color:#fff,stroke:#263238
+    style DOMAIN fill:#546E7A,color:#fff,stroke:#37474F
+    style UI fill:#607D8B,color:#fff,stroke:#455A64
+    style MAIN fill:#78909C,color:#fff,stroke:#546E7A
+    style TARGETS fill:#00BCD4,color:#fff,stroke:#00838F
+```
 
-프로젝트는 각 계층과 기능에 따라 여러 모듈로 분리되어 코드의 재사용성을 높이고, 빌드 시간을 단축하며, 유지보수를 용이하게 합니다.
+### Request Flow
 
-### 아키텍처 컨셉 (Clean Architecture)
+```mermaid
+sequenceDiagram
+    participant App as Android / iOS
+    participant Data as feature:*/data
+    participant Net as shared:network
+    participant Route as backend:server
+    participant Svc as AuthService (Interface)
+    participant Impl as lifemash-core or Stub
 
-아래 다이어그램은 이 프로젝트가 따르는 클린 아키텍처의 기본 구조를 보여줍니다. 의존성 규칙에 따라 외부 계층(UI)이 내부 계층(Domain)에 의존하며, Domain 계층은 다른 어떤 계층에도 의존하지 않습니다.
+    App->>Data: 카카오 로그인
+    Data->>Net: POST /api/v1/auth/kakao
+    Net->>Route: HTTP Request
+    Route->>Svc: inject<AuthService>()
+    Svc->>Impl: signInWithKakao()
+    Impl-->>Svc: AuthTokenDto
+    Svc-->>Route: Response
+    Route-->>Net: JSON
+    Net-->>Data: AuthTokenDto
+    Data-->>App: AuthToken (Domain)
+```
 
-![아키텍처 다이어그램](.README_images/arch.png)
+### Dependency Direction
 
-*   **UI Layer (`:feature:xyz`)**: 화면(UI)과 ViewModel을 담당합니다. 사용자의 입력을 받아 `Domain` 계층의 UseCase를 호출하고, 그 결과를 UI 모델로 변환하여 화면에 표시합니다.
-*   **Domain Layer (`:domain:feature-xyz`)**: 순수한 비즈니스 로직을 포함합니다. UseCase, Domain Model, Repository 인터페이스로 구성되며, Android 프레임워크에 대한 의존성이 없습니다.
-*   **Data Layer (`:data:xyz`)**: `Domain` 계층의 Repository 인터페이스를 구현합니다. 데이터를 가져오는 역할을 담당합니다.
+```mermaid
+flowchart LR
+    A["shared:model"] --> B["backend:api"]
+    B --> C["lifemash-core"]
+    C --> D["backend:server"]
+    B --> E["backend:stub"]
+    E --> D
 
-### 전체 모듈 의존성
+    style A fill:#4CAF50,color:#fff,stroke:#388E3C
+    style B fill:#2196F3,color:#fff,stroke:#1565C0
+    style C fill:#F44336,color:#fff,stroke:#C62828
+    style D fill:#9C27B0,color:#fff,stroke:#6A1B9A
+    style E fill:#FF9800,color:#fff,stroke:#E65100
+```
 
-아래는 현재 프로젝트의 모든 모듈 간의 상세 의존성 그래프입니다.
+## Modules
 
-<img src=".README_images/project.dot.png" width="80%"/>
+| Module | Type | Description |
+|--------|------|-------------|
+| `shared:model` | KMP | 앱 ↔ 백엔드 공통 DTO |
+| `shared:network` | KMP | Ktor HttpClient (OkHttp / Darwin) |
+| `shared:designsystem` | KMP | Material3 디자인 토큰, 공통 Composable |
+| `backend:api` | JVM | 서비스/레포지토리/클라이언트 인터페이스 |
+| `backend:stub` | JVM | 인터페이스 데모 구현체 (공개 빌드용) |
+| `backend:server` | JVM | Ktor Routes, Plugins, Koin DI |
+| `feature:auth` | KMP | 카카오/구글 소셜 로그인 |
+| `feature:calendar` | KMP | 캘린더 이벤트/그룹/댓글 |
+| `feature:assistant` | KMP | AI 어시스턴트 (Claude API) |
+| `feature:home` | KMP | 홈 블록 + 마켓플레이스 |
+| `feature:notification` | KMP | 키워드 알림 + FCM |
 
-*   **`app`**: 모든 모듈을 통합하고 최종 Android 애플리케이션을 빌드하는 메인 모듈입니다.
-*   **`feature`**: 각 화면(UI)과 ViewModel을 담당하는 모듈입니다.
-*   **`domain`**: 순수한 Kotlin으로 작성된 비즈니스 로직(UseCase, Entity)을 포함합니다. Android 프레임워크에 대한 의존성이 없습니다.
-*   **`data`**: `domain` 계층의 Repository 인터페이스를 구현하며, 네트워크(API) 또는 로컬 데이터베이스(Room) 등 데이터 소스를 관리합니다.
-*   **`core`**: 여러 모듈에서 공통으로 사용되는 `Design System`, `Network` 모듈, 데이터 모델 등을 포함합니다.
-*   **`build-logic`**: Gradle Convention Plugin을 사용하여 모듈별 의존성 관리를 중앙화합니다.
+## Tech Stack
 
-<br>
+- **Kotlin Multiplatform** — Android + iOS 단일 코드베이스
+- **Compose Multiplatform** — 선언적 UI
+- **Ktor** — 클라이언트 (앱) + 서버 (백엔드)
+- **Exposed** — Kotlin SQL ORM
+- **Koin** — 멀티플랫폼 DI
+- **PostgreSQL** — Neon (Serverless)
+- **Firebase** — Analytics, Crashlytics, FCM
+- **GitHub Packages** — 모듈 간 아티팩트 배포
 
-## 🚀 시작하기
+## Build
 
-### APK 다운로드
+```bash
+# 전체 백엔드 빌드
+./gradlew :backend:server:build
 
-`google-services.json` 파일이 없어 직접 빌드에 어려움이 있을 수 있습니다. CI를 통해 빌드된 최신 APK 파일을 아래 링크에서 다운로드하여 앱을 바로 설치하고 테스트해볼 수 있습니다.
+# Android 앱 빌드
+./gradlew :app:assembleDebug
 
-*   **[➡️ 최신 APK 다운로드 (GitHub Releases)](https://github.com/your-username/LifeMash-NewsApp/releases)**
+# 백엔드 로컬 실행
+./gradlew :backend:server:run
+```
 
-<br>
+## License
 
-## 📄 라이선스
-
-이 프로젝트는 [LICENSE](LICENSE) 파일에 명시된 MIT 라이선스 정책을 따릅니다.
+[MIT](LICENSE)
