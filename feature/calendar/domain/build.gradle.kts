@@ -10,6 +10,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":shared:validation"))
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.coroutines.core)
             implementation(libs.kotlinx.datetime)

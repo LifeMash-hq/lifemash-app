@@ -15,6 +15,9 @@ dependencies {
     // Backend API (service/repository interfaces)
     implementation(project(":backend:api"))
 
+    // Shared validation (Value Objects + business constants)
+    implementation(project(":shared:validation"))
+
     // Backend Stub (데모 구현체, core 없을 때 fallback)
     implementation(project(":backend:stub"))
 

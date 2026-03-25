@@ -7,6 +7,8 @@ import org.bmsk.lifemash.util.toKotlinxInstant
 import org.bmsk.lifemash.db.tables.GroupMembers
 import org.bmsk.lifemash.db.tables.Groups
 import org.bmsk.lifemash.db.tables.Users
+import org.bmsk.lifemash.validation.GroupLimits
+import org.bmsk.lifemash.validation.InviteCode
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,11 +20,8 @@ class ExposedGroupRepository : GroupRepository {
 
     override fun create(userId: UUID, type: String, name: String?): GroupDto = transaction {
         val now = now()
-        val maxMembers = when (type) {
-            "COUPLE" -> 2
-            else -> 50
-        }
-        val inviteCode = generateInviteCode()
+        val maxMembers = GroupLimits.maxMembers(type)
+        val inviteCode = InviteCode.generate().value
 
         val groupId = Groups.insert {
             it[Groups.name] = name
@@ -132,11 +131,6 @@ class ExposedGroupRepository : GroupRepository {
             it[Groups.name] = name
         }
         findById(groupId) ?: throw org.bmsk.lifemash.plugins.NotFoundException("그룹을 찾을 수 없습니다")
-    }
-
-    private fun generateInviteCode(): String {
-        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return (1..8).map { chars.random() }.joinToString("")
     }
 
     private fun now(): OffsetDateTime =

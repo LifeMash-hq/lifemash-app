@@ -3,6 +3,7 @@ package org.bmsk.lifemash.fake
 import kotlinx.datetime.LocalDate
 import org.bmsk.lifemash.assistant.AssistantUsageRepository
 import org.bmsk.lifemash.model.assistant.UsageResponse
+import org.bmsk.lifemash.validation.AssistantLimits
 import java.util.*
 
 class FakeAssistantUsageRepository : AssistantUsageRepository {
@@ -17,7 +18,7 @@ class FakeAssistantUsageRepository : AssistantUsageRepository {
             inputTokens = d?.inputTokens ?: 0,
             outputTokens = d?.outputTokens ?: 0,
             requestCount = d?.requestCount ?: 0,
-            dailyLimit = AssistantUsageRepository.DAILY_REQUEST_LIMIT,
+            dailyLimit = AssistantLimits.DAILY_REQUEST_LIMIT,
         )
     }
 

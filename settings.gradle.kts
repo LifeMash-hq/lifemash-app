@@ -72,6 +72,7 @@ include(
     ":shared:common",
     ":shared:webview",
     ":shared:fcm",
+    ":shared:validation",
 )
 
 // Backend

@@ -3,6 +3,7 @@ package org.bmsk.lifemash.assistant.domain.usecase
 import org.bmsk.lifemash.assistant.domain.model.InstalledBlock
 import org.bmsk.lifemash.assistant.domain.model.SseEvent
 import org.bmsk.lifemash.assistant.domain.repository.AssistantRepository
+import org.bmsk.lifemash.validation.ChatMessageContent
 
 interface SendMessageUseCase {
     suspend operator fun invoke(
@@ -21,5 +22,8 @@ class SendMessageUseCaseImpl(
         conversationId: String?,
         installedBlocks: List<InstalledBlock>,
         onEvent: suspend (SseEvent) -> Unit,
-    ) = repository.sendMessage(message, conversationId, installedBlocks, onEvent)
+    ) {
+        ChatMessageContent.of(message)
+        repository.sendMessage(message, conversationId, installedBlocks, onEvent)
+    }
 }

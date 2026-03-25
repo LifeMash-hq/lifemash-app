@@ -6,6 +6,7 @@ import org.bmsk.lifemash.model.calendar.JoinGroupRequest
 import org.bmsk.lifemash.model.calendar.UpdateGroupRequest
 import org.bmsk.lifemash.plugins.ForbiddenException
 import org.bmsk.lifemash.plugins.NotFoundException
+import org.bmsk.lifemash.validation.GroupName
 import java.util.*
 
 /**
@@ -44,6 +45,6 @@ class GroupServiceImpl(private val repository: GroupRepository) : GroupService {
             ?: throw ForbiddenException("그룹 멤버가 아닙니다")
         if (member.role != "OWNER") throw ForbiddenException("그룹장만 이름을 변경할 수 있습니다")
 
-        return repository.updateName(groupId, name.asString())
+        return repository.updateName(groupId, name.value)
     }
 }

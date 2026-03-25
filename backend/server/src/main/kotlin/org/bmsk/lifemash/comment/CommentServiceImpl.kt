@@ -5,6 +5,7 @@ import org.bmsk.lifemash.model.calendar.CreateCommentRequest
 import org.bmsk.lifemash.group.GroupRepository
 import org.bmsk.lifemash.notification.FcmService
 import org.bmsk.lifemash.plugins.ForbiddenException
+import org.bmsk.lifemash.validation.CommentContent
 import java.util.*
 
 /**
@@ -24,6 +25,7 @@ class CommentServiceImpl(
 
     /** 댓글 생성 후 그룹 내 다른 멤버에게 "새 댓글" 알림 발송 */
     override fun create(groupId: String, userId: String, eventId: String, request: CreateCommentRequest): CommentDto {
+        CommentContent.of(request.content)
         requireMembership(groupId, userId)
         val comment = commentRepository.create(UUID.fromString(eventId), UUID.fromString(userId), request.content)
         fcmService.notifyGroupExcept(UUID.fromString(groupId), UUID.fromString(userId), "새 댓글", request.content)

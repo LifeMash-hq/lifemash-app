@@ -6,6 +6,7 @@ import org.bmsk.lifemash.model.calendar.UpdateEventRequest
 import org.bmsk.lifemash.group.GroupRepository
 import org.bmsk.lifemash.notification.FcmService
 import org.bmsk.lifemash.plugins.ForbiddenException
+import org.bmsk.lifemash.validation.EventTitle
 import java.util.*
 
 /**
@@ -28,6 +29,7 @@ class EventServiceImpl(
 
     /** 일정 생성 후 그룹 내 다른 멤버에게 "새 일정" 알림 발송 */
     override fun create(groupId: String, userId: String, request: CreateEventRequest): EventDto {
+        EventTitle.of(request.title)
         requireMembership(groupId, userId)
         val event = eventRepository.create(UUID.fromString(groupId), UUID.fromString(userId), request)
         // 작성자 본인은 제외하고 나머지 멤버에게 알림

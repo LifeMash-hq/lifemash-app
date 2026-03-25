@@ -2,6 +2,7 @@ package org.bmsk.lifemash.assistant
 
 import kotlinx.datetime.LocalDate
 import org.bmsk.lifemash.model.assistant.UsageResponse
+import org.bmsk.lifemash.validation.AssistantLimits
 import org.bmsk.lifemash.db.tables.AssistantUsage
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -19,7 +20,7 @@ class ExposedAssistantUsageRepository : AssistantUsageRepository {
             inputTokens = row?.get(AssistantUsage.inputTokens) ?: 0,
             outputTokens = row?.get(AssistantUsage.outputTokens) ?: 0,
             requestCount = row?.get(AssistantUsage.requestCount) ?: 0,
-            dailyLimit = AssistantUsageRepository.DAILY_REQUEST_LIMIT,
+            dailyLimit = AssistantLimits.DAILY_REQUEST_LIMIT,
         )
     }
 

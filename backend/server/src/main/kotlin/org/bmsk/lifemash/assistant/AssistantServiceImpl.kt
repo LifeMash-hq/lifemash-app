@@ -15,6 +15,8 @@ import org.bmsk.lifemash.model.assistant.UsageInfo
 import org.bmsk.lifemash.model.assistant.UsageResponse
 import org.bmsk.lifemash.marketplace.MarketplaceRepository
 import org.bmsk.lifemash.plugins.BadRequestException
+import org.bmsk.lifemash.validation.AssistantLimits
+import org.bmsk.lifemash.validation.ChatMessageContent
 import java.util.*
 
 /**
@@ -51,10 +53,7 @@ class AssistantServiceImpl(
         emitEvent: suspend (SseEvent) -> Unit,
     ) {
         val userUuid = UUID.fromString(userId)
-        val message = request.message.trim()
-
-        if (message.isEmpty()) throw BadRequestException("메시지를 입력해 주세요.")
-        if (message.length > MAX_MESSAGE_LENGTH) throw BadRequestException("메시지는 ${MAX_MESSAGE_LENGTH}자 이내로 입력해 주세요.")
+        val message = ChatMessageContent.of(request.message).value
 
         val userApiKey = apiKeyRepository.getDecryptedApiKey(userUuid)
         val apiKey = userApiKey ?: serverApiKey
@@ -63,8 +62,8 @@ class AssistantServiceImpl(
         if (userApiKey == null) {
             val today = Clock.System.todayIn(TimeZone.UTC)
             val requestCount = usageRepository.getRequestCount(userUuid, today)
-            if (requestCount >= AssistantUsageRepository.DAILY_REQUEST_LIMIT) {
-                throw BadRequestException("일일 사용 한도(${AssistantUsageRepository.DAILY_REQUEST_LIMIT}회)를 초과했습니다. 직접 API 키를 등록하면 무제한으로 사용할 수 있습니다.")
+            if (requestCount >= AssistantLimits.DAILY_REQUEST_LIMIT) {
+                throw BadRequestException("일일 사용 한도(${AssistantLimits.DAILY_REQUEST_LIMIT}회)를 초과했습니다. 직접 API 키를 등록하면 무제한으로 사용할 수 있습니다.")
             }
         }
 
@@ -357,7 +356,6 @@ class AssistantServiceImpl(
 
     companion object {
         private const val MAX_TOOL_CALLS = 5
-        private const val MAX_MESSAGE_LENGTH = 2000
 
         private const val SYSTEM_PROMPT = """당신은 LifeMash 플랫폼의 AI 어시스턴트입니다.
 사용자의 캘린더 일정, 그룹 정보를 조회하고 관리할 수 있습니다.

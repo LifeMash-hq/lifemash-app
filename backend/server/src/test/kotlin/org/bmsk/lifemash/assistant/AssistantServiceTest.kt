@@ -58,17 +58,17 @@ class AssistantServiceTest {
     }
 
     @Test
-    fun `빈 메시지는 BadRequestException을 발생시킨다`() = runTest {
+    fun `빈 메시지는 IllegalArgumentException을 발생시킨다`() = runTest {
         // When & Then
-        assertFailsWith<BadRequestException> {
+        assertFailsWith<IllegalArgumentException> {
             service.chat(userId.toString(), ChatRequest(message = "   ")) {}
         }
     }
 
     @Test
-    fun `2000자 초과 메시지는 BadRequestException을 발생시킨다`() = runTest {
+    fun `2000자 초과 메시지는 IllegalArgumentException을 발생시킨다`() = runTest {
         // When & Then
-        assertFailsWith<BadRequestException> {
+        assertFailsWith<IllegalArgumentException> {
             service.chat(userId.toString(), ChatRequest(message = "a".repeat(2001))) {}
         }
     }
