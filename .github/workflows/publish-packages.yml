@@ -4,7 +4,7 @@ on:
     paths:
       - 'shared/model/**'
       - 'backend/api/**'
-    branches: [main]
+    branches: [main, develop-2026]
 
 permissions:
   contents: read

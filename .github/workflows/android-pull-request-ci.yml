@@ -2,7 +2,7 @@ name: Android Pull Request CI
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop-2026 ]
 
 jobs:
   verify:

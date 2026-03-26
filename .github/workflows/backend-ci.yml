@@ -4,7 +4,7 @@ on:
     paths:
       - 'backend/**'
       - 'shared/model/**'
-    branches: [main]
+    branches: [main, develop-2026]
   pull_request:
     paths:
       - 'backend/**'
