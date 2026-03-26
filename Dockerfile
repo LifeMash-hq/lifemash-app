@@ -1,7 +1,7 @@
-FROM gradle:8.12-jdk17 AS build
+FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
 COPY . .
-RUN gradle :backend:server:installDist --no-daemon
+RUN rm -f gradle/gradle-daemon-jvm.properties && ./gradlew :backend:server:installDist --no-daemon
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
