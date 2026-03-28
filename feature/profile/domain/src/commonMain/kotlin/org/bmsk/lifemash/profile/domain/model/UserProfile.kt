@@ -1,0 +1,15 @@
+package org.bmsk.lifemash.profile.domain.model
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class UserProfile(
+    val id: String,
+    val email: String,
+    val nickname: String,
+    val bio: String? = null,
+    val profileImage: String? = null,
+    val followerCount: Int = 0,
+    val followingCount: Int = 0,
+    val isFollowing: Boolean = false,
+)
