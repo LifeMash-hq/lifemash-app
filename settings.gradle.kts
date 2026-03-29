@@ -51,17 +51,29 @@ include(
 )
 
 include(
-    ":feature:assistant:domain",
-    ":feature:assistant:data",
-    ":feature:assistant:api",
-    ":feature:assistant:ui",
+    ":feature:profile:api",
+    ":feature:profile:domain",
+    ":feature:profile:data",
+    ":feature:profile:ui",
 )
 
 include(
-    ":feature:home:api",
-    ":feature:home:domain",
-    ":feature:home:data",
-    ":feature:home:ui",
+    ":feature:event-detail:api",
+    ":feature:event-detail:ui",
+)
+
+include(
+    ":feature:feed:api",
+    ":feature:feed:domain",
+    ":feature:feed:data",
+    ":feature:feed:ui",
+)
+
+include(
+    ":feature:explore:api",
+    ":feature:explore:domain",
+    ":feature:explore:data",
+    ":feature:explore:ui",
 )
 
 include(
@@ -70,6 +82,5 @@ include(
     ":shared:navigation",
     ":shared:designsystem",
     ":shared:common",
-    ":shared:webview",
     ":shared:fcm",
 )
