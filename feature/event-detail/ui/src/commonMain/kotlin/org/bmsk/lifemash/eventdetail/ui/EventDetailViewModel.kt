@@ -64,14 +64,18 @@ class EventDetailViewModel : ViewModel() {
         )
     }
 
-    fun toggleJoin() {
-        val current = _uiState.value as? EventDetailUiState.Loaded ?: return
-        _uiState.value = current.copy(isJoined = !current.isJoined)
+    fun toggleJoin(loaded: EventDetailUiState.Loaded) {
+        _uiState.value = loaded.copy(isJoined = !loaded.isJoined)
     }
 
-    fun addComment(content: String) {
-        val current = _uiState.value as? EventDetailUiState.Loaded ?: return
-        val newComment = Comment(id = "new_${current.comments.size}", authorNickname = "나", content = content, createdAt = "방금")
-        _uiState.value = current.copy(comments = current.comments + newComment)
+    fun addComment(loaded: EventDetailUiState.Loaded, content: String) {
+        _uiState.value = loaded.copy(
+            comments = loaded.comments + Comment(
+                id = "new_${loaded.comments.size}",
+                authorNickname = "나",
+                content = content,
+                createdAt = "방금",
+            )
+        )
     }
 }
