@@ -19,7 +19,7 @@ fun LifeMashCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = color,
-        shape = RoundedCornerShape(LifeMashRadius.md),
+        shape = RoundedCornerShape(LifeMashRadius.lg),
         shadowElevation = 2.dp,
         content = content,
     )
@@ -38,7 +38,7 @@ fun LifeMashCard(
         enabled = enabled,
         modifier = modifier.fillMaxWidth(),
         color = color,
-        shape = RoundedCornerShape(LifeMashRadius.md),
+        shape = RoundedCornerShape(LifeMashRadius.lg),
         shadowElevation = 2.dp,
         content = content,
     )

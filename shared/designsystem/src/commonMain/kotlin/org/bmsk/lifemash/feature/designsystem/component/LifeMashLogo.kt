@@ -11,7 +11,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.bmsk.lifemash.feature.designsystem.theme.AccentCoral
+import org.bmsk.lifemash.feature.designsystem.theme.Primary
 import org.bmsk.lifemash.feature.designsystem.theme.TextPrimary
 
 @Composable
@@ -52,7 +52,7 @@ fun LifeMashLogo(modifier: Modifier = Modifier, size: Dp = 88.dp) {
                 .offset(x = 30.dp * scale, y = 30.dp * scale)
                 .size(28.dp * scale)
                 .clip(CircleShape)
-                .background(AccentCoral),
+                .background(Primary),
         )
     }
 }

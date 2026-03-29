@@ -2,43 +2,54 @@ package org.bmsk.lifemash.feature.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Background ──────────────────────────────────────────────────────────────
-internal val BgPage = Color(0xFFFFFFFF)
-internal val BgCard = Color(0xFFF6F7F8)
-internal val BgElevated = Color(0xFFEEF2F7)
+// ── Brand ───────────────────────────────────────────────────────────────────
+internal val Primary = Color(0xFF6C5CE7)
+internal val PrimaryLight = Color(0xFFF3F1FF)
+internal val PrimaryDark = Color(0xFF5A4BD1)
 
-// ── Text ────────────────────────────────────────────────────────────────────
+// ── Semantic ────────────────────────────────────────────────────────────────
+internal val Danger = Color(0xFFEF4444)
+internal val Success = Color(0xFF22C55E)
+internal val Warning = Color(0xFFF59E0B)
+internal val Info = Color(0xFF3B82F6)
+
+// ── Surface (Light) ─────────────────────────────────────────────────────────
+internal val BgPage = Color(0xFFFAFAFA)
+internal val Surface = Color(0xFFFFFFFF)
+internal val PageBg = Color(0xFFE8E8E8)
+internal val Divider = Color(0xFFF0F0F0)
+internal val ChipBg = Color(0xFFF0F0F0)
+internal val InputBg = Color(0xFFF0F0F0)
+internal val UnreadBg = Color(0xFFF8F6FF)
+internal val NavBg = Color(0xFFFFFFFF)
+internal val NavBorder = Color(0xFFF0F0F0)
+
+// ── Text (Light) ────────────────────────────────────────────────────────────
 internal val TextPrimary = Color(0xFF1A1A1A)
-internal val TextSecondary = Color(0xFF6B7280)
-internal val TextTertiary = Color(0xFF9CA3AF)
-internal val TextDisabled = Color(0xFFD1D5DB)
-
-// ── Accent ──────────────────────────────────────────────────────────────────
-internal val AccentSlate = Color(0xFF475569)
-internal val AccentCoral = Color(0xFFFF6B6B)
-internal val AccentGreen = Color(0xFF22C55E)
-internal val AccentIndigo = Color(0xFF6366F1)
-internal val AccentYellow = Color(0xFFFCD34D)
-internal val AccentBlue = Color(0xFF3B82F6)
-internal val AccentOrange = Color(0xFFF97316)
-internal val AccentTeal = Color(0xFF14B8A6)
-
-// ── Border ──────────────────────────────────────────────────────────────────
-internal val BorderDefault = Color(0xFFF0F0F0)
+internal val TextSecondary = Color(0xFF888888)
+internal val TextDisabled = Color(0xFFBBBBBB)
 
 // ── Calendar ────────────────────────────────────────────────────────────────
 internal val CalendarSun = Color(0xFFFFADAD)
 internal val CalendarSat = Color(0xFFAEC6F0)
 
-// ── Dark surface (dark theme) ───────────────────────────────────────────────
-internal val DarkSurface = Color(0xFF1A1A1A)
-internal val DarkSurfaceVariant = Color(0xFF2C2C2C)
-internal val DarkBorder = Color(0xFF3A3A3A)
-internal val DarkTextPrimary = Color(0xFFF1F5F9)
-internal val DarkTextSecondary = Color(0xFF94A3B8)
-internal val DarkAccentSlate = Color(0xFF94A3B8)
+// ── Dark: Brand ─────────────────────────────────────────────────────────────
+internal val DarkPrimary = Color(0xFF7B6CF0)
+internal val DarkPrimaryLight = Color(0xFF1E1A2E)
+internal val DarkPrimaryDark = Color(0xFF9B8FF5)
 
-// ── Error ────────────────────────────────────────────────────────────────────
-internal val ErrorRed = Color(0xFFBA1A1A)
-internal val ErrorRedContainer = Color(0xFFFFDAD6)
-internal val OnErrorRedContainer = Color(0xFF410002)
+// ── Dark: Surface ───────────────────────────────────────────────────────────
+internal val DarkBg = Color(0xFF161618)
+internal val DarkSurface = Color(0xFF1E1E22)
+internal val DarkPageBg = Color(0xFF0E0E10)
+internal val DarkDivider = Color(0xFF2A2A2C)
+internal val DarkChipBg = Color(0xFF2A2A2C)
+internal val DarkInputBg = Color(0xFF2A2A2C)
+internal val DarkUnreadBg = Color(0xFF1E1A2E)
+internal val DarkNavBg = Color(0xFF1E1E22)
+internal val DarkNavBorder = Color(0xFF2A2A2C)
+
+// ── Dark: Text ──────────────────────────────────────────────────────────────
+internal val DarkTextPrimary = Color(0xFFEAEAEA)
+internal val DarkTextSecondary = Color(0xFF666666)
+internal val DarkTextDisabled = Color(0xFF444444)
