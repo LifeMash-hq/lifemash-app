@@ -18,9 +18,11 @@ kotlin {
     }
 
     sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
         commonMain.dependencies {
             implementation(project(":shared:common"))
-            implementation(project(":shared:webview"))
             implementation(project(":shared:designsystem"))
             implementation(project(":shared:model"))
             implementation(project(":shared:network"))
@@ -37,14 +39,20 @@ kotlin {
             implementation(project(":feature:notification:data"))
             implementation(project(":feature:notification:api"))
             implementation(project(":feature:notification:ui"))
-            implementation(project(":feature:assistant:domain"))
-            implementation(project(":feature:assistant:data"))
-            implementation(project(":feature:assistant:api"))
-            implementation(project(":feature:assistant:ui"))
-            implementation(project(":feature:home:domain"))
-            implementation(project(":feature:home:data"))
-            implementation(project(":feature:home:api"))
-            implementation(project(":feature:home:ui"))
+            implementation(project(":feature:profile:domain"))
+            implementation(project(":feature:profile:data"))
+            implementation(project(":feature:profile:api"))
+            implementation(project(":feature:profile:ui"))
+            implementation(project(":feature:feed:domain"))
+            implementation(project(":feature:feed:data"))
+            implementation(project(":feature:feed:api"))
+            implementation(project(":feature:feed:ui"))
+            implementation(project(":feature:explore:domain"))
+            implementation(project(":feature:explore:data"))
+            implementation(project(":feature:explore:api"))
+            implementation(project(":feature:explore:ui"))
+            implementation(project(":feature:event-detail:api"))
+            implementation(project(":feature:event-detail:ui"))
 
             implementation(libs.compose.runtime)
             implementation(libs.compose.material.icons.extended)

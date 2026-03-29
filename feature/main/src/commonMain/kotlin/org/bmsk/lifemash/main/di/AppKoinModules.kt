@@ -2,21 +2,25 @@ package org.bmsk.lifemash.main.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import org.bmsk.lifemash.assistant.data.di.assistantDataModule
-import org.bmsk.lifemash.assistant.domain.di.assistantDomainModule
-import org.bmsk.lifemash.assistant.ui.di.assistantUiModule
 import org.bmsk.lifemash.auth.data.di.authDataModule
 import org.bmsk.lifemash.auth.domain.di.authDomainModule
 import org.bmsk.lifemash.auth.ui.di.authUiModule
 import org.bmsk.lifemash.calendar.data.di.calendarDataModule
 import org.bmsk.lifemash.calendar.domain.di.calendarDomainModule
 import org.bmsk.lifemash.calendar.ui.di.calendarUiModule
-import org.bmsk.lifemash.home.data.di.homeDataModule
-import org.bmsk.lifemash.home.ui.di.homeDomainModule
-import org.bmsk.lifemash.home.ui.di.homeUiModule
+import org.bmsk.lifemash.eventdetail.ui.di.eventDetailUiModule
+import org.bmsk.lifemash.explore.data.di.exploreDataModule
+import org.bmsk.lifemash.explore.domain.di.exploreDomainModule
+import org.bmsk.lifemash.explore.ui.di.exploreUiModule
+import org.bmsk.lifemash.feed.data.di.feedDataModule
+import org.bmsk.lifemash.feed.domain.di.feedDomainModule
+import org.bmsk.lifemash.feed.ui.di.feedUiModule
 import org.bmsk.lifemash.main.MainViewModel
 import org.bmsk.lifemash.notification.domain.di.notificationDomainModule
 import org.bmsk.lifemash.notification.ui.di.notificationUiModule
+import org.bmsk.lifemash.profile.data.di.profileDataModule
+import org.bmsk.lifemash.profile.domain.di.profileDomainModule
+import org.bmsk.lifemash.profile.ui.di.profileUiModule
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -45,10 +49,14 @@ fun appKoinModules(
     notificationDomainModule,
     notificationDataModule,
     notificationUiModule,
-    assistantDomainModule,
-    assistantDataModule,
-    assistantUiModule,
-    homeDomainModule,
-    homeDataModule,
-    homeUiModule,
+    profileDomainModule,
+    profileDataModule,
+    profileUiModule,
+    feedDomainModule,
+    feedDataModule,
+    feedUiModule,
+    exploreDomainModule,
+    exploreDataModule,
+    exploreUiModule,
+    eventDetailUiModule,
 )
