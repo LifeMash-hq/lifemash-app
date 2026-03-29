@@ -55,8 +55,8 @@ fun LifeMashBottomTabBar(
     onItemClick: (BottomNavItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val accentSlate = MaterialTheme.colorScheme.primary // #475569
-    val bgSurface = MaterialTheme.colorScheme.surface // #FFFFFF
+    val primary = MaterialTheme.colorScheme.primary
+    val bgSurface = MaterialTheme.colorScheme.surface
     val textSecondary = MaterialTheme.colorScheme.onSurfaceVariant
 
     Row(
@@ -77,12 +77,12 @@ fun LifeMashBottomTabBar(
                 label = "iconTint-${tab.route}",
             )
             val pillBg by animateColorAsState(
-                targetValue = if (isSelected) accentSlate else Color.Transparent,
+                targetValue = if (isSelected) primary else Color.Transparent,
                 animationSpec = tween(durationMillis = 200),
                 label = "pillBg-${tab.route}",
             )
             val labelColor by animateColorAsState(
-                targetValue = if (isSelected) accentSlate else textSecondary,
+                targetValue = if (isSelected) primary else textSecondary,
                 animationSpec = tween(durationMillis = 200),
                 label = "labelColor-${tab.route}",
             )
@@ -90,7 +90,7 @@ fun LifeMashBottomTabBar(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .clip(RoundedCornerShape(LifeMashRadius.pill))
+                    .clip(RoundedCornerShape(LifeMashRadius.full))
                     .clickable { onItemClick(tab) }
                     .padding(vertical = LifeMashSpacing.xxs),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -98,7 +98,7 @@ fun LifeMashBottomTabBar(
             ) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(LifeMashRadius.pill))
+                        .clip(RoundedCornerShape(LifeMashRadius.full))
                         .background(pillBg)
                         .padding(horizontal = LifeMashSpacing.md, vertical = LifeMashSpacing.xxs),
                     contentAlignment = Alignment.Center,

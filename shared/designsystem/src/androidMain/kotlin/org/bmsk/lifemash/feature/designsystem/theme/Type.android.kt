@@ -12,11 +12,11 @@ private val fontProvider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs,
 )
 
-private val notoSansKR = GoogleFont("Noto Sans KR")
+private val pretendard = GoogleFont("Pretendard")
 
-internal actual val NotoSansKR: FontFamily = FontFamily(
-    Font(googleFont = notoSansKR, fontProvider = fontProvider, weight = FontWeight.Normal),
-    Font(googleFont = notoSansKR, fontProvider = fontProvider, weight = FontWeight.Medium),
-    Font(googleFont = notoSansKR, fontProvider = fontProvider, weight = FontWeight.Bold),
-    Font(googleFont = notoSansKR, fontProvider = fontProvider, weight = FontWeight.ExtraBold),
+internal actual val Pretendard: FontFamily = FontFamily(
+    Font(googleFont = pretendard, fontProvider = fontProvider, weight = FontWeight.Normal),
+    Font(googleFont = pretendard, fontProvider = fontProvider, weight = FontWeight.Medium),
+    Font(googleFont = pretendard, fontProvider = fontProvider, weight = FontWeight.SemiBold),
+    Font(googleFont = pretendard, fontProvider = fontProvider, weight = FontWeight.Bold),
 )
