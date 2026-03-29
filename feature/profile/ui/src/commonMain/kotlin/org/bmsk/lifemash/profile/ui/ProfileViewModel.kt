@@ -5,10 +5,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
+import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.profile.domain.model.Moment
 import org.bmsk.lifemash.profile.domain.model.ProfileEvent
@@ -25,7 +26,7 @@ sealed interface ProfileUiState {
         val followers: List<UserProfile> = emptyList(),
         val following: List<UserProfile> = emptyList(),
         val todayEvents: List<ProfileEvent> = emptyList(),
-        val calendarEventDates: Set<Int> = emptySet(), // day-of-month numbers with events
+        val calendarEventDates: Set<Int> = emptySet(),
         val selectedYear: Int = 0,
         val selectedMonth: Int = 0,
     ) : ProfileUiState
@@ -49,7 +50,7 @@ class ProfileViewModel(
                     _uiState.value = ProfileUiState.Loaded(
                         profile = profile,
                         selectedYear = now.year,
-                        selectedMonth = now.monthNumber,
+                        selectedMonth = now.month.number,
                         todayEvents = listOf(
                             ProfileEvent("e1", "청담 오마카세", "19:00", "21:00", "#4F6AF5"),
                             ProfileEvent("e2", "밴드 연습", "14:00", "16:00", "#F5824F"),
@@ -66,23 +67,25 @@ class ProfileViewModel(
             getMomentsUseCase(userId)
                 .catch { /* ignore */ }
                 .collect { moments ->
-                    val current = _uiState.value as? ProfileUiState.Loaded ?: return@collect
-                    _uiState.value = current.copy(moments = moments)
+                    _uiState.update { state ->
+                        if (state is ProfileUiState.Loaded) state.copy(moments = moments) else state
+                    }
                 }
         }
     }
 
-    fun toggleFollow(userId: String) {
-        val current = _uiState.value as? ProfileUiState.Loaded ?: return
-        val wasFollowing = current.profile.isFollowing
-        _uiState.value = current.copy(profile = current.profile.copy(isFollowing = !wasFollowing))
+    fun toggleFollow(loaded: ProfileUiState.Loaded, userId: String) {
+        val wasFollowing = loaded.profile.isFollowing
+        _uiState.value = loaded.copy(profile = loaded.profile.copy(isFollowing = !wasFollowing))
         viewModelScope.launch {
             runCatching {
-                if (wasFollowing) followUseCase.unfollow(userId)
-                else followUseCase.follow(userId)
+                if (wasFollowing) followUseCase.unfollow(userId) else followUseCase.follow(userId)
             }.onFailure {
-                val state = _uiState.value as? ProfileUiState.Loaded ?: return@launch
-                _uiState.value = state.copy(profile = state.profile.copy(isFollowing = wasFollowing))
+                _uiState.update { state ->
+                    if (state is ProfileUiState.Loaded)
+                        state.copy(profile = state.profile.copy(isFollowing = wasFollowing))
+                    else state
+                }
             }
         }
     }

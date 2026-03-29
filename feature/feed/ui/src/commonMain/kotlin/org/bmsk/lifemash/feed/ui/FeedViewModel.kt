@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.feed.domain.model.FeedPost
 import org.bmsk.lifemash.feed.domain.usecase.GetFeedUseCase
@@ -38,23 +39,22 @@ class FeedViewModel(
         }
     }
 
-    fun refresh() {
-        val current = _uiState.value as? FeedUiState.Loaded
-        if (current != null) _uiState.value = current.copy(isRefreshing = true)
+    fun refresh(loaded: FeedUiState.Loaded) {
+        _uiState.value = loaded.copy(isRefreshing = true)
         loadFeed()
     }
 
-    fun loadNextPage() {
-        val current = _uiState.value as? FeedUiState.Loaded ?: return
-        val cursor = current.nextCursor ?: return
+    fun loadNextPage(loaded: FeedUiState.Loaded) {
+        val cursor = loaded.nextCursor ?: return
         viewModelScope.launch {
             getFeedUseCase(cursor)
                 .catch { /* ignore */ }
                 .collect { page ->
-                    _uiState.value = current.copy(
-                        posts = current.posts + page.items,
-                        nextCursor = page.nextCursor,
-                    )
+                    _uiState.update { state ->
+                        if (state is FeedUiState.Loaded)
+                            state.copy(posts = state.posts + page.items, nextCursor = page.nextCursor)
+                        else state
+                    }
                 }
         }
     }

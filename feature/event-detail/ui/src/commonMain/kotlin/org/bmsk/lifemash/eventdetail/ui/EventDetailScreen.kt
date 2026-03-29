@@ -43,7 +43,7 @@ import org.bmsk.lifemash.feature.designsystem.component.LifeMashButton
 fun EventDetailScreen(
     uiState: EventDetailUiState,
     onBack: () -> Unit = {},
-    onJoinToggle: () -> Unit = {},
+    onJoinToggle: (EventDetailUiState.Loaded) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize().statusBarsPadding()) {
@@ -71,7 +71,7 @@ fun EventDetailScreen(
 private fun LoadedContent(
     state: EventDetailUiState.Loaded,
     onBack: () -> Unit,
-    onJoinToggle: () -> Unit,
+    onJoinToggle: (EventDetailUiState.Loaded) -> Unit,
 ) {
     Column(Modifier.fillMaxSize()) {
         // Top bar
@@ -191,7 +191,7 @@ private fun LoadedContent(
         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             LifeMashButton(
                 text = if (state.isJoined) "참여 중" else "참여",
-                onClick = onJoinToggle,
+                onClick = { onJoinToggle(state) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }
