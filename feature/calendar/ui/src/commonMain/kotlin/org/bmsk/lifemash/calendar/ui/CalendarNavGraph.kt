@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import org.bmsk.lifemash.calendar.api.CALENDAR_ROUTE
 import org.bmsk.lifemash.calendar.api.CalendarNavGraphInfo
 import org.bmsk.lifemash.calendar.api.CalendarRoute
-import org.bmsk.lifemash.feature.designsystem.component.BottomNavItem
+import org.bmsk.lifemash.designsystem.component.BottomNavItem
 
 val CalendarTab = BottomNavItem(
     route = CALENDAR_ROUTE,

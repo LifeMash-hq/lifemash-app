@@ -5,5 +5,5 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val calendarUiModule = module {
-    viewModel { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { CalendarViewModel(get(), get()) }
 }

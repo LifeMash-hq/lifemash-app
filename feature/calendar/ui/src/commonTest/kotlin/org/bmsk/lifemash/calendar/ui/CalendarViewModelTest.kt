@@ -2,8 +2,6 @@ package org.bmsk.lifemash.calendar.ui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -12,23 +10,16 @@ import kotlinx.datetime.LocalDate
 import org.bmsk.lifemash.calendar.domain.model.Event
 import org.bmsk.lifemash.calendar.domain.model.Group
 import org.bmsk.lifemash.calendar.domain.model.GroupType
-import org.bmsk.lifemash.calendar.domain.repository.CreateEventRequest
-import org.bmsk.lifemash.calendar.domain.repository.UpdateEventRequest
-import org.bmsk.lifemash.calendar.domain.usecase.CreateEventUseCase
-import org.bmsk.lifemash.calendar.domain.usecase.CreateGroupUseCase
-import org.bmsk.lifemash.calendar.domain.usecase.DeleteEventUseCase
-import org.bmsk.lifemash.calendar.domain.usecase.GetMonthEventsUseCase
-import org.bmsk.lifemash.calendar.domain.usecase.GetMyGroupsUseCase
-import org.bmsk.lifemash.calendar.domain.usecase.JoinGroupUseCase
-import org.bmsk.lifemash.calendar.domain.usecase.UpdateEventUseCase
-import org.bmsk.lifemash.calendar.domain.usecase.UpdateGroupNameUseCase
+import org.bmsk.lifemash.calendar.domain.repository.EventRepository
+import org.bmsk.lifemash.calendar.domain.repository.GroupRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CalendarViewModelTest {
@@ -51,48 +42,44 @@ class CalendarViewModelTest {
     private var groupsResult: List<Group> = listOf(testGroup)
     private var eventsResult: List<Event> = listOf(testEvent)
 
-    private val fakeGetMonthEvents = object : GetMonthEventsUseCase {
-        override fun invoke(groupId: String, year: Int, month: Int): Flow<List<Event>> =
-            flowOf(eventsResult)
+    private val fakeEventRepository = object : EventRepository {
+        override suspend fun getMonthEvents(groupId: String, year: Int, month: Int): List<Event> = eventsResult
+        override suspend fun createEvent(
+            groupId: String,
+            title: String,
+            description: String?,
+            startAt: Instant,
+            endAt: Instant?,
+            isAllDay: Boolean,
+            color: String?,
+        ): Event = testEvent
+
+        override suspend fun updateEvent(
+            groupId: String,
+            eventId: String,
+            title: String?,
+            description: String?,
+            startAt: Instant?,
+            endAt: Instant?,
+            isAllDay: Boolean?,
+            color: String?,
+        ): Event = testEvent
+
+        override suspend fun deleteEvent(groupId: String, eventId: String) {}
     }
 
-    private val fakeGetMyGroups = object : GetMyGroupsUseCase {
-        override suspend fun invoke(): List<Group> = groupsResult
-    }
-
-    private val fakeCreateGroup = object : CreateGroupUseCase {
-        override suspend fun invoke(type: GroupType, name: String?): Group = testGroup
-    }
-
-    private val fakeJoinGroup = object : JoinGroupUseCase {
-        override suspend fun invoke(inviteCode: String): Group = testGroup
-    }
-
-    private val fakeCreateEvent = object : CreateEventUseCase {
-        override suspend fun invoke(groupId: String, request: CreateEventRequest): Event = testEvent
-    }
-
-    private val fakeUpdateEvent = object : UpdateEventUseCase {
-        override suspend fun invoke(groupId: String, eventId: String, request: UpdateEventRequest): Event = testEvent
-    }
-
-    private val fakeDeleteEvent = object : DeleteEventUseCase {
-        override suspend fun invoke(groupId: String, eventId: String) {}
-    }
-
-    private val fakeUpdateGroupName = object : UpdateGroupNameUseCase {
-        override suspend fun invoke(groupId: String, name: String): Group = testGroup
+    private val fakeGroupRepository = object : GroupRepository {
+        override suspend fun createGroup(type: GroupType, name: String?): Group = testGroup
+        override suspend fun joinGroup(inviteCode: String): Group = testGroup
+        override suspend fun getMyGroups(): List<Group> = groupsResult
+        override suspend fun getGroup(groupId: String): Group = testGroup
+        override suspend fun deleteGroup(groupId: String) {}
+        override suspend fun updateGroupName(groupId: String, name: String): Group = testGroup
     }
 
     private fun createViewModel() = CalendarViewModel(
-        getMonthEventsUseCase = fakeGetMonthEvents,
-        getMyGroupsUseCase = fakeGetMyGroups,
-        createGroupUseCase = fakeCreateGroup,
-        joinGroupUseCase = fakeJoinGroup,
-        createEventUseCase = fakeCreateEvent,
-        updateEventUseCase = fakeUpdateEvent,
-        deleteEventUseCase = fakeDeleteEvent,
-        updateGroupNameUseCase = fakeUpdateGroupName,
+        eventRepository = fakeEventRepository,
+        groupRepository = fakeGroupRepository,
     )
 
     @BeforeTest
@@ -108,96 +95,69 @@ class CalendarViewModelTest {
     }
 
     @Test
-    fun `초기 상태는 Loading이다`() = runTest(testDispatcher) {
+    fun `loadGroups 호출 후 그룹과 이벤트가 로드된다`() = runTest(testDispatcher) {
         val viewModel = createViewModel()
 
-        assertIs<CalendarUiState.Loading>(viewModel.uiState.value)
-    }
-
-    @Test
-    fun `loadGroups 호출 시 Loaded 상태가 된다`() = runTest(testDispatcher) {
-        // Given
-        val viewModel = createViewModel()
-
-        // When
         viewModel.loadGroups()
 
-        // Then
-        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
+        val state = viewModel.uiState.value
         assertEquals(1, state.groups.size)
+        assertEquals(false, state.isLoading)
         assertEquals(CalendarOverlay.None, state.overlay)
     }
 
     @Test
     fun `그룹이 없으면 selectedGroup이 null이다`() = runTest(testDispatcher) {
-        // Given
         groupsResult = emptyList()
         val viewModel = createViewModel()
 
-        // When
         viewModel.loadGroups()
 
-        // Then
-        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
-        assertNull(state.selectedGroup)
+        assertNull(viewModel.uiState.value.selectedGroup)
     }
 
     @Test
     fun `날짜 선택 시 selectedDate가 업데이트된다`() = runTest(testDispatcher) {
-        // Given
         val viewModel = createViewModel()
         viewModel.loadGroups()
         val date = LocalDate(2026, 3, 15)
 
-        // When
         viewModel.selectDate(date)
 
-        // Then
-        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
-        assertEquals(date, state.selectedDate)
+        assertEquals(date, viewModel.uiState.value.selectedDate)
     }
 
     @Test
     fun `월 변경 시 currentYear과 currentMonth가 업데이트된다`() = runTest(testDispatcher) {
-        // Given
         val viewModel = createViewModel()
         viewModel.loadGroups()
 
-        // When
-        viewModel.changeMonth(2026, 4)
+        viewModel.changeMonth("group-1", 2026, 4)
 
-        // Then
-        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
+        val state = viewModel.uiState.value
         assertEquals(2026, state.currentYear)
         assertEquals(4, state.currentMonth)
     }
 
     @Test
     fun `showOverlay로 EventDetail을 설정하면 overlay가 변경된다`() = runTest(testDispatcher) {
-        // Given
         val viewModel = createViewModel()
         viewModel.loadGroups()
 
-        // When
         viewModel.showOverlay(CalendarOverlay.EventDetail(testEvent))
 
-        // Then
-        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
-        assertIs<CalendarOverlay.EventDetail>(state.overlay)
+        val overlay = viewModel.uiState.value.overlay
+        assertTrue(overlay is CalendarOverlay.EventDetail)
     }
 
     @Test
     fun `dismissOverlay로 overlay가 None이 된다`() = runTest(testDispatcher) {
-        // Given
         val viewModel = createViewModel()
         viewModel.loadGroups()
         viewModel.showOverlay(CalendarOverlay.GroupRename)
 
-        // When
         viewModel.dismissOverlay()
 
-        // Then
-        val state = assertIs<CalendarUiState.Loaded>(viewModel.uiState.value)
-        assertEquals(CalendarOverlay.None, state.overlay)
+        assertEquals(CalendarOverlay.None, viewModel.uiState.value.overlay)
     }
 }

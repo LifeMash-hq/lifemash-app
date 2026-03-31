@@ -73,58 +73,26 @@ import org.bmsk.lifemash.calendar.domain.model.GroupType
 internal fun CalendarScreen(
     uiState: CalendarUiState,
     onDateSelect: (LocalDate) -> Unit,
-    onChangeMonth: (year: Int, month: Int) -> Unit,
+    onChangeMonth: (groupId: String, year: Int, month: Int) -> Unit,
     onSelectGroup: (String) -> Unit,
     onShowOverlay: (CalendarOverlay) -> Unit,
     onCreateGroup: (GroupType, String?) -> Unit,
     onJoinGroup: (String) -> Unit,
 ) {
-    when (uiState) {
-        is CalendarUiState.Loading -> {
+    when (uiState.screenType) {
+        CalendarUiState.ScreenType.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
 
-        is CalendarUiState.Error -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = uiState.message,
-                    color = MaterialTheme.colorScheme.error,
-                )
-            }
-        }
-
-        is CalendarUiState.Loaded -> CalendarLoadedContent(
-            uiState = uiState,
-            onDateSelect = onDateSelect,
-            onChangeMonth = onChangeMonth,
-            onSelectGroup = onSelectGroup,
-            onShowOverlay = onShowOverlay,
-            onCreateGroup = onCreateGroup,
-            onJoinGroup = onJoinGroup,
-        )
-    }
-}
-
-@Composable
-private fun CalendarLoadedContent(
-    uiState: CalendarUiState.Loaded,
-    onDateSelect: (LocalDate) -> Unit,
-    onChangeMonth: (year: Int, month: Int) -> Unit,
-    onSelectGroup: (String) -> Unit,
-    onShowOverlay: (CalendarOverlay) -> Unit,
-    onCreateGroup: (GroupType, String?) -> Unit,
-    onJoinGroup: (String) -> Unit,
-) {
-    when {
-        uiState.groups.isEmpty() -> NoGroupContent(
+        CalendarUiState.ScreenType.NoGroup -> NoGroupContent(
             isCreating = uiState.isCreatingGroup,
             onCreateGroup = onCreateGroup,
             onJoinGroup = onJoinGroup,
         )
 
-        else -> CalendarContent(
+        CalendarUiState.ScreenType.Calendar -> CalendarContent(
             uiState = uiState,
             onDateSelect = onDateSelect,
             onChangeMonth = onChangeMonth,
@@ -136,12 +104,14 @@ private fun CalendarLoadedContent(
 
 @Composable
 private fun CalendarContent(
-    uiState: CalendarUiState.Loaded,
+    uiState: CalendarUiState,
     onDateSelect: (LocalDate) -> Unit,
-    onChangeMonth: (year: Int, month: Int) -> Unit,
+    onChangeMonth: (groupId: String, year: Int, month: Int) -> Unit,
     onSelectGroup: (String) -> Unit,
     onShowOverlay: (CalendarOverlay) -> Unit,
 ) {
+    val groupId = uiState.selectedGroup?.id
+
     Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
             if (uiState.groups.size > 1) {
@@ -163,7 +133,7 @@ private fun CalendarContent(
                     } else {
                         uiState.currentYear to uiState.currentMonth - 1
                     }
-                    onChangeMonth(y, m)
+                    groupId?.let { onChangeMonth(it, y, m) }
                 },
                 onNext = {
                     val (y, m) = if (uiState.currentMonth == 12) {
@@ -171,7 +141,7 @@ private fun CalendarContent(
                     } else {
                         uiState.currentYear to uiState.currentMonth + 1
                     }
-                    onChangeMonth(y, m)
+                    groupId?.let { onChangeMonth(it, y, m) }
                 },
             )
 
@@ -317,7 +287,7 @@ internal fun EventCreateBottomSheet(
                         editingEvent.startAt.toEpochMilliseconds()
                     } else {
                         val date = selectedDate ?: return@Button
-                        LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, 0, 0)
+                        LocalDateTime(date.year, date.month, date.day, 0, 0)
                             .toInstant(TimeZone.currentSystemDefault())
                             .toEpochMilliseconds()
                     }
@@ -608,13 +578,14 @@ private fun MonthGrid(
             else -> 31
         }
     }
-    val firstDayOfWeek = LocalDate(year, month, 1).dayOfWeek.ordinal
+    // kotlinx-datetime ordinal: Monday=0..Sunday=6 → Sunday-first: (ordinal+1)%7
+    val firstDayOfWeek = (LocalDate(year, month, 1).dayOfWeek.ordinal + 1) % 7
 
     val days = (1..daysInMonth).map { day -> LocalDate(year, month, day) }
     val paddedDays: List<LocalDate?> = List(firstDayOfWeek) { null } + days
 
     Row(Modifier.fillMaxWidth()) {
-        listOf("월", "화", "수", "목", "금", "토", "일").forEach {
+        listOf("일", "월", "화", "수", "목", "금", "토").forEach {
             Text(
                 text = it,
                 modifier = Modifier.weight(1f),
@@ -652,7 +623,7 @@ private fun MonthGrid(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "${date.dayOfMonth}",
+                            text = "${date.day}",
                             style = MaterialTheme.typography.bodySmall,
                             color = if (isSelected) {
                                 MaterialTheme.colorScheme.onPrimary

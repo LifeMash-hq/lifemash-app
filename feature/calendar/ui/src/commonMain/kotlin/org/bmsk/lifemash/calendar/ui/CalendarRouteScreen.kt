@@ -17,10 +17,10 @@ internal fun CalendarRouteScreen(
         viewModel.loadGroups()
     }
 
-    LaunchedEffect(uiState) {
-        val error = (uiState as? CalendarUiState.Error)?.message
-        if (error != null) {
-            onShowErrorSnackbar(Exception(error))
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            onShowErrorSnackbar(Exception(it))
+            viewModel.clearError()
         }
     }
 
@@ -34,15 +34,14 @@ internal fun CalendarRouteScreen(
         onJoinGroup = viewModel::joinGroup,
     )
 
-    val loaded = uiState as? CalendarUiState.Loaded ?: return
-    val groupId = loaded.selectedGroup?.id
+    val groupId = uiState.selectedGroup?.id
 
-    when (val overlay = loaded.overlay) {
+    when (val overlay = uiState.overlay) {
         is CalendarOverlay.EventCreate -> {
             if (groupId != null) {
                 EventCreateBottomSheet(
                     editingEvent = null,
-                    isLoading = loaded.isCreatingEvent,
+                    isLoading = uiState.isCreatingEvent,
                     selectedDate = overlay.selectedDate,
                     onDismiss = viewModel::dismissOverlay,
                     onSubmit = { form -> viewModel.createEvent(groupId, form) },
@@ -54,7 +53,7 @@ internal fun CalendarRouteScreen(
             if (groupId != null) {
                 EventCreateBottomSheet(
                     editingEvent = overlay.event,
-                    isLoading = loaded.isCreatingEvent,
+                    isLoading = uiState.isCreatingEvent,
                     selectedDate = null,
                     onDismiss = viewModel::dismissOverlay,
                     onSubmit = { form -> viewModel.updateEvent(groupId, overlay.event.id, form) },
@@ -74,11 +73,11 @@ internal fun CalendarRouteScreen(
         }
 
         is CalendarOverlay.GroupRename -> {
-            val group = loaded.selectedGroup
+            val group = uiState.selectedGroup
             if (group != null) {
                 GroupRenameDialog(
                     currentName = group.name ?: "",
-                    isLoading = loaded.isRenamingGroup,
+                    isLoading = uiState.isRenamingGroup,
                     onDismiss = viewModel::dismissOverlay,
                     onConfirm = { name -> viewModel.updateGroupName(group.id, name) },
                 )

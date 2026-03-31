@@ -1,29 +1,28 @@
 package org.bmsk.lifemash.calendar.domain.repository
 
-import kotlinx.coroutines.flow.Flow
+import kotlin.time.Instant
 import org.bmsk.lifemash.calendar.domain.model.Event
 
 interface EventRepository {
-    fun getMonthEvents(groupId: String, year: Int, month: Int): Flow<List<Event>>
-    suspend fun createEvent(groupId: String, request: CreateEventRequest): Event
-    suspend fun updateEvent(groupId: String, eventId: String, request: UpdateEventRequest): Event
+    suspend fun getMonthEvents(groupId: String, year: Int, month: Int): List<Event>
+    suspend fun createEvent(
+        groupId: String,
+        title: String,
+        description: String?,
+        startAt: Instant,
+        endAt: Instant?,
+        isAllDay: Boolean,
+        color: String?,
+    ): Event
+    suspend fun updateEvent(
+        groupId: String,
+        eventId: String,
+        title: String?,
+        description: String?,
+        startAt: Instant?,
+        endAt: Instant?,
+        isAllDay: Boolean?,
+        color: String?,
+    ): Event
     suspend fun deleteEvent(groupId: String, eventId: String)
 }
-
-data class CreateEventRequest(
-    val title: String,
-    val description: String?,
-    val startAt: kotlin.time.Instant,
-    val endAt: kotlin.time.Instant?,
-    val isAllDay: Boolean,
-    val color: String?,
-)
-
-data class UpdateEventRequest(
-    val title: String?,
-    val description: String?,
-    val startAt: kotlin.time.Instant?,
-    val endAt: kotlin.time.Instant?,
-    val isAllDay: Boolean?,
-    val color: String?,
-)
