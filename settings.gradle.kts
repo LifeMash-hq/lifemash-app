@@ -59,6 +59,8 @@ include(
 
 include(
     ":feature:event-detail:api",
+    ":feature:event-detail:domain",
+    ":feature:event-detail:data",
     ":feature:event-detail:ui",
 )
 
@@ -70,17 +72,18 @@ include(
 )
 
 include(
-    ":feature:explore:api",
-    ":feature:explore:domain",
-    ":feature:explore:data",
-    ":feature:explore:ui",
-)
-
-include(
     ":shared:model",
     ":shared:network",
     ":shared:navigation",
     ":shared:designsystem",
     ":shared:common",
     ":shared:fcm",
+    ":shared:validation",
+)
+
+// Core (Backend)
+include(
+    ":core:domain",
+    ":core:infra",
+    ":core:ktor",
 )
