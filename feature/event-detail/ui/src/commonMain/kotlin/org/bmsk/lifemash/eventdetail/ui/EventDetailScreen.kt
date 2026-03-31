@@ -35,9 +35,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.bmsk.lifemash.feature.designsystem.component.AvatarSize
-import org.bmsk.lifemash.feature.designsystem.component.LifeMashAvatar
-import org.bmsk.lifemash.feature.designsystem.component.LifeMashButton
+import org.bmsk.lifemash.designsystem.component.AvatarSize
+import org.bmsk.lifemash.designsystem.component.LifeMashAvatar
+import org.bmsk.lifemash.designsystem.component.LifeMashButton
 
 @Composable
 fun EventDetailScreen(
