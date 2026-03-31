@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.feature.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
 import java.net.UnknownHostException
 import kotlin.system.exitProcess
 

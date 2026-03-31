@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>BracesOnIfStatements:FakeMomentRepository.kt$FakeMomentRepository$else</ID>
+    <ID>BracesOnIfStatements:FakeMomentRepository.kt$FakeMomentRepository$if</ID>
+    <ID>MultiLineIfElse:FakeMomentRepository.kt$FakeMomentRepository$moment.visibility == "public"</ID>
+    <ID>MultiLineIfElse:FakeMomentRepository.kt$FakeMomentRepository$true</ID>
+    <ID>NoWildcardImports:FeedServiceTest.kt$import kotlin.test.*</ID>
+    <ID>NoWildcardImports:FollowServiceTest.kt$import kotlin.test.*</ID>
+    <ID>NoWildcardImports:LikeServiceTest.kt$import kotlin.test.*</ID>
+    <ID>NoWildcardImports:MomentServiceTest.kt$import kotlin.test.*</ID>
+    <ID>NoWildcardImports:NotificationServiceTest.kt$import kotlin.test.*</ID>
+    <ID>NoWildcardImports:ProfileServiceTest.kt$import kotlin.test.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

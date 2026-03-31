@@ -14,13 +14,8 @@ import org.bmsk.lifemash.auth.api.AuthRoute
 import org.bmsk.lifemash.auth.ui.authNavGraph
 import org.bmsk.lifemash.calendar.api.CalendarNavGraphInfo
 import org.bmsk.lifemash.calendar.ui.calendarNavGraph
+import org.bmsk.lifemash.designsystem.component.AdaptiveNavigation
 import org.bmsk.lifemash.eventdetail.api.EventDetailRoute
-import org.bmsk.lifemash.explore.api.EXPLORE_ROUTE
-import org.bmsk.lifemash.explore.api.ExploreNavGraphInfo
-import org.bmsk.lifemash.explore.api.ExploreRoute
-import org.bmsk.lifemash.explore.ui.ExploreTab
-import org.bmsk.lifemash.explore.ui.exploreNavGraph
-import org.bmsk.lifemash.feature.designsystem.component.AdaptiveNavigation
 import org.bmsk.lifemash.feed.api.FEED_ROUTE
 import org.bmsk.lifemash.feed.api.FeedNavGraphInfo
 import org.bmsk.lifemash.feed.api.FeedRoute
@@ -40,19 +35,28 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainScreen(
-    onShowErrorSnackbar: (Throwable?) -> Unit = {},
+    modifier: Modifier = Modifier,
+    onShowErrorSnackbar: (Throwable?) -> Unit = {}
 ) {
     val navController = rememberNavController()
-    val tabs = listOf(FeedTab, ExploreTab, NotificationTab, ProfileTab)
+    val tabs = listOf(ProfileTab, FeedTab, NotificationTab)
 
     val mainViewModel = koinViewModel<MainViewModel>()
-    val currentUser by mainViewModel.currentUser.collectAsState()
+    val authState by mainViewModel.authState.collectAsState()
+
+    if (authState is AuthState.Loading) return
+
+    val currentUser = when (val state = authState) {
+        is AuthState.Authenticated -> state.user
+        is AuthState.Unauthenticated, AuthState.Loading -> null
+    }
+
+    val startDestination = if (currentUser != null) FeedRoute else AuthRoute
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentTabRoute = navBackStackEntry?.destination?.let { dest ->
         when {
             dest.hasRoute<FeedRoute>() -> FEED_ROUTE
-            dest.hasRoute<ExploreRoute>() -> EXPLORE_ROUTE
             dest.hasRoute<NotificationRoute>() -> NOTIFICATION_ROUTE
             dest.hasRoute<ProfileRoute>() -> PROFILE_ROUTE
             else -> null
@@ -61,7 +65,6 @@ fun MainScreen(
 
     val tabRouteMap: Map<String, Any> = mapOf(
         FEED_ROUTE to FeedRoute,
-        EXPLORE_ROUTE to ExploreRoute,
         NOTIFICATION_ROUTE to NotificationRoute,
         PROFILE_ROUTE to ProfileRoute,
     )
@@ -69,8 +72,9 @@ fun MainScreen(
     AdaptiveNavigation(
         tabs = tabs,
         currentRoute = currentTabRoute,
+        showNavigation = currentTabRoute != null,
         onItemClick = { tab ->
-            if (tab.route != FEED_ROUTE && tab.route != EXPLORE_ROUTE && currentUser == null) {
+            if (tab.route != FEED_ROUTE && currentUser == null) {
                 navController.navigate(AuthRoute)
                 return@AdaptiveNavigation
             }
@@ -81,44 +85,51 @@ fun MainScreen(
                 restoreState = true
             }
         },
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
-        NavHost(navController = navController, startDestination = FeedRoute) {
-            feedNavGraph(FeedNavGraphInfo(
-                onShowErrorSnackbar = onShowErrorSnackbar,
-                onNavigateToEventDetail = { eventId ->
-                    navController.navigate(EventDetailRoute(eventId))
-                },
-                onNavigateToUserProfile = { /* TODO */ },
-            ))
-            exploreNavGraph(ExploreNavGraphInfo(
-                onShowErrorSnackbar = onShowErrorSnackbar,
-                onNavigateToUserProfile = { /* TODO */ },
-            ))
-            notificationNavGraph(NotificationNavGraphInfo(
-                onShowErrorSnackbar = onShowErrorSnackbar,
-                onBack = { navController.popBackStack() },
-            ))
-            profileNavGraph(ProfileNavGraphInfo(
-                onShowErrorSnackbar = onShowErrorSnackbar,
-                onNavigateToEventDetail = { eventId ->
-                    navController.navigate(EventDetailRoute(eventId))
-                },
-                onNavigateToUserProfile = { /* TODO */ },
-            ))
-            calendarNavGraph(CalendarNavGraphInfo(
-                onShowErrorSnackbar = onShowErrorSnackbar,
-            ))
-            authNavGraph(AuthNavGraphInfo(
-                onSignInComplete = {
-                    navController.popBackStack()
-                    navController.navigate(FeedRoute) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                    }
-                },
-                onShowErrorSnackbar = onShowErrorSnackbar,
-            ))
+        NavHost(navController = navController, startDestination = startDestination) {
+            feedNavGraph(
+                FeedNavGraphInfo(
+                    onShowErrorSnackbar = onShowErrorSnackbar,
+                    onNavigateToEventDetail = { eventId ->
+                        navController.navigate(EventDetailRoute(eventId))
+                    },
+                    onNavigateToUserProfile = { /* TODO */ },
+                )
+            )
+            notificationNavGraph(
+                NotificationNavGraphInfo(
+                    onShowErrorSnackbar = onShowErrorSnackbar,
+                    onBack = { navController.popBackStack() },
+                )
+            )
+            profileNavGraph(
+                navInfo = ProfileNavGraphInfo(
+                    onShowErrorSnackbar = onShowErrorSnackbar,
+                    onNavigateToEventDetail = { eventId ->
+                        navController.navigate(EventDetailRoute(eventId))
+                    },
+                    onNavigateToUserProfile = { /* TODO */ },
+                ),
+                navController = navController,
+            )
+            calendarNavGraph(
+                CalendarNavGraphInfo(
+                    onShowErrorSnackbar = onShowErrorSnackbar,
+                )
+            )
+            authNavGraph(
+                AuthNavGraphInfo(
+                    onSignInComplete = {
+                        navController.popBackStack()
+                        navController.navigate(FeedRoute) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onShowErrorSnackbar = onShowErrorSnackbar,
+                )
+            )
         }
     }
 }

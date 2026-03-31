@@ -1,0 +1,23 @@
+formatting:
+  NoMultipleSpaces:
+    active: false
+  NoWildcardImports:
+    active: false
+  Wrapping:
+    active: false
+  MultiLineIfElse:
+    active: false
+  BracesOnIfStatements:
+    active: false
+
+style:
+  WildcardImport:
+    active: false
+  OptionalUnit:
+    active: false
+  BracesOnIfStatements:
+    active: false
+  LoopWithTooManyJumpStatements:
+    active: false
+  UnusedParameter:
+    active: false

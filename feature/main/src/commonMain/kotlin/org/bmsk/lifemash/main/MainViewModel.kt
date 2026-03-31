@@ -4,13 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.bmsk.lifemash.auth.domain.model.AuthUser
-import org.bmsk.lifemash.auth.domain.usecase.GetCurrentUserUseCase
+import org.bmsk.lifemash.auth.domain.repository.AuthRepository
 
-class MainViewModel(
-    getCurrentUserUseCase: GetCurrentUserUseCase,
+sealed interface AuthState {
+    data object Loading : AuthState
+    data object Unauthenticated : AuthState
+    data class Authenticated(val user: AuthUser) : AuthState
+}
+
+internal class MainViewModel(
+    authRepository: AuthRepository,
 ) : ViewModel() {
-    val currentUser: StateFlow<AuthUser?> = getCurrentUserUseCase()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    val authState: StateFlow<AuthState> = authRepository.getCurrentUser()
+        .map { user -> if (user != null) AuthState.Authenticated(user) else AuthState.Unauthenticated }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AuthState.Loading)
 }

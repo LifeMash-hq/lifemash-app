@@ -18,9 +18,6 @@ kotlin {
     }
 
     sourceSets {
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-        }
         commonMain.dependencies {
             implementation(project(":shared:common"))
             implementation(project(":shared:designsystem"))
@@ -47,24 +44,12 @@ kotlin {
             implementation(project(":feature:feed:data"))
             implementation(project(":feature:feed:api"))
             implementation(project(":feature:feed:ui"))
-            implementation(project(":feature:explore:domain"))
-            implementation(project(":feature:explore:data"))
-            implementation(project(":feature:explore:api"))
-            implementation(project(":feature:explore:ui"))
             implementation(project(":feature:event-detail:api"))
+            implementation(project(":feature:event-detail:domain"))
+            implementation(project(":feature:event-detail:data"))
             implementation(project(":feature:event-detail:ui"))
 
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.material.icons.extended)
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.material3)
-            implementation(libs.compose.ui)
-
-            implementation(libs.jetbrains.navigation.compose)
             implementation(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
-            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)

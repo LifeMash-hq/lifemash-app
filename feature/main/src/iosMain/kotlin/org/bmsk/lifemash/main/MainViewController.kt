@@ -5,10 +5,8 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import okio.Path.Companion.toPath
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.initialize
-import org.bmsk.lifemash.feature.designsystem.theme.LifeMashTheme
+import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.main.di.appKoinModules
-import org.bmsk.lifemash.notification.data.db.getNotificationKeywordDBBuilder
-import org.bmsk.lifemash.notification.data.di.notificationDataModule
 import org.koin.core.context.startKoin
 import platform.Foundation.NSHomeDirectory
 
@@ -25,7 +23,6 @@ fun initKoin() {
             appKoinModules(
                 backendBaseUrl = BACKEND_BASE_URL,
                 dataStore = iosDataStore,
-                notificationDataModule = notificationDataModule(getNotificationKeywordDBBuilder()),
             ),
         )
     }

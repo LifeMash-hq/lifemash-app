@@ -1,6 +1,5 @@
 plugins {
-    id("lifemash.kmp.library")
-    alias(libs.plugins.kotlin.serialization)
+    id("lifemash.kmp.data")
 }
 
 kotlin {
@@ -11,12 +10,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.shared.model)
-            implementation(libs.coroutines.core)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.koin.core)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.auth)
             implementation(libs.ksoup)
@@ -24,10 +17,6 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(project.dependencies.platform(libs.firebase.bom))
-            implementation(libs.ktor.client.okhttp)
-        }
-        iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
         }
     }
 }

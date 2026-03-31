@@ -10,7 +10,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.compose.runtime)
             api(libs.jetbrains.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
         }
