@@ -2,16 +2,11 @@ package org.bmsk.lifemash.notification.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import kotlinx.collections.immutable.persistentListOf
 import kotlin.time.Clock
-import org.bmsk.lifemash.notification.domain.model.NotificationKeyword
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.bmsk.lifemash.notification.domain.model.Notification
+import org.bmsk.lifemash.notification.domain.model.NotificationType
 import org.junit.Rule
 import org.junit.Test
 
@@ -25,86 +20,57 @@ class NotificationScreenTest {
         composeTestRule.setContent {
             NotificationScreen(
                 uiState = NotificationUiState.Empty,
-                onAddKeyword = {},
-                onRemoveKeyword = {},
-                onBack = {},
+                onRetry = {},
             )
         }
 
-        composeTestRule.onNodeWithText("등록된 키워드가 없습니다").assertIsDisplayed()
+        composeTestRule.onNodeWithText("새로운 알림이 없어요").assertIsDisplayed()
     }
 
     @Test
-    fun loaded_상태에서_키워드_목록이_표시된다() {
-        val keywords = persistentListOf(
-            NotificationKeyword(id = 1, keyword = "삼성 반도체", createdAt = Clock.System.now()),
-            NotificationKeyword(id = 2, keyword = "AI 규제", createdAt = Clock.System.now()),
+    fun loaded_상태에서_알림_목록이_표시된다() {
+        val notifications = persistentListOf(
+            Notification(
+                id = "1",
+                type = NotificationType.COMMENT,
+                actorNickname = "이수아",
+                actorProfileImage = null,
+                targetId = null,
+                content = "축하해!",
+                isRead = false,
+                createdAt = Clock.System.now(),
+            ),
+            Notification(
+                id = "2",
+                type = NotificationType.FOLLOW,
+                actorNickname = "정재원",
+                actorProfileImage = null,
+                targetId = null,
+                content = null,
+                isRead = true,
+                createdAt = Clock.System.now(),
+            ),
         )
         composeTestRule.setContent {
             NotificationScreen(
-                uiState = NotificationUiState.Loaded(keywords),
-                onAddKeyword = {},
-                onRemoveKeyword = {},
-                onBack = {},
+                uiState = NotificationUiState.Loaded(notifications),
+                onRetry = {},
             )
         }
 
-        composeTestRule.onNodeWithText("삼성 반도체").assertIsDisplayed()
-        composeTestRule.onNodeWithText("AI 규제").assertIsDisplayed()
+        composeTestRule.onNodeWithText("이수아", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("정재원", substring = true).assertIsDisplayed()
     }
 
     @Test
-    fun 키워드_입력_후_추가_버튼_클릭_시_onAddKeyword가_호출된다() {
-        var addedKeyword: String? = null
+    fun error_상태에서_다시_시도_버튼이_표시된다() {
         composeTestRule.setContent {
             NotificationScreen(
-                uiState = NotificationUiState.Empty,
-                onAddKeyword = { addedKeyword = it },
-                onRemoveKeyword = {},
-                onBack = {},
+                uiState = NotificationUiState.Error("오류 발생"),
+                onRetry = {},
             )
         }
 
-        composeTestRule.onNodeWithTag("keyword_input").performTextInput("삼성")
-        composeTestRule.onNodeWithText("추가").performClick()
-
-        assertEquals("삼성", addedKeyword)
-    }
-
-    @Test
-    fun 삭제_버튼_클릭_시_onRemoveKeyword가_호출된다() {
-        var removedId: Long? = null
-        val keywords = persistentListOf(
-            NotificationKeyword(id = 1, keyword = "삼성", createdAt = Clock.System.now()),
-        )
-        composeTestRule.setContent {
-            NotificationScreen(
-                uiState = NotificationUiState.Loaded(keywords),
-                onAddKeyword = {},
-                onRemoveKeyword = { removedId = it },
-                onBack = {},
-            )
-        }
-
-        composeTestRule.onNodeWithContentDescription("삭제").performClick()
-
-        assertEquals(1L, removedId)
-    }
-
-    @Test
-    fun 뒤로가기_버튼_클릭_시_onBack이_호출된다() {
-        var backCalled = false
-        composeTestRule.setContent {
-            NotificationScreen(
-                uiState = NotificationUiState.Empty,
-                onAddKeyword = {},
-                onRemoveKeyword = {},
-                onBack = { backCalled = true },
-            )
-        }
-
-        composeTestRule.onNodeWithContentDescription("뒤로").performClick()
-
-        assertTrue(backCalled)
+        composeTestRule.onNodeWithText("다시 시도").assertIsDisplayed()
     }
 }

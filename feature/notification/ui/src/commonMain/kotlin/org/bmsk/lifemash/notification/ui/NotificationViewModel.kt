@@ -3,38 +3,49 @@ package org.bmsk.lifemash.notification.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.notification.domain.model.Keyword
-import org.bmsk.lifemash.notification.domain.usecase.AddKeywordUseCase
-import org.bmsk.lifemash.notification.domain.usecase.GetKeywordsUseCase
-import org.bmsk.lifemash.notification.domain.usecase.RemoveKeywordUseCase
+import org.bmsk.lifemash.notification.domain.repository.NotificationRepository
 
 internal class NotificationViewModel(
-    getKeywordsUseCase: GetKeywordsUseCase,
-    private val addKeywordUseCase: AddKeywordUseCase,
-    private val removeKeywordUseCase: RemoveKeywordUseCase,
+    private val notificationRepository: NotificationRepository,
 ) : ViewModel() {
 
-    val uiState: StateFlow<NotificationUiState> = getKeywordsUseCase()
-        .map { keywords ->
-            if (keywords.isEmpty()) NotificationUiState.Empty
-            else NotificationUiState.Loaded(keywords.toPersistentList())
-        }
-        .onStart { emit(NotificationUiState.Loading) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NotificationUiState.Loading)
+    private val _uiState = MutableStateFlow<NotificationUiState>(NotificationUiState.Loading)
+    val uiState: StateFlow<NotificationUiState> = _uiState
 
-    fun addKeyword(keyword: String) {
-        runCatching { Keyword.from(keyword) }.onSuccess {
-            viewModelScope.launch { addKeywordUseCase(keyword) }
+    init {
+        loadNotifications()
+    }
+
+    fun loadNotifications() {
+        viewModelScope.launch {
+            _uiState.value = NotificationUiState.Loading
+            runCatching { notificationRepository.getNotifications() }
+                .onSuccess { notifications ->
+                    _uiState.value = if (notifications.isEmpty()) {
+                        NotificationUiState.Empty
+                    } else {
+                        NotificationUiState.Loaded(notifications.toPersistentList())
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.value = NotificationUiState.Error(e.message ?: "알림을 불러올 수 없습니다")
+                }
         }
     }
 
-    fun removeKeyword(id: Long) {
-        viewModelScope.launch { removeKeywordUseCase(id) }
+    fun markAllAsRead() {
+        val state = _uiState.value as? NotificationUiState.Loaded ?: return
+        val unread = state.notifications.filter { !it.isRead }
+        if (unread.isEmpty()) return
+
+        viewModelScope.launch {
+            unread.forEach { notification ->
+                runCatching { notificationRepository.markAsRead(notification.id) }
+            }
+            loadNotifications()
+        }
     }
 }

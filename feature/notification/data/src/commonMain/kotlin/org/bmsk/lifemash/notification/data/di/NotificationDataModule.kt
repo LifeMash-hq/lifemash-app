@@ -1,24 +1,12 @@
 package org.bmsk.lifemash.notification.data.di
 
-import androidx.room.RoomDatabase
-import org.bmsk.lifemash.notification.data.db.NotificationKeywordDB
-import org.bmsk.lifemash.notification.data.repository.NotificationKeywordRepositoryImpl
-import org.bmsk.lifemash.notification.data.source.FcmTokenFirestoreSource
-import org.bmsk.lifemash.notification.data.source.FcmTokenFirestoreSourceImpl
-import org.bmsk.lifemash.notification.domain.repository.KeywordRepository
-import org.bmsk.lifemash.notification.domain.repository.KeywordSyncRepository
+import io.ktor.client.HttpClient
+import org.bmsk.lifemash.notification.data.api.NotificationApi
+import org.bmsk.lifemash.notification.data.repository.NotificationRepositoryImpl
+import org.bmsk.lifemash.notification.domain.repository.NotificationRepository
 import org.koin.dsl.module
 
-fun notificationDataModule(dbBuilder: RoomDatabase.Builder<NotificationKeywordDB>) = module {
-    single<NotificationKeywordDB> { dbBuilder.build() }
-    single { get<NotificationKeywordDB>().keywordDao() }
-    single<FcmTokenFirestoreSource> { FcmTokenFirestoreSourceImpl() }
-    single {
-        NotificationKeywordRepositoryImpl(
-            dao = get(),
-            firestoreSource = get(),
-        )
-    }
-    single<KeywordRepository> { get<NotificationKeywordRepositoryImpl>() }
-    single<KeywordSyncRepository> { get<NotificationKeywordRepositoryImpl>() }
+val notificationDataModule = module {
+    single { NotificationApi(get<HttpClient>()) }
+    single<NotificationRepository> { NotificationRepositoryImpl(get()) }
 }

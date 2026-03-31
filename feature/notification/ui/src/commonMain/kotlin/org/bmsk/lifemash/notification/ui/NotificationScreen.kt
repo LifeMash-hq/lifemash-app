@@ -1,178 +1,164 @@
 package org.bmsk.lifemash.notification.ui
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import kotlinx.collections.immutable.PersistentList
 import kotlin.time.Clock
 import kotlin.time.Instant
-import org.bmsk.lifemash.notification.domain.model.NotificationKeyword
+import org.bmsk.lifemash.designsystem.component.LifeMashButton
+import org.bmsk.lifemash.designsystem.component.LifeMashEmptyState
+import org.bmsk.lifemash.designsystem.component.LifeMashNotificationItem
+import org.bmsk.lifemash.designsystem.component.LifeMashSkeleton
+import org.bmsk.lifemash.designsystem.component.LifeMashTopBar
+import org.bmsk.lifemash.designsystem.component.NotificationBodyText
+import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
+import org.bmsk.lifemash.notification.domain.model.Notification
+import org.bmsk.lifemash.notification.domain.model.NotificationType
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NotificationScreen(
     uiState: NotificationUiState,
-    onAddKeyword: (String) -> Unit,
-    onRemoveKeyword: (Long) -> Unit,
-    onBack: () -> Unit,
+    onRetry: () -> Unit,
 ) {
-    var inputText by rememberSaveable { mutableStateOf("") }
-
-    val onSubmit = {
-        if (inputText.isNotBlank()) {
-            onAddKeyword(inputText)
-            inputText = ""
-        }
-    }
-
     Column(modifier = Modifier.fillMaxSize()) {
-        TopAppBar(
-            title = { Text("키워드 알림") },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로")
-                }
-            },
-        )
-        Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                OutlinedTextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
-                    modifier = Modifier.weight(1f).testTag("keyword_input"),
-                    placeholder = { Text("관심 키워드 입력") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onSubmit() }),
-                )
-                FilledTonalButton(onClick = { onSubmit() }) {
-                    Text("추가")
-                }
-            }
+        LifeMashTopBar(title = "알림")
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-            when (uiState) {
-                is NotificationUiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-                is NotificationUiState.Empty -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                Icons.Outlined.Notifications,
-                                contentDescription = "등록된 키워드 없음",
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                modifier = Modifier.size(72.dp),
-                            )
-                            Text(
-                                text = "등록된 키워드가 없습니다",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 16.dp),
-                            )
-                            Text(
-                                text = "관심 키워드를 추가하면 새 기사가 올라올 때\n알림을 받을 수 있습니다.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                modifier = Modifier.padding(top = 4.dp),
-                            )
-                        }
-                    }
-                }
-                is NotificationUiState.Loaded -> {
-                    KeywordList(
-                        keywords = uiState.keywords,
-                        onRemoveKeyword = onRemoveKeyword,
-                    )
-                }
-            }
+        when (uiState) {
+            is NotificationUiState.Loading -> LoadingContent()
+            is NotificationUiState.Empty -> EmptyContent()
+            is NotificationUiState.Error -> ErrorContent(message = uiState.message, onRetry = onRetry)
+            is NotificationUiState.Loaded -> NotificationList(notifications = uiState.notifications)
         }
     }
 }
 
 @Composable
-private fun KeywordList(
-    keywords: PersistentList<NotificationKeyword>,
-    onRemoveKeyword: (Long) -> Unit,
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        contentPadding = PaddingValues(vertical = 8.dp),
+private fun LoadingContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = LifeMashSpacing.xl, vertical = LifeMashSpacing.lg),
     ) {
-        items(keywords, key = { it.id }) { keyword ->
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = keyword.keyword.value,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                    Text(
-                        text = formatRelativeTime(keyword.createdAt),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Icon(
-                    Icons.Outlined.Close,
-                    contentDescription = "삭제",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable { onRemoveKeyword(keyword.id) },
-                )
-            }
+        repeat(5) {
+            LifeMashSkeleton(height = LifeMashSpacing.huge)
+            Spacer(modifier = Modifier.height(LifeMashSpacing.md))
         }
     }
 }
+
+@Composable
+private fun EmptyContent() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        LifeMashEmptyState(
+            icon = Icons.Outlined.Notifications,
+            title = "새로운 알림이 없어요",
+            description = "친구가 일정을 공유하거나\n댓글을 달면 여기에 알려드려요",
+        )
+    }
+}
+
+@Composable
+private fun ErrorContent(message: String, onRetry: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        LifeMashEmptyState(
+            icon = Icons.Outlined.Notifications,
+            title = message,
+            action = {
+                LifeMashButton(text = "다시 시도", onClick = onRetry)
+            },
+        )
+    }
+}
+
+@Composable
+private fun NotificationList(notifications: PersistentList<Notification>) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(notifications, key = { it.id }) { notification ->
+            val (emoji, emojiBackground, actorName, actionText, quote) = notificationContent(notification)
+            LifeMashNotificationItem(
+                emoji = emoji,
+                emojiBackground = emojiBackground,
+                bodyText = {
+                    NotificationBodyText(
+                        actorName = actorName,
+                        actionText = actionText,
+                        quote = quote,
+                    )
+                },
+                timeText = formatRelativeTime(notification.createdAt),
+                isUnread = !notification.isRead,
+            )
+        }
+    }
+}
+
+private data class NotificationContent(
+    val emoji: String,
+    val emojiBackground: Color,
+    val actorName: String?,
+    val actionText: String,
+    val quote: String?,
+)
+
+private fun notificationContent(notification: Notification): NotificationContent =
+    when (notification.type) {
+        NotificationType.COMMENT -> NotificationContent(
+            emoji = "\uD83D\uDCAC",
+            emojiBackground = Color(0x1F6C5CE7),
+            actorName = notification.actorNickname,
+            actionText = "님이 댓글 달았습니다",
+            quote = notification.content,
+        )
+        NotificationType.FOLLOW -> NotificationContent(
+            emoji = "\uD83D\uDC64",
+            emojiBackground = Color(0x1F6C5CE7),
+            actorName = notification.actorNickname,
+            actionText = "님이 회원님을 팔로우합니다",
+            quote = null,
+        )
+        NotificationType.LIKE -> NotificationContent(
+            emoji = "\u2764\uFE0F",
+            emojiBackground = Color(0x1FEF4444),
+            actorName = notification.actorNickname,
+            actionText = "님이 좋아요를 눌렀습니다",
+            quote = null,
+        )
+        NotificationType.PHOTO -> NotificationContent(
+            emoji = "\uD83D\uDCF7",
+            emojiBackground = Color(0x1F10B981),
+            actorName = notification.actorNickname,
+            actionText = "님이 새 사진을 올렸습니다",
+            quote = notification.content,
+        )
+        NotificationType.EVENT_REMINDER -> NotificationContent(
+            emoji = "\uD83D\uDCC5",
+            emojiBackground = Color(0x1FE17051),
+            actorName = null,
+            actionText = "오늘 ${notification.content ?: ""} 일정",
+            quote = null,
+        )
+        NotificationType.UNKNOWN -> NotificationContent(
+            emoji = "\uD83D\uDD14",
+            emojiBackground = Color(0x1F888888),
+            actorName = notification.actorNickname,
+            actionText = notification.content ?: "새 알림",
+            quote = null,
+        )
+    }
 
 private fun formatRelativeTime(instant: Instant): String {
     val now = Clock.System.now()

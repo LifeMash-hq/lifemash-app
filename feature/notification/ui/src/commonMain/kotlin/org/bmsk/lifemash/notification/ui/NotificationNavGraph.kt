@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import org.bmsk.lifemash.feature.designsystem.component.BottomNavItem
+import org.bmsk.lifemash.designsystem.component.BottomNavItem
 import org.bmsk.lifemash.notification.api.NOTIFICATION_ROUTE
 import org.bmsk.lifemash.notification.api.NotificationNavGraphInfo
 import org.bmsk.lifemash.notification.api.NotificationRoute
