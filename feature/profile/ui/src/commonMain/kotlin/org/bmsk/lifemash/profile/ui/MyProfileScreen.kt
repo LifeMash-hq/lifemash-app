@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.profile.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,25 +16,39 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import org.bmsk.lifemash.feature.designsystem.component.AvatarSize
-import org.bmsk.lifemash.feature.designsystem.component.LifeMashAvatar
-import org.bmsk.lifemash.feature.designsystem.component.LifeMashButton
+import org.bmsk.lifemash.designsystem.component.AvatarSize
+import org.bmsk.lifemash.designsystem.component.LifeMashAvatar
+import org.bmsk.lifemash.designsystem.component.LifeMashButton
+import org.bmsk.lifemash.designsystem.component.LifeMashButtonStyle
+import org.bmsk.lifemash.designsystem.component.LifeMashPrivacyLabel
+import org.bmsk.lifemash.designsystem.component.LifeMashProfileSubTabs
+import org.bmsk.lifemash.designsystem.component.NetworkImage
+import org.bmsk.lifemash.designsystem.component.PrivacyLevel
+import org.bmsk.lifemash.designsystem.theme.LifeMashShadow
+import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
+import org.bmsk.lifemash.profile.domain.model.CalendarDayEvent
+import org.bmsk.lifemash.profile.domain.model.Moment
 import org.bmsk.lifemash.profile.domain.model.ProfileEvent
 import org.bmsk.lifemash.profile.domain.model.UserProfile
 
@@ -44,6 +59,10 @@ fun MyProfileScreen(
     onFollowerClick: () -> Unit = {},
     onFollowingClick: () -> Unit = {},
     onMomentClick: (String) -> Unit = {},
+    onSubTabSelect: (ProfileSubTab) -> Unit = {},
+    onCalendarDaySelect: (Int?) -> Unit = {},
+    onNavigateMonth: (Int) -> Unit = {},
+    onCameraClick: (ProfileEvent) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize().statusBarsPadding()) {
@@ -63,27 +82,47 @@ fun MyProfileScreen(
                     item {
                         ProfileHeader(
                             profile = uiState.profile,
+                            momentCount = uiState.moments.size,
+                            selectedSubTab = uiState.selectedSubTab,
                             onEditClick = onEditClick,
                             onFollowerClick = onFollowerClick,
                             onFollowingClick = onFollowingClick,
+                            onSubTabSelect = onSubTabSelect,
                         )
                     }
-                    item {
-                        MiniCalendarSection(
-                            year = uiState.selectedYear,
-                            month = uiState.selectedMonth,
-                            eventDays = uiState.calendarEventDates,
-                        )
-                    }
-                    item {
-                        TodayEventsSection(events = uiState.todayEvents)
-                    }
-                    items(uiState.moments, key = { it.id }) { moment ->
-                        Text(
-                            text = moment.caption ?: moment.imageUrl,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        )
+                    when (uiState.selectedSubTab) {
+                        ProfileSubTab.Moments -> {
+                            item {
+                                PhotoGrid(
+                                    moments = uiState.moments,
+                                    onMomentClick = onMomentClick,
+                                )
+                            }
+                            item {
+                                UpcomingEventsSection(events = uiState.todayEvents)
+                            }
+                        }
+                        ProfileSubTab.Calendar -> {
+                            item {
+                                CalendarSection(
+                                    year = uiState.selectedYear,
+                                    month = uiState.selectedMonth,
+                                    calendarEvents = uiState.calendarEvents,
+                                    selectedDay = uiState.selectedCalendarDay,
+                                    viewMode = uiState.calendarViewMode,
+                                    onDaySelect = onCalendarDaySelect,
+                                    onPrevMonth = { onNavigateMonth(-1) },
+                                    onNextMonth = { onNavigateMonth(1) },
+
+                                )
+                            }
+                            item {
+                                TodayEventsSection(
+                                    events = uiState.todayEvents,
+                                    onCameraClick = onCameraClick,
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -94,67 +133,280 @@ fun MyProfileScreen(
 @Composable
 private fun ProfileHeader(
     profile: UserProfile,
+    momentCount: Int,
+    selectedSubTab: ProfileSubTab,
     onEditClick: () -> Unit,
     onFollowerClick: () -> Unit,
     onFollowingClick: () -> Unit,
+    onSubTabSelect: (ProfileSubTab) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
+            .padding(top = LifeMashSpacing.xxl),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            LifeMashAvatar(
-                name = profile.nickname,
-                imageUrl = profile.profileImage,
-                size = AvatarSize.Large,
+        LifeMashAvatar(
+            name = profile.nickname,
+            imageUrl = profile.profileImage,
+            size = AvatarSize.XLarge,
+        )
+        Spacer(Modifier.height(LifeMashSpacing.md))
+        Text(
+            text = profile.nickname,
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            textAlign = TextAlign.Center,
+        )
+        val bio = profile.bio
+        if (bio != null) {
+            Spacer(Modifier.height(LifeMashSpacing.xxs))
+            Text(
+                text = bio,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = profile.nickname,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                )
-                val bio = profile.bio
-                if (bio != null) {
-                    Text(bio, style = MaterialTheme.typography.bodyMedium)
-                }
-            }
         }
-        Spacer(Modifier.height(12.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            TextButton(onClick = onFollowerClick) {
-                Text("팔로워 ${profile.followerCount}")
-            }
-            TextButton(onClick = onFollowingClick) {
-                Text("팔로잉 ${profile.followingCount}")
-            }
+        Spacer(Modifier.height(LifeMashSpacing.lg))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(LifeMashSpacing.xxl),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ProfileStat(count = momentCount.toString(), label = "게시물")
+            ProfileStat(
+                count = formatStatCount(profile.followerCount),
+                label = "팔로워",
+                onClick = onFollowerClick,
+            )
+            ProfileStat(
+                count = formatStatCount(profile.followingCount),
+                label = "팔로잉",
+                onClick = onFollowingClick,
+            )
         }
-        LifeMashButton(text = "편집", onClick = onEditClick, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(LifeMashSpacing.lg))
+        LifeMashButton(
+            text = "프로필 편집",
+            onClick = onEditClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = LifeMashSpacing.xl),
+            style = LifeMashButtonStyle.Outline,
+        )
+        Spacer(Modifier.height(LifeMashSpacing.xl))
+        LifeMashProfileSubTabs(
+            tabs = listOf("순간", "캘린더"),
+            selectedIndex = when (selectedSubTab) {
+                ProfileSubTab.Moments -> 0
+                ProfileSubTab.Calendar -> 1
+            },
+            onTabSelect = { index ->
+                onSubTabSelect(if (index == 0) ProfileSubTab.Moments else ProfileSubTab.Calendar)
+            },
+        )
     }
 }
 
 @Composable
-private fun MiniCalendarSection(year: Int, month: Int, eventDays: Set<Int>) {
-    val monthNames = listOf("1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월")
-    val dayLabels = listOf("일", "월", "화", "수", "목", "금", "토")
+private fun ProfileStat(
+    count: String,
+    label: String,
+    onClick: (() -> Unit)? = null,
+) {
+    val modifier = if (onClick != null) Modifier.clickable { onClick() } else Modifier
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = count,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
 
-    // Calculate first day of month and total days
+private fun formatStatCount(count: Int): String {
+    return when {
+        count >= 10000 -> "${count / 1000 / 10.0}만"
+        count >= 1000 -> "${count / 100 / 10.0}k"
+        else -> count.toString()
+    }
+}
+
+@Composable
+private fun PhotoGrid(
+    moments: List<Moment>,
+    onMomentClick: (String) -> Unit,
+) {
+    if (moments.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = "아직 게시물이 없습니다",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        return
+    }
+    val rows = (moments.size + 2) / 3
+    Column(modifier = Modifier.fillMaxWidth()) {
+        repeat(rows) { rowIndex ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(LifeMashSpacing.micro),
+            ) {
+                repeat(3) { colIndex ->
+                    val momentIndex = rowIndex * 3 + colIndex
+                    val moment = moments.getOrNull(momentIndex)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .then(
+                                if (moment != null) Modifier.clickable { onMomentClick(moment.id) }
+                                else Modifier,
+                            ),
+                    ) {
+                        if (moment != null) {
+                            NetworkImage(
+                                imageUrl = moment.imageUrl,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(LifeMashSpacing.micro))
+        }
+    }
+}
+
+@Composable
+private fun UpcomingEventsSection(events: List<ProfileEvent>) {
+    if (events.isEmpty()) return
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = LifeMashSpacing.xl)
+            .padding(top = LifeMashSpacing.lg, bottom = LifeMashSpacing.md),
+    ) {
+        Text(
+            text = "다가오는 일정",
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(bottom = LifeMashSpacing.md),
+        )
+        events.forEach { event ->
+            UpcomingEventItem(event = event)
+            Spacer(Modifier.height(LifeMashSpacing.sm))
+        }
+    }
+}
+
+@Composable
+private fun UpcomingEventItem(event: ProfileEvent) {
+    val barColor = parseColor(event.color, MaterialTheme.colorScheme.primary)
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        shadowElevation = LifeMashShadow.sm,
+        color = MaterialTheme.colorScheme.surface,
+    ) {
+        Row(
+            modifier = Modifier.padding(LifeMashSpacing.md),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(36.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(barColor),
+            )
+            Spacer(Modifier.width(LifeMashSpacing.md))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = event.title,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                )
+                Text(
+                    text = "${event.startTime} – ${event.endTime}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = LifeMashSpacing.micro),
+                )
+            }
+            Text(
+                text = visibilityLabel(event.visibility),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CalendarSection(
+    year: Int,
+    month: Int,
+    calendarEvents: Map<Int, List<CalendarDayEvent>>,
+    selectedDay: Int?,
+    viewMode: CalendarViewMode,
+    onDaySelect: (Int?) -> Unit,
+    onPrevMonth: () -> Unit,
+    onNextMonth: () -> Unit,
+) {
+    val monthNames = listOf("1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월")
+    val dayLabels = listOf("일", "월", "화", "수", "목", "금", "토")
     val daysInMonth = daysInMonth(year, month)
-    val firstDayOfWeek = firstDayOfWeek(year, month) // 0=Sun
+    val firstDayOfWeek = firstDayOfWeek(year, month)
+    val primary = MaterialTheme.colorScheme.primary
+    val onPrimary = MaterialTheme.colorScheme.onPrimary
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 8.dp),
+            .padding(horizontal = LifeMashSpacing.xl)
+            .padding(top = LifeMashSpacing.md, bottom = LifeMashSpacing.sm),
     ) {
-        Text(
-            text = "${year}년 ${if (month in 1..12) monthNames[month - 1] else ""}",
-            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-        // Day headers
+        // 월 헤더
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            IconButton(onClick = onPrevMonth, modifier = Modifier.size(28.dp)) {
+                Icon(
+                    imageVector = Icons.Default.ChevronLeft,
+                    contentDescription = "이전 달",
+                    modifier = Modifier.size(12.dp),
+                )
+            }
+            Text(
+                text = "${year}년 ${if (month in 1..12) monthNames[month - 1] else ""}",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+            )
+            IconButton(onClick = onNextMonth, modifier = Modifier.size(28.dp)) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "다음 달",
+                    modifier = Modifier.size(12.dp),
+                )
+            }
+        }
+        Spacer(Modifier.height(LifeMashSpacing.sm))
+        // 요일 헤더
         Row(modifier = Modifier.fillMaxWidth()) {
             dayLabels.forEach { day ->
                 Text(
@@ -162,12 +414,12 @@ private fun MiniCalendarSection(year: Int, month: Int, eventDays: Set<Int>) {
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 )
             }
         }
-        Spacer(Modifier.height(4.dp))
-        // Calendar grid
+        Spacer(Modifier.height(LifeMashSpacing.xxs))
+        // 달력 그리드
         val totalCells = firstDayOfWeek + daysInMonth
         val rows = (totalCells + 6) / 7
         var dayCounter = 1
@@ -176,26 +428,34 @@ private fun MiniCalendarSection(year: Int, month: Int, eventDays: Set<Int>) {
                 repeat(7) { col ->
                     val cellIndex = row * 7 + col
                     Box(
-                        modifier = Modifier.weight(1f).aspectRatio(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f),
                         contentAlignment = Alignment.Center,
                     ) {
                         if (cellIndex >= firstDayOfWeek && dayCounter <= daysInMonth) {
                             val day = dayCounter
-                            val hasEvent = day in eventDays
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = day.toString(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontSize = 11.sp,
+                            val events = calendarEvents[day] ?: emptyList()
+                            val isSelected = day == selectedDay
+
+                            if (viewMode == CalendarViewMode.Chip) {
+                                CalendarChipDayCell(
+                                    day = day,
+                                    events = events,
+                                    isSelected = isSelected,
+                                    onDaySelect = onDaySelect,
+                                    primary = primary,
+                                    onPrimary = onPrimary,
                                 )
-                                if (hasEvent) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(4.dp)
-                                            .clip(CircleShape)
-                                            .background(MaterialTheme.colorScheme.primary),
-                                    )
-                                }
+                            } else {
+                                CalendarDotDayCell(
+                                    day = day,
+                                    events = events,
+                                    isSelected = isSelected,
+                                    onDaySelect = onDaySelect,
+                                    primary = primary,
+                                    onPrimary = onPrimary,
+                                )
                             }
                             dayCounter++
                         }
@@ -208,63 +468,234 @@ private fun MiniCalendarSection(year: Int, month: Int, eventDays: Set<Int>) {
 }
 
 @Composable
-private fun TodayEventsSection(events: List<ProfileEvent>) {
-    if (events.isEmpty()) return
+private fun CalendarDotDayCell(
+    day: Int,
+    events: List<CalendarDayEvent>,
+    isSelected: Boolean,
+    onDaySelect: (Int?) -> Unit,
+    primary: Color,
+    onPrimary: Color,
+) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 12.dp),
+            .fillMaxSize()
+            .clickable { onDaySelect(if (isSelected) null else day) },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Text(
-            text = "오늘 일정",
-            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-        events.forEach { event ->
-            ProfileEventItem(event = event)
-            Spacer(Modifier.height(6.dp))
+        Box(
+            modifier = Modifier.size(22.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clip(CircleShape)
+                        .background(primary),
+                )
+            }
+            Text(
+                text = day.toString(),
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                color = if (isSelected) onPrimary else MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        if (events.isNotEmpty()) {
+            Spacer(Modifier.height(LifeMashSpacing.micro))
+            Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                events.take(3).forEach { event ->
+                    Box(
+                        modifier = Modifier
+                            .size(5.dp)
+                            .clip(CircleShape)
+                            .background(parseColor(event.color, primary)),
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun ProfileEventItem(event: ProfileEvent) {
-    val barColor = runCatching {
-        val hex = event.color.trimStart('#')
-        val r = hex.substring(0, 2).toInt(16)
-        val g = hex.substring(2, 4).toInt(16)
-        val b = hex.substring(4, 6).toInt(16)
-        Color(r, g, b)
-    }.getOrElse { MaterialTheme.colorScheme.primary }
-
-    Row(
+private fun CalendarChipDayCell(
+    day: Int,
+    events: List<CalendarDayEvent>,
+    isSelected: Boolean,
+    onDaySelect: (Int?) -> Unit,
+    primary: Color,
+    onPrimary: Color,
+) {
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .fillMaxSize()
+            .padding(LifeMashSpacing.micro)
+            .clickable { onDaySelect(if (isSelected) null else day) },
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier
-                .width(3.dp)
-                .height(36.dp)
-                .background(barColor),
-        )
-        Spacer(Modifier.width(10.dp))
-        Column(modifier = Modifier.weight(1f)) {
+            modifier = Modifier.size(22.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clip(CircleShape)
+                        .background(primary),
+                )
+            }
+            Text(
+                text = day.toString(),
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                color = if (isSelected) onPrimary else MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        events.take(3).forEach { event ->
+            val chipColor = parseColor(event.color, primary)
             Text(
                 text = event.title,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-            )
-            Text(
-                text = "${event.startTime} – ${event.endTime}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 1.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(chipColor),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = MaterialTheme.typography.labelSmall.fontSize * 0.8f,
+                ),
+                color = onPrimary,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
             )
         }
     }
+}
+
+@Composable
+private fun TodayEventsSection(
+    events: List<ProfileEvent>,
+    onCameraClick: (ProfileEvent) -> Unit,
+) {
+    if (events.isEmpty()) return
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = LifeMashSpacing.xl)
+            .padding(top = LifeMashSpacing.md, bottom = LifeMashSpacing.md),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = LifeMashSpacing.sm),
+        ) {
+            Text(
+                text = "오늘",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+            )
+            Spacer(Modifier.width(LifeMashSpacing.sm))
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(LifeMashSpacing.sm))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(horizontal = LifeMashSpacing.sm, vertical = LifeMashSpacing.micro),
+            ) {
+                Text(
+                    text = events.size.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            }
+        }
+        events.forEach { event ->
+            TodayEventItem(event = event, onCameraClick = onCameraClick)
+            Spacer(Modifier.height(LifeMashSpacing.xs))
+        }
+    }
+}
+
+@Composable
+private fun TodayEventItem(
+    event: ProfileEvent,
+    onCameraClick: (ProfileEvent) -> Unit,
+) {
+    val barColor = parseColor(event.color, MaterialTheme.colorScheme.primary)
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        shadowElevation = LifeMashShadow.sm,
+        color = MaterialTheme.colorScheme.surface,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = LifeMashSpacing.md, vertical = 11.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .height(30.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(barColor),
+            )
+            Spacer(Modifier.width(LifeMashSpacing.md))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = event.title,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                )
+                Text(
+                    text = "${event.startTime} – ${event.endTime}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = LifeMashSpacing.micro),
+                )
+            }
+            Spacer(Modifier.width(LifeMashSpacing.sm))
+            LifeMashPrivacyLabel(level = visibilityToPrivacyLevel(event.visibility))
+            Spacer(Modifier.width(LifeMashSpacing.sm))
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .clip(RoundedCornerShape(LifeMashSpacing.sm))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable { onCameraClick(event) },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = "사진 올리기",
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+private fun visibilityToPrivacyLevel(visibility: String): PrivacyLevel {
+    return when (visibility.lowercase()) {
+        "public" -> PrivacyLevel.Public
+        "friend", "friends", "followers" -> PrivacyLevel.Friend
+        else -> PrivacyLevel.Private
+    }
+}
+
+private fun visibilityLabel(visibility: String): String {
+    return when (visibility.lowercase()) {
+        "public" -> "공개"
+        "friend", "friends", "followers" -> "친구"
+        else -> "비공개"
+    }
+}
+
+@Composable
+private fun parseColor(hex: String, fallback: Color): Color {
+    return runCatching {
+        val clean = hex.trimStart('#')
+        val r = clean.substring(0, 2).toInt(16)
+        val g = clean.substring(2, 4).toInt(16)
+        val b = clean.substring(4, 6).toInt(16)
+        Color(r, g, b)
+    }.getOrElse { fallback }
 }
 
 private fun daysInMonth(year: Int, month: Int): Int {

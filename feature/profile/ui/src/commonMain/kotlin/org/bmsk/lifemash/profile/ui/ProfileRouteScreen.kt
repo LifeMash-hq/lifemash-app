@@ -9,6 +9,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 internal fun ProfileRouteScreen(
     onShowErrorSnackbar: (Throwable?) -> Unit,
+    onNavigateToProfileEdit: () -> Unit = {},
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -17,5 +18,11 @@ internal fun ProfileRouteScreen(
         viewModel.loadProfile("me")
     }
 
-    MyProfileScreen(uiState = uiState)
+    MyProfileScreen(
+        uiState = uiState,
+        onEditClick = onNavigateToProfileEdit,
+        onSubTabSelect = viewModel::selectSubTab,
+        onCalendarDaySelect = viewModel::selectCalendarDay,
+        onNavigateMonth = viewModel::navigateMonth,
+    )
 }

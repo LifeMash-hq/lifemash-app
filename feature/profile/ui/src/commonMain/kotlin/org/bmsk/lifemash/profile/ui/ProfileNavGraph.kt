@@ -5,8 +5,10 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import org.bmsk.lifemash.feature.designsystem.component.BottomNavItem
+import org.bmsk.lifemash.designsystem.component.BottomNavItem
+import androidx.navigation.NavController
 import org.bmsk.lifemash.profile.api.PROFILE_ROUTE
+import org.bmsk.lifemash.profile.api.ProfileEditRoute
 import org.bmsk.lifemash.profile.api.ProfileNavGraphInfo
 import org.bmsk.lifemash.profile.api.ProfileRoute
 
@@ -17,8 +19,14 @@ val ProfileTab = BottomNavItem(
     label = "나",
 )
 
-fun NavGraphBuilder.profileNavGraph(navInfo: ProfileNavGraphInfo) {
+fun NavGraphBuilder.profileNavGraph(navInfo: ProfileNavGraphInfo, navController: NavController) {
     composable<ProfileRoute> {
-        ProfileRouteScreen(onShowErrorSnackbar = navInfo.onShowErrorSnackbar)
+        ProfileRouteScreen(
+            onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
+            onNavigateToProfileEdit = { navController.navigate(ProfileEditRoute) },
+        )
+    }
+    composable<ProfileEditRoute> {
+        ProfileEditRouteScreen(onBack = { navController.popBackStack() })
     }
 }

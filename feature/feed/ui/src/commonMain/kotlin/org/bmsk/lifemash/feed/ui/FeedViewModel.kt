@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.feed.domain.model.FeedPost
-import org.bmsk.lifemash.feed.domain.usecase.GetFeedUseCase
+import org.bmsk.lifemash.feed.domain.repository.FeedRepository
 
 sealed interface FeedUiState {
     data object Loading : FeedUiState
@@ -22,15 +22,15 @@ sealed interface FeedUiState {
     data class Error(val message: String) : FeedUiState
 }
 
-class FeedViewModel(
-    private val getFeedUseCase: GetFeedUseCase,
+internal class FeedViewModel(
+    private val feedRepository: FeedRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<FeedUiState>(FeedUiState.Loading)
     val uiState: StateFlow<FeedUiState> = _uiState
 
     fun loadFeed() {
         viewModelScope.launch {
-            getFeedUseCase()
+            feedRepository.getFeed(cursor = null, limit = 20)
                 .catch { _uiState.value = FeedUiState.Error(it.message ?: "오류") }
                 .collect { page ->
                     _uiState.value = if (page.items.isEmpty()) FeedUiState.Empty
@@ -47,8 +47,8 @@ class FeedViewModel(
     fun loadNextPage(loaded: FeedUiState.Loaded) {
         val cursor = loaded.nextCursor ?: return
         viewModelScope.launch {
-            getFeedUseCase(cursor)
-                .catch { /* ignore */ }
+            feedRepository.getFeed(cursor = cursor, limit = 20)
+                .catch { e -> e.printStackTrace() }
                 .collect { page ->
                     _uiState.update { state ->
                         if (state is FeedUiState.Loaded)

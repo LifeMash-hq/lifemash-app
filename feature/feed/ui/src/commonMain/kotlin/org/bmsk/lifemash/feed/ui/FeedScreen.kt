@@ -30,11 +30,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.bmsk.lifemash.feature.designsystem.component.AvatarSize
-import org.bmsk.lifemash.feature.designsystem.component.LifeMashAvatar
-import org.bmsk.lifemash.feature.designsystem.component.LifeMashButton
-import org.bmsk.lifemash.feature.designsystem.component.LifeMashSkeleton
-import org.bmsk.lifemash.feature.designsystem.component.NetworkImage
+import org.bmsk.lifemash.designsystem.component.AvatarSize
+import org.bmsk.lifemash.designsystem.component.LifeMashAvatar
+import org.bmsk.lifemash.designsystem.component.LifeMashButton
+import org.bmsk.lifemash.designsystem.component.LifeMashSkeleton
+import org.bmsk.lifemash.designsystem.component.NetworkImage
 import org.bmsk.lifemash.feed.domain.model.FeedPost
 
 @Composable

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.bmsk.lifemash.profile.domain.repository.ProfileRepository
+import org.bmsk.lifemash.profile.domain.repository.MomentRepository
 
 sealed interface PostMomentEvent {
     data object PostComplete : PostMomentEvent
@@ -26,8 +26,8 @@ data class PostMomentUiState(
     val isSubmitting: Boolean = false,
 )
 
-class PostMomentViewModel(
-    private val profileRepository: ProfileRepository,
+internal class PostMomentViewModel(
+    private val momentRepository: MomentRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PostMomentUiState())
     val uiState: StateFlow<PostMomentUiState> = _uiState
@@ -65,13 +65,12 @@ class PostMomentViewModel(
         _uiState.value = state.copy(isSubmitting = true)
         viewModelScope.launch {
             runCatching {
-                profileRepository.postMoment(
+                momentRepository.postMoment(
                     eventId = state.eventId,
                     imageUrl = state.media.first(),
                     caption = state.caption.ifBlank { null },
                     visibility = state.visibility.name.lowercase(),
                 )
-            }.onSuccess {
                 _events.emit(PostMomentEvent.PostComplete)
             }.onFailure {
                 _uiState.value = _uiState.value.copy(isSubmitting = false)

@@ -11,10 +11,14 @@ data class UserProfileRoute(val userId: String)
 @Serializable
 data object PostMomentRoute
 
+@Serializable
+data object ProfileEditRoute
+
 const val PROFILE_ROUTE = "profile"
 
 data class ProfileNavGraphInfo(
     val onShowErrorSnackbar: (Throwable?) -> Unit,
     val onNavigateToEventDetail: (String) -> Unit,
     val onNavigateToUserProfile: (String) -> Unit,
+    val onNavigateToProfileEdit: () -> Unit = {},
 )

@@ -6,10 +6,13 @@ import org.bmsk.lifemash.profile.data.api.ProfileApi
 import org.bmsk.lifemash.profile.data.api.dto.PostMomentBody
 import org.bmsk.lifemash.profile.data.api.dto.UpdateProfileBody
 import org.bmsk.lifemash.profile.domain.model.Moment
+import org.bmsk.lifemash.profile.domain.model.ProfileSettings
 import org.bmsk.lifemash.profile.domain.model.UserProfile
+import org.bmsk.lifemash.profile.domain.repository.MomentRepository
 import org.bmsk.lifemash.profile.domain.repository.ProfileRepository
 
-internal class ProfileRepositoryImpl(private val api: ProfileApi) : ProfileRepository {
+internal class ProfileRepositoryImpl(private val api: ProfileApi) : ProfileRepository, MomentRepository {
+    private var cachedSettings = ProfileSettings()
     override fun getProfile(userId: String): Flow<UserProfile> = flow {
         emit(api.getProfile(userId).toDomain())
     }
@@ -28,4 +31,10 @@ internal class ProfileRepositoryImpl(private val api: ProfileApi) : ProfileRepos
         api.postMoment(eventId, PostMomentBody(imageUrl, caption, visibility)).toDomain()
 
     override suspend fun deleteMoment(momentId: String) = api.deleteMoment(momentId)
+
+    override suspend fun getProfileSettings(): ProfileSettings = cachedSettings
+
+    override suspend fun updateProfileSettings(settings: ProfileSettings) {
+        cachedSettings = settings
+    }
 }
