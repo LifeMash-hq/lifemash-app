@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "org.bmsk.lifemash.feature.designsystem"
+        namespace = "org.bmsk.lifemash.designsystem"
         androidResources {
             enable = true
         }
@@ -14,15 +14,7 @@ kotlin {
     }
 
     sourceSets {
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-        }
         commonMain.dependencies {
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.material3)
-            implementation(libs.compose.material.icons.extended)
-            implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
