@@ -8,29 +8,16 @@ kotlin {
     }
 
     sourceSets {
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            implementation(libs.coroutines.test)
-        }
         commonMain.dependencies {
             implementation(project(":feature:auth:api"))
             implementation(project(":feature:auth:domain"))
             implementation(project(":shared:designsystem"))
-
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.material3)
-            implementation(libs.compose.material.icons.extended)
-            implementation(libs.compose.ui)
-
-            implementation(libs.jetbrains.navigation.compose)
-            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
-            implementation(libs.jetbrains.lifecycle.runtime.compose)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
         }
         androidMain.dependencies {
             implementation(libs.kakao.user)
+            implementation(libs.google.identity.googleid)
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play.services.auth)
         }
     }
 }

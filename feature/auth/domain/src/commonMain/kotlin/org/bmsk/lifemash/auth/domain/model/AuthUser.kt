@@ -12,4 +12,4 @@ data class AuthUser(
 )
 
 @Serializable
-enum class SocialProvider { KAKAO, GOOGLE }
+enum class SocialProvider { KAKAO, GOOGLE, EMAIL }

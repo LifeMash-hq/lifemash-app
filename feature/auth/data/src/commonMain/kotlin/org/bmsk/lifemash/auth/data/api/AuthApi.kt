@@ -10,6 +10,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import org.bmsk.lifemash.auth.data.api.dto.AuthTokenDto
 import org.bmsk.lifemash.auth.data.api.dto.AuthUserDto
+import org.bmsk.lifemash.auth.data.api.dto.EmailSignInBody
 import org.bmsk.lifemash.auth.data.api.dto.GoogleSignInBody
 import org.bmsk.lifemash.auth.data.api.dto.KakaoSignInBody
 import org.bmsk.lifemash.auth.data.api.dto.RefreshTokenBody
@@ -28,6 +29,12 @@ class AuthApi(private val client: HttpClient) {
         client.post("$base/google") {
             contentType(ContentType.Application.Json)
             setBody(GoogleSignInBody(idToken))
+        }.body()
+
+    suspend fun signInWithEmail(email: String, password: String): AuthTokenDto =
+        client.post("$base/email") {
+            contentType(ContentType.Application.Json)
+            setBody(EmailSignInBody(email, password))
         }.body()
 
     suspend fun refreshToken(refreshToken: String): AuthTokenDto =

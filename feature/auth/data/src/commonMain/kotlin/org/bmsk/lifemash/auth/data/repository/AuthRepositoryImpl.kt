@@ -30,6 +30,14 @@ internal class AuthRepositoryImpl(
         return token
     }
 
+    override suspend fun signInWithEmail(email: String, password: String): AuthToken {
+        val token = api.signInWithEmail(email, password).toDomain()
+        tokenStorage.save(token)
+        val user = api.getMe(token.accessToken).toDomain()
+        tokenStorage.saveUser(user)
+        return token
+    }
+
     override suspend fun refreshToken(refreshToken: String): AuthToken {
         val token = api.refreshToken(refreshToken).toDomain()
         tokenStorage.save(token)

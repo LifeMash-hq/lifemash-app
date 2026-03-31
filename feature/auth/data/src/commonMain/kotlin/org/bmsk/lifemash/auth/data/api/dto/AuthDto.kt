@@ -37,4 +37,7 @@ data class KakaoSignInBody(val accessToken: String)
 data class GoogleSignInBody(val idToken: String)
 
 @Serializable
+data class EmailSignInBody(val email: String, val password: String)
+
+@Serializable
 data class RefreshTokenBody(val refreshToken: String)
