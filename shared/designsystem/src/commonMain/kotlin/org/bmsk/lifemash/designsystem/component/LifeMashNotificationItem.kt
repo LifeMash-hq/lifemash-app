@@ -97,6 +97,7 @@ fun NotificationBodyText(
     actorName: String?,
     actionText: String,
     quote: String? = null,
+    modifier: Modifier = Modifier,
 ) {
     val text = buildAnnotatedString {
         if (actorName != null) {

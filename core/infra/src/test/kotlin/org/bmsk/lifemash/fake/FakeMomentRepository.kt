@@ -1,5 +1,6 @@
 package org.bmsk.lifemash.fake
 
+import org.bmsk.lifemash.model.moment.CreateMomentRequest
 import org.bmsk.lifemash.model.moment.MomentDto
 import org.bmsk.lifemash.moment.MomentRepository
 import kotlin.uuid.Uuid
@@ -7,16 +8,17 @@ import kotlin.uuid.Uuid
 class FakeMomentRepository : MomentRepository {
     private val moments = mutableMapOf<Uuid, MomentDto>()
 
-    override fun create(eventId: Uuid, authorId: Uuid, imageUrl: String, caption: String?, visibility: String): MomentDto {
+    override fun create(authorId: Uuid, request: CreateMomentRequest): MomentDto {
         val id = Uuid.random()
         val moment = MomentDto(
             id = id.toString(),
-            eventId = eventId.toString(),
+            eventId = request.eventId,
+            eventTitle = null,
             authorId = authorId.toString(),
             authorNickname = "User",
-            imageUrl = imageUrl,
-            caption = caption,
-            visibility = visibility,
+            caption = request.caption,
+            visibility = request.visibility,
+            media = request.media,
             createdAt = "2026-01-01T00:00:00Z",
         )
         moments[id] = moment
@@ -29,8 +31,9 @@ class FakeMomentRepository : MomentRepository {
         return moments.values
             .filter { it.authorId == userId.toString() }
             .filter { moment ->
-                if (viewerId != null && moment.authorId == viewerId.toString()) true
-                else moment.visibility == "public"
+                val isSelf = viewerId != null && moment.authorId == viewerId.toString()
+                if (isSelf) true
+                else moment.visibility == "public" || moment.visibility == "followers"
             }
             .sortedByDescending { it.createdAt }
     }

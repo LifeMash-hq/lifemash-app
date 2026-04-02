@@ -17,7 +17,7 @@ object Users : Table("users") {
     val email = varchar("email", 255).uniqueIndex()            // 이메일 (중복 불가)
     val provider = varchar("provider", 20)                     // 로그인 제공자 (KAKAO, GOOGLE)
     val providerId = varchar("provider_id", 255)               // 소셜 서비스에서의 고유 ID
-    val nickname = varchar("nickname", 50)                     // 표시 이름
+    val nickname = varchar("nickname", 50).uniqueIndex()             // 표시 이름 (검색용 Handle 역할)
     val profileImage = varchar("profile_image", 500).nullable() // 프로필 이미지 URL (없을 수 있음)
     val bio = varchar("bio", 300).nullable()                   // 자기소개 (없을 수 있음)
     val createdAt = timestampWithTimeZone("created_at")        // 가입 일시

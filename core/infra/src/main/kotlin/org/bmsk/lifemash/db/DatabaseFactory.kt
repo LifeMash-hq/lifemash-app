@@ -5,11 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import org.bmsk.lifemash.db.tables.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
-import kotlin.uuid.Uuid
-import kotlin.uuid.toJavaUuid
 
 /**
  * 데이터베이스 연결 및 테이블 초기화를 담당하는 팩토리.
@@ -39,49 +35,11 @@ object DatabaseFactory {
         // 서버 시작 시 테이블/컬럼이 없으면 자동 생성 (이미 있으면 무시, 누락 컬럼은 추가)
         transaction {
             SchemaUtils.createMissingTablesAndColumns(
-                Users, Groups, GroupMembers, Events, Comments,
+                Users, Groups, GroupMembers, Events, Comments, EventAttendees,
                 AssistantConversations, AssistantMessages, AssistantUsage, UserApiKeys,
-                MarketplaceBlocks,
-                Follows, Moments, Likes, Notifications,
+                Follows, Moments, MomentMedia, Likes, Notifications,
+                Memos, ChecklistItems,
             )
-        }
-
-        seedSystemBlocks()
-    }
-
-    /** 시스템 제공 블록(뉴스 등)을 마켓플레이스에 등록. 이미 존재하면 무시하고, url은 항상 최신으로 유지. */
-    private fun seedSystemBlocks() {
-        val newsBlockId = Uuid.parse("00000000-0000-0000-0000-000000000001").toJavaUuid()
-        val newsBlockUrl = "https://lifemash-e79c5.web.app/blocks/news/"
-
-        transaction {
-            MarketplaceBlocks.insertIgnore {
-                it[id] = newsBlockId
-                it[name] = "LifeMash 뉴스"
-                it[url] = newsBlockUrl
-                it[description] = "키워드 기반 뉴스 기사 검색"
-                it[creatorId] = null
-                it[status] = "APPROVED"
-                it[createdAt] = System.currentTimeMillis()
-                it[toolDefinitions] = """[{
-                    "name": "search_news",
-                    "description": "뉴스 기사를 키워드로 검색합니다. 특정 주제나 키워드와 관련된 최신 뉴스를 가져올 때 사용합니다.",
-                    "input_schema": {
-                        "type": "object",
-                        "properties": {
-                            "keyword": {"type": "string", "description": "검색 키워드 (예: '삼성전자', 'AI', '경제')"},
-                            "limit": {"type": "integer", "description": "가져올 기사 수 (기본값: 10, 최대: 100)"},
-                            "category": {"type": "string", "description": "카테고리 필터 (politics, economy, tech 등). 생략 시 전체."}
-                        },
-                        "required": ["keyword"]
-                    },
-                    "executionUrl": "https://asia-northeast3-lifemash-e79c5.cloudfunctions.net/newsBlockToolHandler"
-                }]""".trimIndent()
-            }
-            // 시스템 블록의 url은 항상 최신 값으로 유지 (insertIgnore는 기존 레코드 미갱신)
-            MarketplaceBlocks.update({ MarketplaceBlocks.id eq newsBlockId }) {
-                it[url] = newsBlockUrl
-            }
         }
     }
 }

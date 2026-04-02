@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import org.bmsk.lifemash.calendar.domain.model.Event
+import org.bmsk.lifemash.calendar.domain.model.EventVisibility
 import org.bmsk.lifemash.calendar.domain.model.Group
 import org.bmsk.lifemash.calendar.domain.model.GroupType
 import org.bmsk.lifemash.calendar.domain.repository.EventRepository
@@ -34,7 +35,7 @@ class CalendarViewModelTest {
 
     private val testEvent = Event(
         id = "event-1", groupId = "group-1", authorId = "user-1",
-        title = "테스트 일정", description = null,
+        title = "테스트 일정", description = null, location = null,
         startAt = now, endAt = null, isAllDay = false, color = null,
         createdAt = now, updatedAt = now,
     )
@@ -48,10 +49,12 @@ class CalendarViewModelTest {
             groupId: String,
             title: String,
             description: String?,
+            location: String?,
             startAt: Instant,
             endAt: Instant?,
             isAllDay: Boolean,
             color: String?,
+            visibility: EventVisibility,
         ): Event = testEvent
 
         override suspend fun updateEvent(
@@ -59,10 +62,12 @@ class CalendarViewModelTest {
             eventId: String,
             title: String?,
             description: String?,
+            location: String?,
             startAt: Instant?,
             endAt: Instant?,
             isAllDay: Boolean?,
             color: String?,
+            visibility: EventVisibility?,
         ): Event = testEvent
 
         override suspend fun deleteEvent(groupId: String, eventId: String) {}

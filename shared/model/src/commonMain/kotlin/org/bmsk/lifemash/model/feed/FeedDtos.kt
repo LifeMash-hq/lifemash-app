@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.model.feed
 
 import kotlinx.serialization.Serializable
+import org.bmsk.lifemash.model.moment.MediaItemDto
 
 @Serializable
 data class FeedPostDto(
@@ -8,9 +9,9 @@ data class FeedPostDto(
     val authorId: String,
     val authorNickname: String,
     val authorProfileImage: String? = null,
-    val eventId: String,
-    val eventTitle: String,
-    val imageUrl: String,
+    val eventId: String? = null,
+    val eventTitle: String? = null,
+    val media: List<MediaItemDto> = emptyList(),
     val caption: String? = null,
     val likeCount: Int = 0,
     val isLiked: Boolean = false,

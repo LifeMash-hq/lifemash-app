@@ -2,6 +2,7 @@ package org.bmsk.lifemash.profile.data.api.dto
 
 import kotlinx.serialization.Serializable
 import org.bmsk.lifemash.profile.domain.model.Moment
+import org.bmsk.lifemash.profile.domain.model.ProfileMomentMedia
 import org.bmsk.lifemash.profile.domain.model.UserProfile
 
 @Serializable
@@ -25,18 +26,33 @@ data class ProfileDto(
 data class UpdateProfileBody(val nickname: String? = null, val bio: String? = null, val profileImage: String? = null)
 
 @Serializable
+data class MomentMediaDto(
+    val mediaUrl: String,
+    val mediaType: String,
+    val sortOrder: Int,
+)
+
+@Serializable
 data class MomentDto(
     val id: String,
-    val eventId: String,
+    val eventId: String? = null,
+    val eventTitle: String? = null,
     val authorId: String,
     val authorNickname: String,
-    val imageUrl: String,
+    val media: List<MomentMediaDto> = emptyList(),
     val caption: String? = null,
     val visibility: String = "public",
     val createdAt: String,
 ) {
-    fun toDomain() = Moment(id = id, eventId = eventId, authorId = authorId, authorNickname = authorNickname, imageUrl = imageUrl, caption = caption, visibility = visibility, createdAt = createdAt)
+    fun toDomain() = Moment(
+        id = id,
+        eventId = eventId,
+        eventTitle = eventTitle,
+        authorId = authorId,
+        authorNickname = authorNickname,
+        media = media.map { ProfileMomentMedia(it.mediaUrl, it.mediaType, it.sortOrder) },
+        caption = caption,
+        visibility = visibility,
+        createdAt = createdAt,
+    )
 }
-
-@Serializable
-data class PostMomentBody(val imageUrl: String, val caption: String? = null, val visibility: String = "public")

@@ -10,21 +10,31 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.uuid.Uuid
 import kotlin.uuid.toJavaUuid
 
+import org.bmsk.lifemash.db.tables.Users
+
 class ExposedCommentRepository : CommentRepository {
 
     override fun getByEventId(eventId: Uuid): List<CommentDto> = transaction {
-        Comments.selectAll().where { Comments.eventId eq eventId.toJavaUuid() }
+        (Comments innerJoin Users)
+            .selectAll()
+            .where { Comments.eventId eq eventId.toJavaUuid() }
             .orderBy(Comments.createdAt)
             .map { it.toDto() }
     }
 
     override fun create(eventId: Uuid, authorId: Uuid, content: String): CommentDto = transaction {
-        Comments.insert {
+        val newId = Comments.insert {
             it[Comments.eventId] = eventId.toJavaUuid()
             it[Comments.authorId] = authorId.toJavaUuid()
             it[Comments.content] = content
             it[Comments.createdAt] = nowUtc()
-        }.resultedValues!!.first().toDto()
+        }.resultedValues!!.first()[Comments.id]
+
+        (Comments innerJoin Users)
+            .selectAll()
+            .where { Comments.id eq newId }
+            .single()
+            .toDto()
     }
 
     override fun delete(commentId: Uuid, authorId: Uuid) = transaction {
@@ -43,6 +53,8 @@ class ExposedCommentRepository : CommentRepository {
         id = this[Comments.id].toString(),
         eventId = this[Comments.eventId].toString(),
         authorId = this[Comments.authorId].toString(),
+        authorNickname = this[Users.nickname],
+        authorProfileImage = this[Users.profileImage],
         content = this[Comments.content],
         createdAt = this[Comments.createdAt].toKotlinxInstant(),
     )

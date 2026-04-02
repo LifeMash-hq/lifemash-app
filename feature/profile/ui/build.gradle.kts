@@ -11,6 +11,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":feature:profile:api"))
             implementation(project(":feature:profile:domain"))
+            implementation(project(":feature:calendar:api"))
             implementation(project(":feature:calendar:domain"))
             implementation(project(":shared:designsystem"))
             implementation(libs.kotlinx.immutable)

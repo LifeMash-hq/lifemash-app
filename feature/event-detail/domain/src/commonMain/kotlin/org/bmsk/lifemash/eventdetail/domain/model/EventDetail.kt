@@ -1,6 +1,8 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
 package org.bmsk.lifemash.eventdetail.domain.model
 
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class EventDetail(
@@ -8,7 +10,8 @@ data class EventDetail(
     val groupId: String,
     val title: String,
     val description: String?,
-    val date: String,
+    val startAt: Instant,
+    val endAt: Instant?,
     val location: String? = null,
     val imageEmoji: String = "",
     val sharedByNickname: String? = null,
@@ -29,5 +32,5 @@ data class EventComment(
     val id: String,
     val authorNickname: String,
     val content: String,
-    val createdAt: String,
+    val createdAt: Instant,
 )

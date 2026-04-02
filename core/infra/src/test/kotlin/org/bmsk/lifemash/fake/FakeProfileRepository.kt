@@ -38,4 +38,6 @@ class FakeProfileRepository : ProfileRepository {
 
     override fun getFollowerCount(userId: Uuid): Int = followerCounts[userId] ?: 0
     override fun getFollowingCount(userId: Uuid): Int = followingCounts[userId] ?: 0
+    override fun checkHandleAvailability(handle: String): Boolean =
+        profiles.values.none { it.nickname == handle }
 }

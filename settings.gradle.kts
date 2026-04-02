@@ -72,6 +72,20 @@ include(
 )
 
 include(
+    ":feature:memo:api",
+    ":feature:memo:domain",
+    ":feature:memo:data",
+    ":feature:memo:ui",
+)
+
+include(
+    ":feature:moment:api",
+    ":feature:moment:domain",
+    ":feature:moment:data",
+    ":feature:moment:ui",
+)
+
+include(
     ":shared:model",
     ":shared:network",
     ":shared:navigation",

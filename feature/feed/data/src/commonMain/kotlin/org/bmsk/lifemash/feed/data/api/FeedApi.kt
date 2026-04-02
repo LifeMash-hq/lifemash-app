@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.*
 import kotlinx.serialization.Serializable
+import org.bmsk.lifemash.feed.domain.model.FeedFilter
 import org.bmsk.lifemash.feed.domain.model.FeedPost
 import org.bmsk.lifemash.feed.domain.repository.FeedPage
 
@@ -11,8 +12,9 @@ import org.bmsk.lifemash.feed.domain.repository.FeedPage
 data class FeedResponseDto(val items: List<FeedPost>, val nextCursor: String? = null)
 
 internal class FeedApi(private val client: HttpClient) {
-    suspend fun getFeed(cursor: String?, limit: Int): FeedPage {
+    suspend fun getFeed(filter: FeedFilter, cursor: String?, limit: Int): FeedPage {
         val dto: FeedResponseDto = client.get("/api/v1/feed") {
+            parameter("filter", filter.queryValue)
             cursor?.let { parameter("cursor", it) }
             parameter("limit", limit.toString())
         }.body()

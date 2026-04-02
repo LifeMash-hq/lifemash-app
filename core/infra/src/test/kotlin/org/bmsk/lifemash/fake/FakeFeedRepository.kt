@@ -15,6 +15,13 @@ class FakeFeedRepository : FeedRepository {
         return FeedResponse(items = items, nextCursor = nextCursor)
     }
 
+    override fun getAllFeed(cursor: String?, limit: Int): FeedResponse {
+        val startIndex = if (cursor != null) cursor.toInt() else 0
+        val items = posts.drop(startIndex).take(limit)
+        val nextCursor = if (startIndex + limit < posts.size) (startIndex + limit).toString() else null
+        return FeedResponse(items = items, nextCursor = nextCursor)
+    }
+
     override fun getTrending(limit: Int): List<FeedPostDto> {
         return posts.take(limit)
     }

@@ -10,6 +10,10 @@ import org.bmsk.lifemash.eventdetail.data.di.eventDetailDataModule
 import org.bmsk.lifemash.eventdetail.ui.di.eventDetailUiModule
 import org.bmsk.lifemash.feed.data.di.feedDataModule
 import org.bmsk.lifemash.feed.ui.di.feedUiModule
+import org.bmsk.lifemash.memo.data.di.memoDataModule
+import org.bmsk.lifemash.memo.ui.di.memoUiModule
+import org.bmsk.lifemash.moment.data.di.momentDataModule
+import org.bmsk.lifemash.moment.ui.di.momentUiModule
 import org.bmsk.lifemash.main.MainViewModel
 import org.bmsk.lifemash.notification.data.di.notificationDataModule
 import org.bmsk.lifemash.notification.ui.di.notificationUiModule
@@ -44,4 +48,8 @@ fun appKoinModules(
     feedUiModule,
     eventDetailDataModule,
     eventDetailUiModule,
+    memoDataModule,
+    memoUiModule,
+    momentDataModule,
+    momentUiModule,
 )

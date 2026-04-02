@@ -1,13 +1,12 @@
 package org.bmsk.lifemash.calendar.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,8 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -45,7 +44,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -62,12 +60,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import kotlinx.datetime.number
 import org.bmsk.lifemash.calendar.domain.model.Event
 import org.bmsk.lifemash.calendar.domain.model.Group
 import org.bmsk.lifemash.calendar.domain.model.GroupType
+import org.bmsk.lifemash.designsystem.component.LifeMashButton
+import org.bmsk.lifemash.designsystem.component.LifeMashInput
+import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
 
 @Composable
 internal fun CalendarScreen(
@@ -78,6 +77,9 @@ internal fun CalendarScreen(
     onShowOverlay: (CalendarOverlay) -> Unit,
     onCreateGroup: (GroupType, String?) -> Unit,
     onJoinGroup: (String) -> Unit,
+    onNavigateToEventCreate: (year: Int, month: Int, day: Int, groupId: String?) -> Unit = { _, _, _, _ -> },
+    onNavigateToEventEdit: (groupId: String, event: org.bmsk.lifemash.calendar.domain.model.Event) -> Unit = { _, _ -> },
+    onBack: () -> Unit = {},
 ) {
     when (uiState.screenType) {
         CalendarUiState.ScreenType.Loading -> {
@@ -90,6 +92,7 @@ internal fun CalendarScreen(
             isCreating = uiState.isCreatingGroup,
             onCreateGroup = onCreateGroup,
             onJoinGroup = onJoinGroup,
+            onBack = onBack,
         )
 
         CalendarUiState.ScreenType.Calendar -> CalendarContent(
@@ -98,6 +101,9 @@ internal fun CalendarScreen(
             onChangeMonth = onChangeMonth,
             onSelectGroup = onSelectGroup,
             onShowOverlay = onShowOverlay,
+            onNavigateToEventCreate = onNavigateToEventCreate,
+            onNavigateToEventEdit = onNavigateToEventEdit,
+            onBack = onBack,
         )
     }
 }
@@ -109,11 +115,27 @@ private fun CalendarContent(
     onChangeMonth: (groupId: String, year: Int, month: Int) -> Unit,
     onSelectGroup: (String) -> Unit,
     onShowOverlay: (CalendarOverlay) -> Unit,
+    onNavigateToEventCreate: (year: Int, month: Int, day: Int, groupId: String?) -> Unit,
+    onNavigateToEventEdit: (groupId: String, event: org.bmsk.lifemash.calendar.domain.model.Event) -> Unit,
+    onBack: () -> Unit = {},
 ) {
     val groupId = uiState.selectedGroup?.id
 
     Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로가기")
+                }
+                Text(
+                    text = "그룹 캘린더",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f),
+                )
+            }
             if (uiState.groups.size > 1) {
                 GroupSelector(
                     groups = uiState.groups,
@@ -181,7 +203,15 @@ private fun CalendarContent(
             }
         }
         FloatingActionButton(
-            onClick = { onShowOverlay(CalendarOverlay.EventCreate(uiState.selectedDate)) },
+            onClick = {
+                val date = uiState.selectedDate
+                onNavigateToEventCreate(
+                    date?.year ?: uiState.currentYear,
+                    date?.let { it.month.number } ?: uiState.currentMonth,
+                    date?.day ?: 0,
+                    uiState.selectedGroup?.id,
+                )
+            },
             modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
         ) {
             Icon(Icons.Filled.Add, contentDescription = "일정 추가")
@@ -191,138 +221,12 @@ private fun CalendarContent(
 
 // region BottomSheet / Dialog (internal — RouteScreen에서 사용)
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@Composable
-internal fun EventCreateBottomSheet(
-    editingEvent: Event?,
-    isLoading: Boolean,
-    selectedDate: LocalDate?,
-    onDismiss: () -> Unit,
-    onSubmit: (EventFormData) -> Unit,
-) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val isEdit = editingEvent != null
-
-    var title by remember { mutableStateOf(editingEvent?.title.orEmpty()) }
-    var description by remember { mutableStateOf(editingEvent?.description.orEmpty()) }
-    var isAllDay by remember { mutableStateOf(editingEvent?.isAllDay ?: false) }
-    var selectedColor by remember { mutableStateOf(editingEvent?.color) }
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(
-                text = if (isEdit) "일정 수정" else "새 일정",
-                style = MaterialTheme.typography.titleLarge,
-            )
-
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("제목") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-            )
-
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("설명 (선택)") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 2,
-                maxLines = 4,
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("종일", style = MaterialTheme.typography.bodyLarge)
-                Switch(checked = isAllDay, onCheckedChange = { isAllDay = it })
-            }
-
-            Text("색상", style = MaterialTheme.typography.bodyLarge)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                EVENT_COLORS.forEach { (hex, color) ->
-                    val isSelectedColor = selectedColor == hex
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                            .then(
-                                if (isSelectedColor) {
-                                    Modifier.padding(2.dp)
-                                        .clip(CircleShape)
-                                        .background(color)
-                                } else {
-                                    Modifier
-                                }
-                            )
-                            .clickable { selectedColor = if (isSelectedColor) null else hex },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (isSelectedColor) {
-                            Box(
-                                Modifier.size(16.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.surface)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            Button(
-                onClick = {
-                    val startMs = if (isEdit) {
-                        editingEvent.startAt.toEpochMilliseconds()
-                    } else {
-                        val date = selectedDate ?: return@Button
-                        LocalDateTime(date.year, date.month, date.day, 0, 0)
-                            .toInstant(TimeZone.currentSystemDefault())
-                            .toEpochMilliseconds()
-                    }
-                    onSubmit(
-                        EventFormData(
-                            title = title.ifBlank { editingEvent?.title ?: "" },
-                            description = description.ifBlank { null },
-                            startAt = startMs,
-                            endAt = null,
-                            isAllDay = isAllDay,
-                            color = selectedColor,
-                        ),
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = title.isNotBlank() && !isLoading,
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                    Spacer(Modifier.width(8.dp))
-                }
-                Text(if (isEdit) "수정" else "저장")
-            }
-
-            Spacer(Modifier.height(16.dp))
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EventDetailBottomSheet(
     event: Event,
     onDismiss: () -> Unit,
-    onEdit: () -> Unit,
+    onEdit: (Event) -> Unit,
     onDelete: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -359,7 +263,7 @@ internal fun EventDetailBottomSheet(
                     )
                 }
                 Row {
-                    IconButton(onClick = onEdit) {
+                    IconButton(onClick = { onEdit(event) }) {
                         Icon(Icons.Filled.Edit, contentDescription = "수정")
                     }
                     IconButton(onClick = { showDeleteConfirm = true }) {
@@ -458,14 +362,23 @@ private fun NoGroupContent(
     isCreating: Boolean,
     onCreateGroup: (GroupType, String?) -> Unit,
     onJoinGroup: (String) -> Unit,
+    onBack: () -> Unit = {},
 ) {
     var inviteCode by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
+        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로가기")
+            }
+        }
         Text(
             text = "공유 캘린더를 시작하세요",
             style = MaterialTheme.typography.headlineSmall,
@@ -688,12 +601,12 @@ private fun EventItem(event: Event, onClick: () -> Unit) {
 // region Color utils
 
 internal val EVENT_COLORS = listOf(
-    "#FF6B6B" to Color(0xFFFF6B6B),
-    "#4ECDC4" to Color(0xFF4ECDC4),
-    "#45B7D1" to Color(0xFF45B7D1),
-    "#96CEB4" to Color(0xFF96CEB4),
-    "#FFEAA7" to Color(0xFFFFEAA7),
-    "#DDA0DD" to Color(0xFFDDA0DD),
+    "#6C5CE7" to Color(0xFF6C5CE7),
+    "#E17055" to Color(0xFFE17055),
+    "#00B894" to Color(0xFF00B894),
+    "#FF6B81" to Color(0xFFFF6B81),
+    "#0984E3" to Color(0xFF0984E3),
+    "#FDCB6E" to Color(0xFFFDCB6E),
 )
 
 internal fun parseEventColor(hex: String): Color {

@@ -17,7 +17,6 @@ internal data class CalendarUiState(
     val overlay: CalendarOverlay = CalendarOverlay.None,
     val events: PersistentList<Event> = persistentListOf(),
     val isCreatingGroup: Boolean = false,
-    val isCreatingEvent: Boolean = false,
     val isRenamingGroup: Boolean = false,
 ) {
     enum class ScreenType { Loading, NoGroup, Calendar }

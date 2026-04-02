@@ -9,15 +9,25 @@ data class FeedComment(
 )
 
 @Serializable
+data class FeedMedia(
+    val mediaUrl: String,
+    val mediaType: String,
+    val sortOrder: Int,
+    val width: Int? = null,
+    val height: Int? = null,
+    val durationMs: Long? = null,
+)
+
+@Serializable
 data class FeedPost(
     val id: String,
     val authorId: String,
     val authorNickname: String,
     val authorProfileImage: String? = null,
-    val eventId: String,
-    val eventTitle: String,
+    val eventId: String? = null,
+    val eventTitle: String? = null,
     val eventDate: String? = null,
-    val imageUrl: String,
+    val media: List<FeedMedia> = emptyList(),
     val caption: String? = null,
     val previewComments: List<FeedComment> = emptyList(),
     val likeCount: Int = 0,

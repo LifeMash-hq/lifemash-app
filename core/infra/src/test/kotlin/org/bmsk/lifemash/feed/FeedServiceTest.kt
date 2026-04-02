@@ -14,7 +14,7 @@ class FeedServiceTest {
     private fun createPost(i: Int) = FeedPostDto(
         id = Uuid.random().toString(), authorId = Uuid.random().toString(),
         authorNickname = "User$i", eventId = Uuid.random().toString(),
-        eventTitle = "Event$i", imageUrl = "img$i.jpg", createdAt = "2026-01-01T00:00:${i.toString().padStart(2, '0')}Z",
+        eventTitle = "Event$i", createdAt = "2026-01-01T00:00:${i.toString().padStart(2, '0')}Z",
     )
 
     @Test

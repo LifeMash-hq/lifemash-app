@@ -1,4 +1,5 @@
 [versions]
+dokka = "2.0.0"
 androidGradlePlugin = "9.1.0"
 androidDesugarJdkLibs = "2.1.5"
 
@@ -75,8 +76,9 @@ logback = "1.5.16"
 javaJwt = "4.5.0"
 firebaseAdmin = "9.4.3"
 shadow = "9.0.0-beta12"
-uiToolingPreview = "1.10.6"
 uiTooling = "1.10.6"
+h2 = "2.3.232"
+awsSdkKotlin = "1.4.119"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -241,8 +243,11 @@ java-jwt = { module = "com.auth0:java-jwt", version.ref = "javaJwt" }
 firebase-admin-sdk = { module = "com.google.firebase:firebase-admin", version.ref = "firebaseAdmin" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
+aws-s3 = { module = "aws.sdk.kotlin:s3", version.ref = "awsSdkKotlin" }
 
 [plugins]
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version = "2.3.10" }

@@ -22,6 +22,7 @@ fun NavGraphBuilder.notificationNavGraph(navInfo: NotificationNavGraphInfo) {
         NotificationRouteScreen(
             onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
             onBack = navInfo.onBack,
+            onNavigateToEventDetail = navInfo.onNavigateToEventDetail,
         )
     }
 }

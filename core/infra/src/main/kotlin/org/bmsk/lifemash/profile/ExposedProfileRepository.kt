@@ -55,6 +55,10 @@ class ExposedProfileRepository : ProfileRepository {
         countFollowing(userId.toJavaUuid())
     }
 
+    override fun checkHandleAvailability(handle: String): Boolean = transaction {
+        Users.selectAll().where { Users.nickname eq handle }.empty()
+    }
+
     // ── private helpers ──
 
     private fun countFollowers(javaId: java.util.UUID): Int =

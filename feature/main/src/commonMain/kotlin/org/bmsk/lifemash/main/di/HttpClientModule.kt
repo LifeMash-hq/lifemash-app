@@ -67,4 +67,10 @@ fun httpClientModule(backendBaseUrl: String) = module {
             install(Logging) { level = LogLevel.BODY }
         }
     }
+
+    single<HttpClient>(named("upload")) {
+        HttpClient(createPlatformHttpClientEngine()) {
+            install(Logging) { level = LogLevel.BODY }
+        }
+    }
 }

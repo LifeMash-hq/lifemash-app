@@ -2,7 +2,7 @@ package org.bmsk.lifemash.main
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -14,6 +14,8 @@ import org.bmsk.lifemash.auth.api.AuthRoute
 import org.bmsk.lifemash.auth.ui.authNavGraph
 import org.bmsk.lifemash.calendar.api.CalendarNavGraphInfo
 import org.bmsk.lifemash.calendar.ui.calendarNavGraph
+import org.bmsk.lifemash.memo.api.MemoNavGraphInfo
+import org.bmsk.lifemash.memo.ui.memoNavGraph
 import org.bmsk.lifemash.designsystem.component.AdaptiveNavigation
 import org.bmsk.lifemash.eventdetail.api.EventDetailRoute
 import org.bmsk.lifemash.feed.api.FEED_ROUTE
@@ -31,6 +33,7 @@ import org.bmsk.lifemash.profile.api.ProfileNavGraphInfo
 import org.bmsk.lifemash.profile.api.ProfileRoute
 import org.bmsk.lifemash.profile.ui.ProfileTab
 import org.bmsk.lifemash.profile.ui.profileNavGraph
+import org.bmsk.lifemash.eventdetail.ui.eventDetailNavGraph
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -42,7 +45,7 @@ fun MainScreen(
     val tabs = listOf(ProfileTab, FeedTab, NotificationTab)
 
     val mainViewModel = koinViewModel<MainViewModel>()
-    val authState by mainViewModel.authState.collectAsState()
+    val authState by mainViewModel.authState.collectAsStateWithLifecycle()
 
     if (authState is AuthState.Loading) return
 
@@ -97,10 +100,14 @@ fun MainScreen(
                     onNavigateToUserProfile = { /* TODO */ },
                 )
             )
+            eventDetailNavGraph(onBack = { navController.popBackStack() })
             notificationNavGraph(
                 NotificationNavGraphInfo(
                     onShowErrorSnackbar = onShowErrorSnackbar,
                     onBack = { navController.popBackStack() },
+                    onNavigateToEventDetail = { eventId ->
+                        navController.navigate(EventDetailRoute(eventId))
+                    },
                 )
             )
             profileNavGraph(
@@ -114,8 +121,16 @@ fun MainScreen(
                 navController = navController,
             )
             calendarNavGraph(
-                CalendarNavGraphInfo(
+                navInfo = CalendarNavGraphInfo(
                     onShowErrorSnackbar = onShowErrorSnackbar,
+                    onBack = { navController.popBackStack() },
+                ),
+                navController = navController,
+            )
+            memoNavGraph(
+                MemoNavGraphInfo(
+                    onShowErrorSnackbar = onShowErrorSnackbar,
+                    onBack = { navController.popBackStack() },
                 )
             )
             authNavGraph(

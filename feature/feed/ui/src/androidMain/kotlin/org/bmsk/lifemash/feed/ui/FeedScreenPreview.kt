@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.feed.domain.model.FeedComment
+import org.bmsk.lifemash.feed.domain.model.FeedFilter
+import org.bmsk.lifemash.feed.domain.model.FeedMedia
 import org.bmsk.lifemash.feed.domain.model.FeedPost
 
 private val samplePosts = listOf(
@@ -15,7 +17,7 @@ private val samplePosts = listOf(
         eventId = "e1",
         eventTitle = "팀 스프린트 킥오프",
         eventDate = "2024.03.15",
-        imageUrl = "",
+        media = listOf(FeedMedia(mediaUrl = "", mediaType = "image", sortOrder = 0)),
         caption = "새 스프린트 시작! 열심히 달려봅시다 🚀",
         previewComments = listOf(
             FeedComment(authorNickname = "lifemash", content = "화이팅!"),
@@ -32,7 +34,7 @@ private val samplePosts = listOf(
         eventId = "e2",
         eventTitle = "마라톤 대회",
         eventDate = "2024.03.20",
-        imageUrl = "",
+        media = listOf(FeedMedia(mediaUrl = "", mediaType = "image", sortOrder = 0)),
         caption = "드디어 완주! 🏃‍♂️",
         previewComments = emptyList(),
         likeCount = 34,
@@ -52,6 +54,8 @@ fun FeedScreenPreview_Loaded() {
                 posts = samplePosts,
                 followingCount = 5,
             ),
+            selectedFilter = FeedFilter.ALL,
+            onFilterSelect = {},
         )
     }
 }
@@ -61,7 +65,11 @@ fun FeedScreenPreview_Loaded() {
 @Composable
 fun FeedScreenPreview_Loading() {
     LifeMashTheme {
-        FeedScreen(uiState = FeedUiState.Loading)
+        FeedScreen(
+            uiState = FeedUiState.Loading,
+            selectedFilter = FeedFilter.ALL,
+            onFilterSelect = {},
+        )
     }
 }
 
@@ -70,6 +78,10 @@ fun FeedScreenPreview_Loading() {
 @Composable
 fun FeedScreenPreview_Empty() {
     LifeMashTheme {
-        FeedScreen(uiState = FeedUiState.Empty)
+        FeedScreen(
+            uiState = FeedUiState.Empty,
+            selectedFilter = FeedFilter.ALL,
+            onFilterSelect = {},
+        )
     }
 }

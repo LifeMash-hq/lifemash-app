@@ -3,7 +3,7 @@ package org.bmsk.lifemash.follow
 import org.bmsk.lifemash.fake.FakeFollowRepository
 import org.bmsk.lifemash.fake.FakeNotificationRepository
 import org.bmsk.lifemash.plugins.BadRequestException
-import org.bmsk.lifemash.social.NotificationService
+import org.bmsk.lifemash.notification.NotificationService
 import kotlin.uuid.Uuid
 import kotlin.test.*
 

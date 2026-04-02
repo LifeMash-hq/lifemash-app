@@ -11,15 +11,16 @@ import org.bmsk.lifemash.calendar.domain.model.Group
 import org.bmsk.lifemash.calendar.domain.model.GroupType
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
 
-private val sampleInstant = Instant.parse("2024-03-15T10:00:00Z")
+internal val sampleInstant = Instant.parse("2024-03-15T10:00:00Z")
 
-private val sampleEvents = persistentListOf(
+internal val sampleEvents = persistentListOf(
     Event(
         id = "event-1",
         groupId = "group-1",
         authorId = "user-1",
         title = "팀 스프린트 회의",
         description = "2주 스프린트 계획 수립",
+        location = null,
         startAt = Instant.parse("2024-03-15T09:00:00Z"),
         endAt = Instant.parse("2024-03-15T10:00:00Z"),
         isAllDay = false,
@@ -33,6 +34,7 @@ private val sampleEvents = persistentListOf(
         authorId = "user-2",
         title = "가족 저녁 식사",
         description = null,
+        location = null,
         startAt = Instant.parse("2024-03-15T18:00:00Z"),
         endAt = Instant.parse("2024-03-15T20:00:00Z"),
         isAllDay = false,

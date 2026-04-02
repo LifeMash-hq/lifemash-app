@@ -10,10 +10,12 @@ data class Event(
     val authorId: String,
     val title: String,
     val description: String?,
+    val location: String?,
     val startAt: Instant,
     val endAt: Instant?,
     val isAllDay: Boolean,
     val color: String?,
+    val visibility: EventVisibility = EventVisibility.Followers,
     val createdAt: Instant,
     val updatedAt: Instant,
 )

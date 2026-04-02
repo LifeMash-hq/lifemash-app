@@ -45,6 +45,9 @@ dependencies {
     // Firebase Admin
     implementation(libs.firebase.admin.sdk)
 
+    // AWS S3
+    implementation(libs.aws.s3)
+
     // Serialization
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
@@ -55,6 +58,7 @@ dependencies {
     // Test
     testImplementation(kotlin("test"))
     testImplementation(libs.coroutines.test)
+    testImplementation(libs.h2)
 }
 
 tasks.test {

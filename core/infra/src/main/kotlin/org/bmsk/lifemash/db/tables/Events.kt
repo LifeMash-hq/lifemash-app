@@ -18,6 +18,8 @@ object Events : Table("events") {
     val endAt = timestampWithTimeZone("end_at").nullable()   // 종료 일시 (선택, 종일 일정 등)
     val isAllDay = bool("is_all_day").default(false)         // 종일 일정 여부
     val color = varchar("color", 7).nullable()               // 일정 색상 (#FF0000 등, 선택)
+    val location = varchar("location", 500).nullable()       // 장소 정보 (선택)
+    val imageEmoji = varchar("image_emoji", 10).nullable()   // 일정 대표 이모지 (선택)
     val createdAt = timestampWithTimeZone("created_at")
     val updatedAt = timestampWithTimeZone("updated_at")
 

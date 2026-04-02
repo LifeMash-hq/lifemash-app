@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.feed.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,24 +29,39 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.bmsk.lifemash.designsystem.component.AvatarSize
 import org.bmsk.lifemash.designsystem.component.LifeMashAvatar
 import org.bmsk.lifemash.designsystem.component.LifeMashButton
+import org.bmsk.lifemash.designsystem.component.LifeMashSegmentControl
 import org.bmsk.lifemash.designsystem.component.LifeMashSkeleton
 import org.bmsk.lifemash.designsystem.component.NetworkImage
+import androidx.compose.ui.unit.dp
+import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
+import org.bmsk.lifemash.feed.domain.model.FeedFilter
 import org.bmsk.lifemash.feed.domain.model.FeedPost
 
 @Composable
 fun FeedScreen(
     uiState: FeedUiState,
+    selectedFilter: FeedFilter,
+    onFilterSelect: (FeedFilter) -> Unit,
     onRetry: () -> Unit = {},
     onFindFriends: () -> Unit = {},
     onPostClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier.fillMaxSize().statusBarsPadding()) {
+    Column(modifier.fillMaxSize().statusBarsPadding()) {
+        FeedHeader(followingCount = (uiState as? FeedUiState.Loaded)?.followingCount ?: 0)
+
+        LifeMashSegmentControl(
+            options = FeedFilter.entries.map { it.label },
+            selectedIndex = FeedFilter.entries.indexOf(selectedFilter),
+            onSelect = { index -> onFilterSelect(FeedFilter.entries[index]) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = LifeMashSpacing.xl, vertical = LifeMashSpacing.md),
+        )
+
         when (uiState) {
             is FeedUiState.Loading -> FeedSkeletonList()
             is FeedUiState.Empty -> {
@@ -55,7 +71,7 @@ fun FeedScreen(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text("아직 피드가 없어요", style = MaterialTheme.typography.bodyLarge)
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(LifeMashSpacing.lg))
                     LifeMashButton(text = "친구 찾기", onClick = onFindFriends)
                 }
             }
@@ -66,15 +82,12 @@ fun FeedScreen(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(uiState.message, style = MaterialTheme.typography.bodyLarge)
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(LifeMashSpacing.lg))
                     LifeMashButton(text = "재시도", onClick = onRetry)
                 }
             }
             is FeedUiState.Loaded -> {
                 LazyColumn(Modifier.fillMaxSize()) {
-                    item {
-                        FeedHeader(followingCount = uiState.followingCount)
-                    }
                     items(uiState.posts, key = { it.id }) { post ->
                         FeedCard(post = post, onPostClick = onPostClick)
                     }
@@ -86,11 +99,10 @@ fun FeedScreen(
 
 @Composable
 private fun FeedHeader(followingCount: Int) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+    Column(modifier = Modifier.padding(horizontal = LifeMashSpacing.lg, vertical = LifeMashSpacing.md)) {
         Text(
             text = "피드",
             style = MaterialTheme.typography.titleLarge.copy(
-                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
             ),
         )
@@ -109,7 +121,8 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp),
+            .clickable { onPostClick(post.eventId ?: post.id) }
+            .padding(bottom = LifeMashSpacing.lg),
     ) {
         // Image with event tag overlay
         Box(
@@ -118,7 +131,7 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
                 .aspectRatio(1f),
         ) {
             NetworkImage(
-                imageUrl = post.imageUrl,
+                imageUrl = post.media.firstOrNull()?.mediaUrl.orEmpty(),
                 modifier = Modifier.fillMaxSize(),
             )
             // Event tag overlay at bottom
@@ -131,15 +144,17 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
                             colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f)),
                         ),
                     )
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                    .padding(horizontal = LifeMashSpacing.md, vertical = LifeMashSpacing.sm),
                 contentAlignment = Alignment.BottomStart,
             ) {
                 Column {
-                    Text(
-                        text = post.eventTitle,
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.White,
-                    )
+                    post.eventTitle?.let { title ->
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color.White,
+                        )
+                    }
                     post.eventDate?.let { date ->
                         Text(
                             text = date,
@@ -152,7 +167,7 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
         }
 
         // Bottom info
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = LifeMashSpacing.md, vertical = LifeMashSpacing.sm)) {
             // Author row
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -162,7 +177,7 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
                     name = post.authorNickname,
                     size = AvatarSize.Small,
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(LifeMashSpacing.sm))
                 Text(
                     text = post.authorNickname,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
@@ -177,7 +192,7 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
 
             // Caption
             post.caption?.let { caption ->
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(LifeMashSpacing.xxs))
                 Text(
                     text = caption,
                     style = MaterialTheme.typography.bodySmall,
@@ -188,7 +203,7 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
 
             // Preview comments
             if (post.previewComments.isNotEmpty()) {
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(LifeMashSpacing.xxs))
                 post.previewComments.take(2).forEach { comment ->
                     Text(
                         text = buildAnnotatedString {
@@ -206,7 +221,7 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
             }
 
             // Comment prompt
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(LifeMashSpacing.xs))
             Text(
                 text = "댓글 달기...",
                 style = MaterialTheme.typography.bodySmall,
@@ -218,10 +233,10 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
 
 @Composable
 private fun FeedSkeletonList() {
-    Column(modifier = Modifier.fillMaxSize().padding(top = 16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().padding(top = LifeMashSpacing.lg)) {
         repeat(3) {
             FeedCardSkeleton()
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(LifeMashSpacing.lg))
         }
     }
 }
@@ -230,7 +245,7 @@ private fun FeedSkeletonList() {
 private fun FeedCardSkeleton() {
     Column(modifier = Modifier.fillMaxWidth()) {
         LifeMashSkeleton(modifier = Modifier.fillMaxWidth().aspectRatio(1f), height = 0.dp)
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = LifeMashSpacing.md, vertical = LifeMashSpacing.sm)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
@@ -240,12 +255,12 @@ private fun FeedCardSkeleton() {
                             shape = androidx.compose.foundation.shape.CircleShape,
                         ),
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(LifeMashSpacing.sm))
                 LifeMashSkeleton(modifier = Modifier.width(120.dp), height = 14.dp)
             }
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(LifeMashSpacing.xs))
             LifeMashSkeleton(modifier = Modifier.fillMaxWidth(0.9f), height = 12.dp)
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(LifeMashSpacing.xxs))
             LifeMashSkeleton(modifier = Modifier.fillMaxWidth(0.7f), height = 12.dp)
         }
     }

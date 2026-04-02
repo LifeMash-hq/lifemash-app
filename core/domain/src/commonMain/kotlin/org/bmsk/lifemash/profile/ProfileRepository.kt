@@ -8,4 +8,5 @@ interface ProfileRepository {
     fun updateProfile(userId: Uuid, nickname: String?, bio: String?, profileImage: String?): UserProfileDto?
     fun getFollowerCount(userId: Uuid): Int
     fun getFollowingCount(userId: Uuid): Int
+    fun checkHandleAvailability(handle: String): Boolean
 }

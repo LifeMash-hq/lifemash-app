@@ -1,9 +1,11 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
 package org.bmsk.lifemash.eventdetail.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
+import kotlin.time.Instant
 
 @Preview(name = "Light - Loaded", showBackground = true)
 @Preview(name = "Dark - Loaded", showBackground = true, uiMode = UI_MODE_NIGHT_YES)
@@ -15,6 +17,7 @@ fun EventDetailScreenPreview_Loaded() {
                 eventId = "event-1",
                 title = "팀 스프린트 킥오프",
                 date = "2024년 3월 15일 (금) 오전 10:00",
+                startAt = Instant.fromEpochMilliseconds(0L),
                 location = "강남구 테헤란로 123, 3층 회의실",
                 description = "새 스프린트를 시작하며 목표와 역할을 정합니다. 모든 팀원 참석 부탁드립니다.",
                 imageEmoji = "🚀",

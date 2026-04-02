@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -112,49 +111,15 @@ internal class CalendarViewModel(
         }
     }
 
-    fun createEvent(groupId: String, form: EventFormData) {
-        _uiState.update { it.copy(isCreatingEvent = true) }
+    fun refreshEvents() {
+        val state = _uiState.value
+        val groupId = state.selectedGroup?.id ?: return
         viewModelScope.launch {
             runCatching {
-                eventRepository.createEvent(
-                    groupId = groupId,
-                    title = form.title,
-                    description = form.description,
-                    startAt = Instant.fromEpochMilliseconds(form.startAt),
-                    endAt = form.endAt?.let { Instant.fromEpochMilliseconds(it) },
-                    isAllDay = form.isAllDay,
-                    color = form.color,
-                )
-                _uiState.update { it.copy(isCreatingEvent = false, overlay = CalendarOverlay.None) }
-                val state = _uiState.value
                 val events = eventRepository.getMonthEvents(groupId, state.currentYear, state.currentMonth)
                 _uiState.update { it.copy(events = events.toPersistentList()) }
             }.onFailure { e ->
-                _uiState.update { it.copy(isCreatingEvent = false, errorMessage = e.message ?: "일정 생성 실패") }
-            }
-        }
-    }
-
-    fun updateEvent(groupId: String, eventId: String, form: EventFormData) {
-        _uiState.update { it.copy(isCreatingEvent = true) }
-        viewModelScope.launch {
-            runCatching {
-                eventRepository.updateEvent(
-                    groupId = groupId,
-                    eventId = eventId,
-                    title = form.title,
-                    description = form.description,
-                    startAt = Instant.fromEpochMilliseconds(form.startAt),
-                    endAt = form.endAt?.let { Instant.fromEpochMilliseconds(it) },
-                    isAllDay = form.isAllDay,
-                    color = form.color,
-                )
-                _uiState.update { it.copy(isCreatingEvent = false, overlay = CalendarOverlay.None) }
-                val state = _uiState.value
-                val events = eventRepository.getMonthEvents(groupId, state.currentYear, state.currentMonth)
-                _uiState.update { it.copy(events = events.toPersistentList()) }
-            }.onFailure { e ->
-                _uiState.update { it.copy(isCreatingEvent = false, errorMessage = e.message ?: "일정 수정 실패") }
+                _uiState.update { it.copy(errorMessage = e.message ?: "일정 로드 실패") }
             }
         }
     }

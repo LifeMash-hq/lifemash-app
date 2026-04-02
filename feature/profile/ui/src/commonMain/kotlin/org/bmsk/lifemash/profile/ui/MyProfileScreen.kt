@@ -2,6 +2,7 @@ package org.bmsk.lifemash.profile.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,16 +20,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,12 +43,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.designsystem.component.AvatarSize
 import org.bmsk.lifemash.designsystem.component.LifeMashAvatar
+import org.bmsk.lifemash.designsystem.component.LifeMashPrivacyLabel
+import org.bmsk.lifemash.designsystem.component.PrivacyLevel
 import org.bmsk.lifemash.designsystem.component.LifeMashButton
 import org.bmsk.lifemash.designsystem.component.LifeMashButtonStyle
-import org.bmsk.lifemash.designsystem.component.LifeMashPrivacyLabel
 import org.bmsk.lifemash.designsystem.component.LifeMashProfileSubTabs
 import org.bmsk.lifemash.designsystem.component.NetworkImage
-import org.bmsk.lifemash.designsystem.component.PrivacyLevel
 import org.bmsk.lifemash.designsystem.theme.LifeMashShadow
 import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
 import org.bmsk.lifemash.profile.domain.model.CalendarDayEvent
@@ -62,7 +66,9 @@ fun MyProfileScreen(
     onSubTabSelect: (ProfileSubTab) -> Unit = {},
     onCalendarDaySelect: (Int?) -> Unit = {},
     onNavigateMonth: (Int) -> Unit = {},
-    onCameraClick: (ProfileEvent) -> Unit = {},
+    onNavigateToEventCreate: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
+    onCameraClick: (eventId: String) -> Unit = {},
+    onEventClick: (eventId: String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize().statusBarsPadding()) {
@@ -78,50 +84,80 @@ fun MyProfileScreen(
                 }
             }
             is ProfileUiState.Loaded -> {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    item {
-                        ProfileHeader(
-                            profile = uiState.profile,
-                            momentCount = uiState.moments.size,
-                            selectedSubTab = uiState.selectedSubTab,
-                            onEditClick = onEditClick,
-                            onFollowerClick = onFollowerClick,
-                            onFollowingClick = onFollowingClick,
-                            onSubTabSelect = onSubTabSelect,
-                        )
-                    }
-                    when (uiState.selectedSubTab) {
-                        ProfileSubTab.Moments -> {
-                            item {
-                                PhotoGrid(
-                                    moments = uiState.moments,
-                                    onMomentClick = onMomentClick,
-                                )
+                Box(Modifier.fillMaxSize()) {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        item {
+                            ProfileHeader(
+                                profile = uiState.profile,
+                                momentCount = uiState.moments.size,
+                                selectedSubTab = uiState.selectedSubTab,
+                                onEditClick = onEditClick,
+                                onFollowerClick = onFollowerClick,
+                                onFollowingClick = onFollowingClick,
+                                onSubTabSelect = onSubTabSelect,
+                            )
+                        }
+                        when (uiState.selectedSubTab) {
+                            ProfileSubTab.Moments -> {
+                                item {
+                                    PhotoGrid(
+                                        moments = uiState.moments,
+                                        onMomentClick = onMomentClick,
+                                    )
+                                }
+                                item {
+                                    UpcomingEventsSection(
+                                        events = uiState.todayEvents,
+                                        onEventClick = onEventClick,
+                                    )
+                                }
                             }
-                            item {
-                                UpcomingEventsSection(events = uiState.todayEvents)
+                            ProfileSubTab.Calendar -> {
+                                item {
+                                    CalendarSection(
+                                        year = uiState.selectedYear,
+                                        month = uiState.selectedMonth,
+                                        calendarEvents = uiState.calendarEvents,
+                                        selectedDay = uiState.selectedCalendarDay,
+                                        viewMode = uiState.calendarViewMode,
+                                        onDaySelect = onCalendarDaySelect,
+                                        onPrevMonth = { onNavigateMonth(-1) },
+                                        onNextMonth = { onNavigateMonth(1) },
+                                    )
+                                }
+                                val selectedDay = uiState.selectedCalendarDay
+                                val selectedDayEvents = if (selectedDay != null) {
+                                    uiState.dayEvents[selectedDay] ?: emptyList()
+                                } else {
+                                    uiState.todayEvents
+                                }
+                                item {
+                                    SelectedDayEventsSection(
+                                        label = if (selectedDay != null) "${uiState.selectedMonth}월 ${selectedDay}일" else "오늘",
+                                        events = selectedDayEvents,
+                                        onCameraClick = onCameraClick,
+                                        onEventClick = onEventClick,
+                                    )
+                                }
+                                item { Spacer(Modifier.height(80.dp)) }
                             }
                         }
-                        ProfileSubTab.Calendar -> {
-                            item {
-                                CalendarSection(
-                                    year = uiState.selectedYear,
-                                    month = uiState.selectedMonth,
-                                    calendarEvents = uiState.calendarEvents,
-                                    selectedDay = uiState.selectedCalendarDay,
-                                    viewMode = uiState.calendarViewMode,
-                                    onDaySelect = onCalendarDaySelect,
-                                    onPrevMonth = { onNavigateMonth(-1) },
-                                    onNextMonth = { onNavigateMonth(1) },
+                    }
 
+                    if (uiState.selectedSubTab == ProfileSubTab.Calendar) {
+                        FloatingActionButton(
+                            onClick = {
+                                onNavigateToEventCreate(
+                                    uiState.selectedYear,
+                                    uiState.selectedMonth,
+                                    uiState.selectedCalendarDay ?: 0,
                                 )
-                            }
-                            item {
-                                TodayEventsSection(
-                                    events = uiState.todayEvents,
-                                    onCameraClick = onCameraClick,
-                                )
-                            }
+                            },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(LifeMashSpacing.lg),
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = "일정 추가")
                         }
                     }
                 }
@@ -280,7 +316,7 @@ private fun PhotoGrid(
                     ) {
                         if (moment != null) {
                             NetworkImage(
-                                imageUrl = moment.imageUrl,
+                                imageUrl = moment.media.firstOrNull()?.mediaUrl.orEmpty(),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop,
                             )
@@ -294,7 +330,10 @@ private fun PhotoGrid(
 }
 
 @Composable
-private fun UpcomingEventsSection(events: List<ProfileEvent>) {
+private fun UpcomingEventsSection(
+    events: List<ProfileEvent>,
+    onEventClick: (eventId: String) -> Unit = {},
+) {
     if (events.isEmpty()) return
     Column(
         modifier = Modifier
@@ -303,22 +342,22 @@ private fun UpcomingEventsSection(events: List<ProfileEvent>) {
             .padding(top = LifeMashSpacing.lg, bottom = LifeMashSpacing.md),
     ) {
         Text(
-            text = "다가오는 일정",
+            text = "다가오는 이벤트",
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(bottom = LifeMashSpacing.md),
         )
         events.forEach { event ->
-            UpcomingEventItem(event = event)
+            UpcomingEventItem(event = event, onClick = { onEventClick(event.id) })
             Spacer(Modifier.height(LifeMashSpacing.sm))
         }
     }
 }
 
 @Composable
-private fun UpcomingEventItem(event: ProfileEvent) {
+private fun UpcomingEventItem(event: ProfileEvent, onClick: () -> Unit = {}) {
     val barColor = parseColor(event.color, MaterialTheme.colorScheme.primary)
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         shadowElevation = LifeMashShadow.sm,
         color = MaterialTheme.colorScheme.surface,
@@ -479,7 +518,10 @@ private fun CalendarDotDayCell(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .clickable { onDaySelect(if (isSelected) null else day) },
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) { onDaySelect(if (isSelected) null else day) },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -530,7 +572,10 @@ private fun CalendarChipDayCell(
         modifier = Modifier
             .fillMaxSize()
             .padding(LifeMashSpacing.micro)
-            .clickable { onDaySelect(if (isSelected) null else day) },
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) { onDaySelect(if (isSelected) null else day) },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
@@ -574,11 +619,12 @@ private fun CalendarChipDayCell(
 }
 
 @Composable
-private fun TodayEventsSection(
+private fun SelectedDayEventsSection(
+    label: String,
     events: List<ProfileEvent>,
-    onCameraClick: (ProfileEvent) -> Unit,
+    onCameraClick: (eventId: String) -> Unit,
+    onEventClick: (eventId: String) -> Unit = {},
 ) {
-    if (events.isEmpty()) return
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -590,7 +636,7 @@ private fun TodayEventsSection(
             modifier = Modifier.padding(bottom = LifeMashSpacing.sm),
         ) {
             Text(
-                text = "오늘",
+                text = label,
                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
             )
             Spacer(Modifier.width(LifeMashSpacing.sm))
@@ -606,21 +652,40 @@ private fun TodayEventsSection(
                 )
             }
         }
-        events.forEach { event ->
-            TodayEventItem(event = event, onCameraClick = onCameraClick)
-            Spacer(Modifier.height(LifeMashSpacing.xs))
+        if (events.isEmpty()) {
+            Text(
+                text = "일정이 없습니다",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = LifeMashSpacing.lg),
+            )
+        } else {
+            events.forEach { event ->
+                DayEventItem(
+                    event = event,
+                    onCameraClick = onCameraClick,
+                    onClick = { onEventClick(event.id) },
+                )
+                Spacer(Modifier.height(LifeMashSpacing.xs))
+            }
         }
     }
 }
 
 @Composable
-private fun TodayEventItem(
+private fun DayEventItem(
     event: ProfileEvent,
-    onCameraClick: (ProfileEvent) -> Unit,
+    onCameraClick: (eventId: String) -> Unit,
+    onClick: () -> Unit = {},
 ) {
     val barColor = parseColor(event.color, MaterialTheme.colorScheme.primary)
+    val privacyLevel = when (event.visibility) {
+        "public" -> PrivacyLevel.Public
+        "friend" -> PrivacyLevel.Friend
+        else -> PrivacyLevel.Private
+    }
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         shadowElevation = LifeMashShadow.sm,
         color = MaterialTheme.colorScheme.surface,
@@ -642,40 +707,37 @@ private fun TodayEventItem(
                     text = event.title,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                 )
-                Text(
-                    text = "${event.startTime} – ${event.endTime}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = LifeMashSpacing.micro),
-                )
+                if (event.startTime.isNotBlank()) {
+                    Text(
+                        text = "${event.startTime} – ${event.endTime}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = LifeMashSpacing.micro),
+                    )
+                }
             }
             Spacer(Modifier.width(LifeMashSpacing.sm))
-            LifeMashPrivacyLabel(level = visibilityToPrivacyLevel(event.visibility))
+            LifeMashPrivacyLabel(level = privacyLevel)
             Spacer(Modifier.width(LifeMashSpacing.sm))
             Box(
                 modifier = Modifier
                     .size(30.dp)
-                    .clip(RoundedCornerShape(LifeMashSpacing.sm))
+                    .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable { onCameraClick(event) },
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                    ) { onCameraClick(event.id) },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
-                    contentDescription = "사진 올리기",
+                    contentDescription = "사진 업로드",
                     modifier = Modifier.size(14.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
-    }
-}
-
-private fun visibilityToPrivacyLevel(visibility: String): PrivacyLevel {
-    return when (visibility.lowercase()) {
-        "public" -> PrivacyLevel.Public
-        "friend", "friends", "followers" -> PrivacyLevel.Friend
-        else -> PrivacyLevel.Private
     }
 }
 
@@ -715,3 +777,4 @@ private fun firstDayOfWeek(year: Int, month: Int): Int {
     val yy = y % 100
     return ((yy + yy / 4 + c / 4 - 2 * c + 26 * (m + 1) / 10 + 1 - 1) % 7 + 7) % 7
 }
+

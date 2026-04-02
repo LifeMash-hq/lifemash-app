@@ -68,6 +68,79 @@ class ExposedEventRepository : EventRepository {
         Events.selectAll().where { Events.id eq eventId.toJavaUuid() }.singleOrNull()?.toDto()
     }
 
+    override fun getEventDetail(eventId: Uuid, viewerId: Uuid): org.bmsk.lifemash.model.calendar.EventDetailDto? = transaction {
+        val eventUuid = eventId.toJavaUuid()
+        val viewerUuid = viewerId.toJavaUuid()
+
+        val eventRow = (Events innerJoin org.bmsk.lifemash.db.tables.Users).selectAll().where { Events.id eq eventUuid }.singleOrNull() ?: return@transaction null
+
+        val attendees = (org.bmsk.lifemash.db.tables.EventAttendees innerJoin org.bmsk.lifemash.db.tables.Users)
+            .selectAll()
+            .where { org.bmsk.lifemash.db.tables.EventAttendees.eventId eq eventUuid }
+            .map { row ->
+                org.bmsk.lifemash.model.calendar.EventAttendeeDto(
+                    id = row[org.bmsk.lifemash.db.tables.Users.id].toString(),
+                    nickname = row[org.bmsk.lifemash.db.tables.Users.nickname],
+                    profileImage = row[org.bmsk.lifemash.db.tables.Users.profileImage]
+                )
+            }
+        
+        val attendeeUserIds = (org.bmsk.lifemash.db.tables.EventAttendees).selectAll().where { org.bmsk.lifemash.db.tables.EventAttendees.eventId eq eventUuid }.map { it[org.bmsk.lifemash.db.tables.EventAttendees.userId] }
+
+        val comments = (org.bmsk.lifemash.db.tables.Comments innerJoin org.bmsk.lifemash.db.tables.Users)
+            .selectAll()
+            .where { org.bmsk.lifemash.db.tables.Comments.eventId eq eventUuid }
+            .orderBy(org.bmsk.lifemash.db.tables.Comments.createdAt)
+            .map { row ->
+                org.bmsk.lifemash.model.calendar.CommentDto(
+                    id = row[org.bmsk.lifemash.db.tables.Comments.id].toString(),
+                    eventId = row[org.bmsk.lifemash.db.tables.Comments.eventId].toString(),
+                    authorId = row[org.bmsk.lifemash.db.tables.Comments.authorId].toString(),
+                    authorNickname = row[org.bmsk.lifemash.db.tables.Users.nickname],
+                    authorProfileImage = row[org.bmsk.lifemash.db.tables.Users.profileImage],
+                    content = row[org.bmsk.lifemash.db.tables.Comments.content],
+                    createdAt = row[org.bmsk.lifemash.db.tables.Comments.createdAt].toKotlinxInstant()
+                )
+            }
+
+        org.bmsk.lifemash.model.calendar.EventDetailDto(
+            id = eventRow[Events.id].toString(),
+            groupId = eventRow[Events.groupId].toString(),
+            title = eventRow[Events.title],
+            description = eventRow[Events.description],
+            startAt = eventRow[Events.startAt].toKotlinxInstant(),
+            endAt = eventRow[Events.endAt]?.toKotlinxInstant(),
+            isAllDay = eventRow[Events.isAllDay],
+            location = eventRow[Events.location],
+            imageEmoji = eventRow[Events.imageEmoji],
+            authorNickname = eventRow[org.bmsk.lifemash.db.tables.Users.nickname],
+            attendees = attendees,
+            comments = comments,
+            isJoined = attendeeUserIds.any { it == viewerUuid }
+        )
+    }
+
+    override fun toggleJoin(eventId: Uuid, userId: Uuid): Boolean = transaction {
+        val eventUuid = eventId.toJavaUuid()
+        val userUuid = userId.toJavaUuid()
+        
+        val deletedCount = org.bmsk.lifemash.db.tables.EventAttendees.deleteWhere {
+            (org.bmsk.lifemash.db.tables.EventAttendees.eventId eq eventUuid) and 
+            (org.bmsk.lifemash.db.tables.EventAttendees.userId eq userUuid)
+        }
+        
+        if (deletedCount > 0) {
+            false
+        } else {
+            org.bmsk.lifemash.db.tables.EventAttendees.insert {
+                it[org.bmsk.lifemash.db.tables.EventAttendees.eventId] = eventUuid
+                it[org.bmsk.lifemash.db.tables.EventAttendees.userId] = userUuid
+                it[org.bmsk.lifemash.db.tables.EventAttendees.joinedAt] = org.bmsk.lifemash.util.nowUtc()
+            }
+            true
+        }
+    }
+
     private fun ResultRow.toDto() = EventDto(
         id = this[Events.id].toString(),
         groupId = this[Events.groupId].toString(),
@@ -78,6 +151,8 @@ class ExposedEventRepository : EventRepository {
         endAt = this[Events.endAt]?.toKotlinxInstant(),
         isAllDay = this[Events.isAllDay],
         color = this[Events.color],
+        location = this[Events.location],
+        imageEmoji = this[Events.imageEmoji],
         createdAt = this[Events.createdAt].toKotlinxInstant(),
         updatedAt = this[Events.updatedAt].toKotlinxInstant(),
     )

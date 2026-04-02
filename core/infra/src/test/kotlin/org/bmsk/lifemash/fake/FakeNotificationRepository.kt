@@ -1,7 +1,7 @@
 package org.bmsk.lifemash.fake
 
 import org.bmsk.lifemash.model.notification.NotificationDto
-import org.bmsk.lifemash.social.NotificationRepository
+import org.bmsk.lifemash.notification.NotificationRepository
 import kotlin.uuid.Uuid
 
 class FakeNotificationRepository : NotificationRepository {

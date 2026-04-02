@@ -1,5 +1,6 @@
 package org.bmsk.lifemash.notification.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,6 +34,7 @@ import org.bmsk.lifemash.notification.domain.model.NotificationType
 internal fun NotificationScreen(
     uiState: NotificationUiState,
     onRetry: () -> Unit,
+    onNotificationClick: (String) -> Unit = {},
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         LifeMashTopBar(title = "알림")
@@ -41,7 +43,10 @@ internal fun NotificationScreen(
             is NotificationUiState.Loading -> LoadingContent()
             is NotificationUiState.Empty -> EmptyContent()
             is NotificationUiState.Error -> ErrorContent(message = uiState.message, onRetry = onRetry)
-            is NotificationUiState.Loaded -> NotificationList(notifications = uiState.notifications)
+            is NotificationUiState.Loaded -> NotificationList(
+                notifications = uiState.notifications,
+                onNotificationClick = onNotificationClick,
+            )
         }
     }
 }
@@ -85,7 +90,10 @@ private fun ErrorContent(message: String, onRetry: () -> Unit) {
 }
 
 @Composable
-private fun NotificationList(notifications: PersistentList<Notification>) {
+private fun NotificationList(
+    notifications: PersistentList<Notification>,
+    onNotificationClick: (String) -> Unit = {},
+) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(notifications, key = { it.id }) { notification ->
             val (emoji, emojiBackground, actorName, actionText, quote) = notificationContent(notification)
@@ -101,6 +109,9 @@ private fun NotificationList(notifications: PersistentList<Notification>) {
                 },
                 timeText = formatRelativeTime(notification.createdAt),
                 isUnread = !notification.isRead,
+                modifier = Modifier.clickable {
+                    notification.targetId?.let { onNotificationClick(it) }
+                },
             )
         }
     }

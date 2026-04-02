@@ -14,6 +14,11 @@ data class EventDto(
     val endAt: Instant? = null,
     val isAllDay: Boolean = false,
     val color: String? = null,
+    val location: String? = null,
+    val imageEmoji: String? = null,
+    val visibility: String = "followers",
+    val visibilityGroupId: String? = null,
+    val visibilityUserIds: List<String>? = null,
     val createdAt: Instant,
     val updatedAt: Instant,
 )
@@ -26,6 +31,9 @@ data class CreateEventRequest(
     val endAt: Instant? = null,
     val isAllDay: Boolean = false,
     val color: String? = null,
+    val visibility: String = "followers",
+    val visibilityGroupId: String? = null,
+    val visibilityUserIds: List<String>? = null,
 )
 
 @Serializable
@@ -36,4 +44,9 @@ data class UpdateEventRequest(
     val endAt: Instant? = null,
     val isAllDay: Boolean? = null,
     val color: String? = null,
+    val location: String? = null,
+    val imageEmoji: String? = null,
+    val visibility: String? = null,
+    val visibilityGroupId: String? = null,
+    val visibilityUserIds: List<String>? = null,
 )

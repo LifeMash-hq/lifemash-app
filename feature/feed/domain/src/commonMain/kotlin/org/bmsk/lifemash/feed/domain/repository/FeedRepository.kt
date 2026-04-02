@@ -1,10 +1,10 @@
 package org.bmsk.lifemash.feed.domain.repository
 
-import kotlinx.coroutines.flow.Flow
+import org.bmsk.lifemash.feed.domain.model.FeedFilter
 import org.bmsk.lifemash.feed.domain.model.FeedPost
 
 interface FeedRepository {
-    fun getFeed(cursor: String?, limit: Int): Flow<FeedPage>
+    suspend fun getFeed(filter: FeedFilter, cursor: String?, limit: Int): FeedPage
     suspend fun toggleLike(postId: String): Boolean
 }
 

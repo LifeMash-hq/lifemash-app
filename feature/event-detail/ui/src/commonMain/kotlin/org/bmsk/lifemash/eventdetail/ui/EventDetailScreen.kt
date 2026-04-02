@@ -18,9 +18,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Notes
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Notes
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -152,7 +152,7 @@ private fun LoadedContent(
                 }
                 state.description?.let {
                     Spacer(Modifier.height(8.dp))
-                    DetailRow(icon = { Icon(Icons.Outlined.Notes, contentDescription = null, modifier = Modifier.size(36.dp)) }, text = it)
+                    DetailRow(icon = { Icon(Icons.AutoMirrored.Outlined.Notes, contentDescription = null, modifier = Modifier.size(36.dp)) }, text = it)
                 }
             }
 

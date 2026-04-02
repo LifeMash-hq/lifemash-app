@@ -19,9 +19,11 @@ alias(libs.plugins.verify.detekt) apply false
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.shadow) apply false
+    alias(libs.plugins.dokka) apply false
 }
 
 subprojects {
+    apply(plugin = "org.jetbrains.dokka")
     configurations.all {
         exclude(group = "com.google.firebase", module = "firebase-common-ktx")
     }

@@ -6,7 +6,7 @@ import kotlin.uuid.Uuid
 
 class FollowService(
     private val followRepository: FollowRepository,
-    private val notificationService: org.bmsk.lifemash.social.NotificationService,
+    private val notificationService: org.bmsk.lifemash.notification.NotificationService,
 ) {
     fun follow(followerId: Uuid, followingId: Uuid) {
         if (followerId == followingId) throw BadRequestException("자기 자신을 팔로우할 수 없습니다")

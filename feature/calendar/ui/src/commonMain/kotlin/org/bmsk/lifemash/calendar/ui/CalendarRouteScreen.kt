@@ -2,16 +2,23 @@ package org.bmsk.lifemash.calendar.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import org.bmsk.lifemash.calendar.domain.model.Event
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun CalendarRouteScreen(
     onShowErrorSnackbar: (Throwable?) -> Unit,
+    onBack: () -> Unit = {},
+    onNavigateToEventCreate: (year: Int, month: Int, day: Int, groupId: String?) -> Unit = { _, _, _, _ -> },
+    onNavigateToEventEdit: (groupId: String, event: Event) -> Unit = { _, _ -> },
+    navController: NavController? = null,
     viewModel: CalendarViewModel = koinViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.loadGroups()
@@ -24,6 +31,20 @@ internal fun CalendarRouteScreen(
         }
     }
 
+    // 일정 생성/수정 후 돌아왔을 때 목록 새로고침
+    LaunchedEffect(navController) {
+        navController?.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("event_changed", false)
+            ?.collect { changed ->
+                if (changed) {
+                    viewModel.refreshEvents()
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle?.set("event_changed", false)
+                }
+            }
+    }
+
     CalendarScreen(
         uiState = uiState,
         onDateSelect = viewModel::selectDate,
@@ -32,41 +53,20 @@ internal fun CalendarRouteScreen(
         onShowOverlay = viewModel::showOverlay,
         onCreateGroup = viewModel::createGroup,
         onJoinGroup = viewModel::joinGroup,
+        onNavigateToEventCreate = onNavigateToEventCreate,
+        onNavigateToEventEdit = onNavigateToEventEdit,
+        onBack = onBack,
     )
 
     val groupId = uiState.selectedGroup?.id
 
     when (val overlay = uiState.overlay) {
-        is CalendarOverlay.EventCreate -> {
-            if (groupId != null) {
-                EventCreateBottomSheet(
-                    editingEvent = null,
-                    isLoading = uiState.isCreatingEvent,
-                    selectedDate = overlay.selectedDate,
-                    onDismiss = viewModel::dismissOverlay,
-                    onSubmit = { form -> viewModel.createEvent(groupId, form) },
-                )
-            }
-        }
-
-        is CalendarOverlay.EventEdit -> {
-            if (groupId != null) {
-                EventCreateBottomSheet(
-                    editingEvent = overlay.event,
-                    isLoading = uiState.isCreatingEvent,
-                    selectedDate = null,
-                    onDismiss = viewModel::dismissOverlay,
-                    onSubmit = { form -> viewModel.updateEvent(groupId, overlay.event.id, form) },
-                )
-            }
-        }
-
         is CalendarOverlay.EventDetail -> {
             if (groupId != null) {
                 EventDetailBottomSheet(
                     event = overlay.event,
                     onDismiss = viewModel::dismissOverlay,
-                    onEdit = { viewModel.showOverlay(CalendarOverlay.EventEdit(overlay.event)) },
+                    onEdit = { event -> onNavigateToEventEdit(groupId, event) },
                     onDelete = { viewModel.deleteEvent(groupId, overlay.event.id) },
                 )
             }

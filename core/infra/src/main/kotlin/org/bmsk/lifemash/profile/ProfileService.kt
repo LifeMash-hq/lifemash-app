@@ -26,4 +26,12 @@ class ProfileService(
             profileImage = request.profileImage,
         ) ?: throw NotFoundException("사용자를 찾을 수 없습니다")
     }
+
+    fun checkHandleAvailability(handle: String): Boolean {
+        val regex = "^[a-z0-9_]{3,15}$".toRegex()
+        if (!regex.matches(handle)) {
+            throw BadRequestException("아이디는 영소문자, 숫자, 밑줄(_) 3~15자로 입력해주세요")
+        }
+        return profileRepository.checkHandleAvailability(handle)
+    }
 }

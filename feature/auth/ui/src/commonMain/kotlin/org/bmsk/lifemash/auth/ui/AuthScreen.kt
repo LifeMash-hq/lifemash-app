@@ -96,6 +96,7 @@ internal fun AuthScreen(
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = LifeMashSpacing.xxl),
+            verticalArrangement = Arrangement.Center,
         ) {
             // 소셜 로그인 그룹
             Column(

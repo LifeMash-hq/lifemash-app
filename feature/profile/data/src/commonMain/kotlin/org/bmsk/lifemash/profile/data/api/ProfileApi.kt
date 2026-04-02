@@ -25,13 +25,4 @@ internal class ProfileApi(private val client: HttpClient) {
 
     suspend fun getMoments(userId: String): List<MomentDto> =
         client.get("/api/v1/users/$userId/moments").body()
-
-    suspend fun postMoment(eventId: String, body: PostMomentBody): MomentDto =
-        client.post("/api/v1/events/$eventId/moments") {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }.body()
-
-    suspend fun deleteMoment(momentId: String): Unit =
-        client.delete("/api/v1/moments/$momentId").body()
 }
