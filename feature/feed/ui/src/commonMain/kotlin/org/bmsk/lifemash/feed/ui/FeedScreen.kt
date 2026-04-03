@@ -17,6 +17,12 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.ModeComment
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +54,8 @@ fun FeedScreen(
     onRetry: () -> Unit = {},
     onFindFriends: () -> Unit = {},
     onPostClick: (String) -> Unit = {},
+    onLikeClick: (String) -> Unit = {},
+    onCommentClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Column(modifier.fillMaxSize().statusBarsPadding()) {
@@ -89,7 +97,12 @@ fun FeedScreen(
             is FeedUiState.Loaded -> {
                 LazyColumn(Modifier.fillMaxSize()) {
                     items(uiState.posts, key = { it.id }) { post ->
-                        FeedCard(post = post, onPostClick = onPostClick)
+                        FeedCard(
+                            post = post,
+                            onPostClick = onPostClick,
+                            onLikeClick = onLikeClick,
+                            onCommentClick = onCommentClick,
+                        )
                     }
                 }
             }
@@ -117,7 +130,12 @@ private fun FeedHeader(followingCount: Int) {
 }
 
 @Composable
-private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
+private fun FeedCard(
+    post: FeedPost,
+    onPostClick: (String) -> Unit,
+    onLikeClick: (String) -> Unit,
+    onCommentClick: (String) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -190,6 +208,45 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
                 )
             }
 
+            // Action bar: like + comment
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(LifeMashSpacing.xs),
+            ) {
+                IconButton(onClick = { onLikeClick(post.id) }, modifier = Modifier.size(36.dp)) {
+                    Icon(
+                        imageVector = if (post.isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = if (post.isLiked) "좋아요 취소" else "좋아요",
+                        tint = if (post.isLiked) MaterialTheme.colorScheme.error
+                               else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(LifeMashSpacing.xl),
+                    )
+                }
+                if (post.likeCount > 0) {
+                    Text(
+                        text = post.likeCount.toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.width(LifeMashSpacing.xs))
+                IconButton(onClick = { onCommentClick(post.id) }, modifier = Modifier.size(36.dp)) {
+                    Icon(
+                        imageVector = Icons.Outlined.ModeComment,
+                        contentDescription = "댓글",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(LifeMashSpacing.xl),
+                    )
+                }
+                if (post.commentCount > 0) {
+                    Text(
+                        text = post.commentCount.toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
             // Caption
             post.caption?.let { caption ->
                 Spacer(Modifier.height(LifeMashSpacing.xxs))
@@ -219,14 +276,6 @@ private fun FeedCard(post: FeedPost, onPostClick: (String) -> Unit) {
                     )
                 }
             }
-
-            // Comment prompt
-            Spacer(Modifier.height(LifeMashSpacing.xs))
-            Text(
-                text = "댓글 달기...",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-            )
         }
     }
 }
@@ -259,9 +308,9 @@ private fun FeedCardSkeleton() {
                 LifeMashSkeleton(modifier = Modifier.width(120.dp), height = 14.dp)
             }
             Spacer(Modifier.height(LifeMashSpacing.xs))
-            LifeMashSkeleton(modifier = Modifier.fillMaxWidth(0.9f), height = 12.dp)
+            LifeMashSkeleton(modifier = Modifier.fillMaxWidth(0.9f), height = LifeMashSpacing.md)
             Spacer(Modifier.height(LifeMashSpacing.xxs))
-            LifeMashSkeleton(modifier = Modifier.fillMaxWidth(0.7f), height = 12.dp)
+            LifeMashSkeleton(modifier = Modifier.fillMaxWidth(0.7f), height = LifeMashSpacing.md)
         }
     }
 }

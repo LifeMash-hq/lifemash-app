@@ -4,8 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FeedComment(
+    val id: String = "",
+    val authorId: String = "",
     val authorNickname: String,
+    val authorProfileImage: String? = null,
     val content: String,
+    val createdAt: String = "",
 )
 
 @Serializable
