@@ -20,6 +20,9 @@ object Events : Table("events") {
     val color = varchar("color", 7).nullable()               // 일정 색상 (#FF0000 등, 선택)
     val location = varchar("location", 500).nullable()       // 장소 정보 (선택)
     val imageEmoji = varchar("image_emoji", 10).nullable()   // 일정 대표 이모지 (선택)
+    val visibility = varchar("visibility", 20).default("followers") // 공개 범위
+    val visibilityGroupId = uuid("visibility_group_id").nullable()  // 그룹 공개 시 대상 그룹 ID
+    val visibilityUserIds = text("visibility_user_ids").nullable()  // 특정인 공개 시 유저 ID 목록 (쉼표 구분)
     val createdAt = timestampWithTimeZone("created_at")
     val updatedAt = timestampWithTimeZone("updated_at")
 

@@ -12,6 +12,7 @@ object EventAttendees : Table("event_attendees") {
     val eventId = uuid("event_id").references(Events.id, onDelete = ReferenceOption.CASCADE)
     val userId = uuid("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
     val joinedAt = timestampWithTimeZone("joined_at")
+    val status = varchar("status", 20).default("attending") // "attending" | "maybe" | "declined"
 
     override val primaryKey = PrimaryKey(eventId, userId)
 }

@@ -20,6 +20,11 @@ object Users : Table("users") {
     val nickname = varchar("nickname", 50).uniqueIndex()             // 표시 이름 (검색용 Handle 역할)
     val profileImage = varchar("profile_image", 500).nullable() // 프로필 이미지 URL (없을 수 있음)
     val bio = varchar("bio", 300).nullable()                   // 자기소개 (없을 수 있음)
+    val passwordHash = varchar("password_hash", 255).nullable() // 이메일 로그인 비밀번호 해시 (소셜 로그인 유저는 null)
+    val startScreen = varchar("start_screen", 20).default("moments")          // 시작 화면: "moments" | "calendar"
+    val viewStyleSelf = varchar("view_style_self", 10).default("dot")         // 내 캘린더 보기: "dot" | "chip"
+    val viewStyleOthers = varchar("view_style_others", 10).default("dot")     // 타인 캘린더 보기: "dot" | "chip"
+    val defaultVisibility = varchar("default_visibility", 20).default("followers") // 기본 공개범위
     val createdAt = timestampWithTimeZone("created_at")        // 가입 일시
     val updatedAt = timestampWithTimeZone("updated_at")        // 최종 수정 일시
 

@@ -34,11 +34,24 @@ object DatabaseFactory {
 
         // 서버 시작 시 테이블/컬럼이 없으면 자동 생성 (이미 있으면 무시, 누락 컬럼은 추가)
         transaction {
-            SchemaUtils.createMissingTablesAndColumns(
-                Users, Groups, GroupMembers, Events, Comments, EventAttendees,
-                AssistantConversations, AssistantMessages, AssistantUsage, UserApiKeys,
-                Follows, Moments, MomentMedia, Likes, Notifications,
-                Memos, ChecklistItems,
+            arrayOf(
+                Users,
+                Groups,
+                GroupMembers,
+                Events,
+                Comments,
+                EventAttendees,
+                AssistantConversations,
+                AssistantMessages,
+                AssistantUsage,
+                UserApiKeys,
+                Follows,
+                Moments,
+                MomentMedia,
+                Likes,
+                Notifications,
+                Memos,
+                ChecklistItems
             )
         }
     }
