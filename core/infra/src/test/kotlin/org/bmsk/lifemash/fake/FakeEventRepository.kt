@@ -37,6 +37,9 @@ class FakeEventRepository : EventRepository {
             startAt = request.startAt,
             endAt = request.endAt,
             isAllDay = request.isAllDay,
+            visibility = request.visibility,
+            visibilityGroupId = request.visibilityGroupId,
+            visibilityUserIds = request.visibilityUserIds,
             createdAt = now,
             updatedAt = now,
         )
@@ -53,7 +56,10 @@ class FakeEventRepository : EventRepository {
             endAt = request.endAt ?: existing.endAt,
             isAllDay = request.isAllDay ?: existing.isAllDay,
             location = request.location ?: existing.location,
-            imageEmoji = request.imageEmoji ?: existing.imageEmoji
+            imageEmoji = request.imageEmoji ?: existing.imageEmoji,
+            visibility = request.visibility ?: existing.visibility,
+            visibilityGroupId = request.visibilityGroupId ?: existing.visibilityGroupId,
+            visibilityUserIds = request.visibilityUserIds ?: existing.visibilityUserIds,
         )
         events[eventId] = updated
         return updated

@@ -59,6 +59,7 @@ class EventServiceTest {
         eventRepository.addEvent(mockEvent)
         eventRepository.setEventDetail(eventId, mockDetail)
         membershipGuard.addMember(groupId, userId)
+        membershipGuard.addEventGroup(eventId, groupId)
 
         // When
         val result = eventService.getEventDetail(userId.toString(), eventId.toString())
@@ -98,6 +99,7 @@ class EventServiceTest {
         )
         eventRepository.addEvent(mockEvent)
         membershipGuard.addMember(groupId, userId)
+        membershipGuard.addEventGroup(eventId, groupId)
 
         // When (First toggle: join)
         val firstResult = eventService.toggleJoin(userId.toString(), eventId.toString())

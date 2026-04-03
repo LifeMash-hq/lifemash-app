@@ -10,6 +10,9 @@ class FakeProfileRepository : ProfileRepository {
     private val profiles = mutableMapOf<Uuid, ProfileData>()
     private val followerCounts = mutableMapOf<Uuid, Int>()
     private val followingCounts = mutableMapOf<Uuid, Int>()
+    private val followPairs = mutableSetOf<Pair<Uuid, Uuid>>() // (followerId, followingId)
+
+    fun addFollow(followerId: Uuid, followingId: Uuid) { followPairs.add(followerId to followingId) }
 
     fun addProfile(id: Uuid, nickname: String, email: String = "test@test.com", provider: String = "KAKAO", bio: String? = null) {
         profiles[id] = ProfileData(nickname, bio, null, email, provider)
@@ -18,13 +21,17 @@ class FakeProfileRepository : ProfileRepository {
     fun setFollowerCount(userId: Uuid, count: Int) { followerCounts[userId] = count }
     fun setFollowingCount(userId: Uuid, count: Int) { followingCounts[userId] = count }
 
-    override fun getProfile(userId: Uuid): UserProfileDto? {
+    override fun getProfile(userId: Uuid, viewerId: Uuid?): UserProfileDto? {  // default in interface
         val p = profiles[userId] ?: return null
+        val isFollowing = if (viewerId != null && viewerId != userId) {
+            followPairs.contains(viewerId to userId)
+        } else null
         return UserProfileDto(
             id = userId.toString(), email = p.email, nickname = p.nickname,
             bio = p.bio, profileImage = p.profileImage, provider = p.provider,
             followerCount = followerCounts[userId] ?: 0,
             followingCount = followingCounts[userId] ?: 0,
+            isFollowing = isFollowing,
         )
     }
 

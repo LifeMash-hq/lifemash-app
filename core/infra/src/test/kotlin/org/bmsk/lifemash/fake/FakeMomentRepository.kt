@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.fake
 
 import org.bmsk.lifemash.model.moment.CreateMomentRequest
+import org.bmsk.lifemash.model.moment.MediaItemDto
 import org.bmsk.lifemash.model.moment.MomentDto
 import org.bmsk.lifemash.moment.MomentRepository
 import kotlin.uuid.Uuid
@@ -36,6 +37,17 @@ class FakeMomentRepository : MomentRepository {
                 else moment.visibility == "public" || moment.visibility == "followers"
             }
             .sortedByDescending { it.createdAt }
+    }
+
+    override fun update(momentId: Uuid, caption: String?, visibility: String?, media: List<MediaItemDto>?): MomentDto? {
+        val existing = moments[momentId] ?: return null
+        val updated = existing.copy(
+            caption = caption ?: existing.caption,
+            visibility = visibility ?: existing.visibility,
+            media = media ?: existing.media,
+        )
+        moments[momentId] = updated
+        return updated
     }
 
     override fun delete(momentId: Uuid) {

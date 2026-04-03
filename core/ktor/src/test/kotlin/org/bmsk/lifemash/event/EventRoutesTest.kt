@@ -109,9 +109,45 @@ class EventRoutesTest {
 // Helper Stub to avoid implementing all methods
 open class EventServiceStub : EventService {
     override fun getMonthEvents(groupId: String, userId: String, year: Int, month: Int): List<org.bmsk.lifemash.model.calendar.EventDto> = emptyList()
-    override fun create(groupId: String, userId: String, request: org.bmsk.lifemash.model.calendar.CreateEventRequest): org.bmsk.lifemash.model.calendar.EventDto = TODO()
-    override fun update(groupId: String, userId: String, eventId: String, request: org.bmsk.lifemash.model.calendar.UpdateEventRequest): org.bmsk.lifemash.model.calendar.EventDto = TODO()
+    override fun create(groupId: String, userId: String, request: org.bmsk.lifemash.model.calendar.CreateEventRequest): org.bmsk.lifemash.model.calendar.EventDto {
+        val now = Clock.System.now()
+        return org.bmsk.lifemash.model.calendar.EventDto(
+            id = Uuid.random().toString(),
+            groupId = groupId,
+            authorId = userId,
+            title = request.title,
+            startAt = request.startAt,
+            createdAt = now,
+            updatedAt = now,
+        )
+    }
+    override fun update(groupId: String, userId: String, eventId: String, request: org.bmsk.lifemash.model.calendar.UpdateEventRequest): org.bmsk.lifemash.model.calendar.EventDto {
+        val now = Clock.System.now()
+        return org.bmsk.lifemash.model.calendar.EventDto(
+            id = eventId,
+            groupId = groupId,
+            authorId = userId,
+            title = request.title ?: "",
+            startAt = request.startAt ?: now,
+            createdAt = now,
+            updatedAt = now,
+        )
+    }
     override fun delete(groupId: String, userId: String, eventId: String) {}
-    override fun getEventDetail(userId: String, eventId: String): EventDetailDto = TODO()
-    override fun toggleJoin(userId: String, eventId: String): Boolean = TODO()
+    override fun getEventDetail(userId: String, eventId: String): EventDetailDto = EventDetailDto(
+        id = eventId,
+        groupId = "",
+        title = "",
+        description = null,
+        startAt = Clock.System.now(),
+        endAt = null,
+        isAllDay = false,
+        location = null,
+        imageEmoji = null,
+        authorNickname = null,
+        attendees = emptyList(),
+        comments = emptyList(),
+        isJoined = false,
+    )
+    override fun toggleJoin(userId: String, eventId: String): Boolean = false
 }
