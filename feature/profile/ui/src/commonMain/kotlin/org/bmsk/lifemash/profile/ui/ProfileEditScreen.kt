@@ -47,6 +47,7 @@ fun ProfileEditScreen(
     onMyCalendarViewChange: (Int) -> Unit,
     onOthersCalendarViewChange: (Int) -> Unit,
     onDefaultVisibilityChange: (Int) -> Unit,
+    onPickImage: () -> Unit = {},
     onSave: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
@@ -78,7 +79,7 @@ fun ProfileEditScreen(
                 textAlign = TextAlign.Center,
             )
             if (uiState.isSaving) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(modifier = Modifier.size(LifeMashSpacing.xl), strokeWidth = LifeMashSpacing.micro)
             } else {
                 TextButton(onClick = onSave) {
                     Text(
@@ -106,9 +107,9 @@ fun ProfileEditScreen(
                         size = AvatarSize.XXLarge,
                     )
                     IconButton(
-                        onClick = { /* TODO: 이미지 선택 */ },
+                        onClick = onPickImage,
                         modifier = Modifier
-                            .size(26.dp)
+                            .size(LifeMashSpacing.xxl)
                             .align(Alignment.BottomEnd)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.onSurface),
@@ -116,7 +117,7 @@ fun ProfileEditScreen(
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
                             contentDescription = "프로필 사진 변경",
-                            modifier = Modifier.size(12.dp),
+                            modifier = Modifier.size(LifeMashSpacing.md),
                             tint = MaterialTheme.colorScheme.surface,
                         )
                     }
@@ -159,7 +160,7 @@ fun ProfileEditScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp)
+                    .height(LifeMashSpacing.sm)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
             )
 

@@ -14,6 +14,8 @@ kotlin {
             implementation(project(":feature:calendar:api"))
             implementation(project(":feature:calendar:domain"))
             implementation(project(":shared:designsystem"))
+            implementation(project(":shared:common"))
+            implementation(project(":shared:model"))
             implementation(libs.kotlinx.immutable)
             implementation(libs.kotlinx.datetime)
         }

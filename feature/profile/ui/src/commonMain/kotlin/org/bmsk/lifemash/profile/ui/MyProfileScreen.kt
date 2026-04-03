@@ -91,10 +91,17 @@ fun MyProfileScreen(
                                 profile = uiState.profile,
                                 momentCount = uiState.moments.size,
                                 selectedSubTab = uiState.selectedSubTab,
-                                onEditClick = onEditClick,
                                 onFollowerClick = onFollowerClick,
                                 onFollowingClick = onFollowingClick,
                                 onSubTabSelect = onSubTabSelect,
+                                actionContent = {
+                                    LifeMashButton(
+                                        text = "프로필 편집",
+                                        onClick = onEditClick,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        style = LifeMashButtonStyle.Outline,
+                                    )
+                                },
                             )
                         }
                         when (uiState.selectedSubTab) {
@@ -167,14 +174,14 @@ fun MyProfileScreen(
 }
 
 @Composable
-private fun ProfileHeader(
+internal fun ProfileHeader(
     profile: UserProfile,
     momentCount: Int,
     selectedSubTab: ProfileSubTab,
-    onEditClick: () -> Unit,
     onFollowerClick: () -> Unit,
     onFollowingClick: () -> Unit,
     onSubTabSelect: (ProfileSubTab) -> Unit,
+    actionContent: @Composable () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -221,14 +228,13 @@ private fun ProfileHeader(
             )
         }
         Spacer(Modifier.height(LifeMashSpacing.lg))
-        LifeMashButton(
-            text = "프로필 편집",
-            onClick = onEditClick,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = LifeMashSpacing.xl),
-            style = LifeMashButtonStyle.Outline,
-        )
+        ) {
+            actionContent()
+        }
         Spacer(Modifier.height(LifeMashSpacing.xl))
         LifeMashProfileSubTabs(
             tabs = listOf("순간", "캘린더"),
@@ -244,7 +250,7 @@ private fun ProfileHeader(
 }
 
 @Composable
-private fun ProfileStat(
+internal fun ProfileStat(
     count: String,
     label: String,
     onClick: (() -> Unit)? = null,
@@ -266,7 +272,7 @@ private fun ProfileStat(
     }
 }
 
-private fun formatStatCount(count: Int): String {
+internal fun formatStatCount(count: Int): String {
     return when {
         count >= 10000 -> "${count / 1000 / 10.0}만"
         count >= 1000 -> "${count / 100 / 10.0}k"
@@ -275,7 +281,7 @@ private fun formatStatCount(count: Int): String {
 }
 
 @Composable
-private fun PhotoGrid(
+internal fun PhotoGrid(
     moments: List<Moment>,
     onMomentClick: (String) -> Unit,
 ) {
@@ -330,7 +336,7 @@ private fun PhotoGrid(
 }
 
 @Composable
-private fun UpcomingEventsSection(
+internal fun UpcomingEventsSection(
     events: List<ProfileEvent>,
     onEventClick: (eventId: String) -> Unit = {},
 ) {
@@ -354,11 +360,11 @@ private fun UpcomingEventsSection(
 }
 
 @Composable
-private fun UpcomingEventItem(event: ProfileEvent, onClick: () -> Unit = {}) {
+internal fun UpcomingEventItem(event: ProfileEvent, onClick: () -> Unit = {}) {
     val barColor = parseColor(event.color, MaterialTheme.colorScheme.primary)
     Surface(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(LifeMashSpacing.md),
         shadowElevation = LifeMashShadow.sm,
         color = MaterialTheme.colorScheme.surface,
     ) {
@@ -368,9 +374,9 @@ private fun UpcomingEventItem(event: ProfileEvent, onClick: () -> Unit = {}) {
         ) {
             Box(
                 modifier = Modifier
-                    .width(4.dp)
+                    .width(LifeMashSpacing.xxs)
                     .height(36.dp)
-                    .clip(RoundedCornerShape(2.dp))
+                    .clip(RoundedCornerShape(LifeMashSpacing.micro))
                     .background(barColor),
             )
             Spacer(Modifier.width(LifeMashSpacing.md))
@@ -396,7 +402,7 @@ private fun UpcomingEventItem(event: ProfileEvent, onClick: () -> Unit = {}) {
 }
 
 @Composable
-private fun CalendarSection(
+internal fun CalendarSection(
     year: Int,
     month: Int,
     calendarEvents: Map<Int, List<CalendarDayEvent>>,
@@ -429,7 +435,7 @@ private fun CalendarSection(
                 Icon(
                     imageVector = Icons.Default.ChevronLeft,
                     contentDescription = "이전 달",
-                    modifier = Modifier.size(12.dp),
+                    modifier = Modifier.size(LifeMashSpacing.md),
                 )
             }
             Text(
@@ -440,7 +446,7 @@ private fun CalendarSection(
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "다음 달",
-                    modifier = Modifier.size(12.dp),
+                    modifier = Modifier.size(LifeMashSpacing.md),
                 )
             }
         }
@@ -507,7 +513,7 @@ private fun CalendarSection(
 }
 
 @Composable
-private fun CalendarDotDayCell(
+internal fun CalendarDotDayCell(
     day: Int,
     events: List<CalendarDayEvent>,
     isSelected: Boolean,
@@ -560,7 +566,7 @@ private fun CalendarDotDayCell(
 }
 
 @Composable
-private fun CalendarChipDayCell(
+internal fun CalendarChipDayCell(
     day: Int,
     events: List<CalendarDayEvent>,
     isSelected: Boolean,
@@ -603,7 +609,7 @@ private fun CalendarChipDayCell(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 1.dp)
-                    .clip(RoundedCornerShape(2.dp))
+                    .clip(RoundedCornerShape(LifeMashSpacing.micro))
                     .background(chipColor),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.SemiBold,
@@ -619,7 +625,7 @@ private fun CalendarChipDayCell(
 }
 
 @Composable
-private fun SelectedDayEventsSection(
+internal fun SelectedDayEventsSection(
     label: String,
     events: List<ProfileEvent>,
     onCameraClick: (eventId: String) -> Unit,
@@ -673,7 +679,7 @@ private fun SelectedDayEventsSection(
 }
 
 @Composable
-private fun DayEventItem(
+internal fun DayEventItem(
     event: ProfileEvent,
     onCameraClick: (eventId: String) -> Unit,
     onClick: () -> Unit = {},
@@ -686,7 +692,7 @@ private fun DayEventItem(
     }
     Surface(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(LifeMashSpacing.md),
         shadowElevation = LifeMashShadow.sm,
         color = MaterialTheme.colorScheme.surface,
     ) {
@@ -698,7 +704,7 @@ private fun DayEventItem(
                 modifier = Modifier
                     .width(3.dp)
                     .height(30.dp)
-                    .clip(RoundedCornerShape(2.dp))
+                    .clip(RoundedCornerShape(LifeMashSpacing.micro))
                     .background(barColor),
             )
             Spacer(Modifier.width(LifeMashSpacing.md))
@@ -722,7 +728,7 @@ private fun DayEventItem(
             Box(
                 modifier = Modifier
                     .size(30.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(LifeMashSpacing.sm))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -741,7 +747,7 @@ private fun DayEventItem(
     }
 }
 
-private fun visibilityLabel(visibility: String): String {
+internal fun visibilityLabel(visibility: String): String {
     return when (visibility.lowercase()) {
         "public" -> "공개"
         "friend", "friends", "followers" -> "친구"
@@ -750,7 +756,7 @@ private fun visibilityLabel(visibility: String): String {
 }
 
 @Composable
-private fun parseColor(hex: String, fallback: Color): Color {
+internal fun parseColor(hex: String, fallback: Color): Color {
     return runCatching {
         val clean = hex.trimStart('#')
         val r = clean.substring(0, 2).toInt(16)
@@ -760,7 +766,7 @@ private fun parseColor(hex: String, fallback: Color): Color {
     }.getOrElse { fallback }
 }
 
-private fun daysInMonth(year: Int, month: Int): Int {
+internal fun daysInMonth(year: Int, month: Int): Int {
     return when (month) {
         1, 3, 5, 7, 8, 10, 12 -> 31
         4, 6, 9, 11 -> 30
@@ -769,7 +775,7 @@ private fun daysInMonth(year: Int, month: Int): Int {
     }
 }
 
-private fun firstDayOfWeek(year: Int, month: Int): Int {
+internal fun firstDayOfWeek(year: Int, month: Int): Int {
     // Tomohiko Sakamoto's algorithm (0=Sunday)
     val y = if (month < 3) year - 1 else year
     val m = if (month < 3) month + 10 else month - 2

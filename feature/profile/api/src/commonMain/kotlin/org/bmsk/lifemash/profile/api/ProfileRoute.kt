@@ -21,4 +21,5 @@ data class ProfileNavGraphInfo(
     val onNavigateToEventDetail: (String) -> Unit,
     val onNavigateToUserProfile: (String) -> Unit,
     val onNavigateToProfileEdit: () -> Unit = {},
+    val onNavigateToEventCreate: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
 )

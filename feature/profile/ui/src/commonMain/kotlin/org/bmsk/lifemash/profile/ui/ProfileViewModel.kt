@@ -176,6 +176,7 @@ internal class ProfileViewModel(
         val gId = groupId ?: return
         viewModelScope.launch {
             runCatching {
+                // 프로필 화면 인라인 편집은 title/color만 수정. null = 기존 값 유지.
                 eventRepository.updateEvent(
                     groupId = gId,
                     eventId = eventId,

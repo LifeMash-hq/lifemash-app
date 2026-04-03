@@ -65,6 +65,7 @@ internal class ProfileEditViewModel(
     fun updateMyCalendarView(index: Int) = _uiState.update { it.copy(myCalendarView = index) }
     fun updateOthersCalendarView(index: Int) = _uiState.update { it.copy(othersCalendarView = index) }
     fun updateDefaultVisibility(index: Int) = _uiState.update { it.copy(defaultVisibility = index) }
+    fun updateProfileImage(url: String) = _uiState.update { it.copy(profileImageUrl = url) }
 
     fun save(onDone: () -> Unit) {
         val state = _uiState.value
