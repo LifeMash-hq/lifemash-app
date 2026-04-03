@@ -6,6 +6,7 @@ import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.provideDelegate
@@ -27,8 +28,8 @@ internal fun Project.configureKotlinAndroid() {
 }
 
 private fun LibraryExtension.applyAndroidOptions() {
-    compileSdk = 36
-    defaultConfig { minSdk = 28 }
+    compileSdk = AndroidSdk.COMPILE_SDK
+    defaultConfig { minSdk = AndroidSdk.MIN_SDK }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -42,8 +43,8 @@ private fun LibraryExtension.applyAndroidOptions() {
 }
 
 private fun ApplicationExtension.applyAndroidOptions() {
-    compileSdk = 36
-    defaultConfig { minSdk = 28 }
+    compileSdk = AndroidSdk.COMPILE_SDK
+    defaultConfig { minSdk = AndroidSdk.MIN_SDK }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -62,6 +63,10 @@ private fun ApplicationExtension.applyAndroidOptions() {
 }
 
 internal fun Project.configureKotlin() {
+    extensions.findByType<JavaPluginExtension>()?.apply {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)

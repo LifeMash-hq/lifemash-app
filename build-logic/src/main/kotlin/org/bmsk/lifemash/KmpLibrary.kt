@@ -14,8 +14,8 @@ internal fun Project.configureKmpLibrary() {
             .extensions
             .getByName("android") as KotlinMultiplatformAndroidLibraryTarget
         androidLib.apply {
-            compileSdk = 36
-            minSdk = 28
+            compileSdk = AndroidSdk.COMPILE_SDK
+            minSdk = AndroidSdk.MIN_SDK
             compilerOptions {
                 jvmTarget.set(JvmTarget.JVM_17)
                 freeCompilerArgs.add("-Xexpect-actual-classes")

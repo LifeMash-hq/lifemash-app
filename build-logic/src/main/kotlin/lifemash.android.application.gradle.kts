@@ -1,5 +1,5 @@
 import com.android.build.api.dsl.ApplicationExtension
-import org.bmsk.lifemash.configureKotestAndroid
+import org.bmsk.lifemash.configureKotest
 import org.bmsk.lifemash.configureKotlinAndroid
 import org.bmsk.lifemash.libs
 import org.gradle.kotlin.dsl.configure
@@ -11,7 +11,7 @@ plugins {
 }
 
 configureKotlinAndroid()
-configureKotestAndroid()
+configureKotest()
 
 extensions.configure<ApplicationExtension> {
     namespace = "org.bmsk.lifemash"
@@ -21,12 +21,4 @@ extensions.configure<ApplicationExtension> {
         versionCode = 1
         versionName = "1.3.0"
     }
-}
-
-dependencies {
-    val libs = project.extensions.libs
-    implementation(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
-    implementation(libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
-
-    lintChecks(project(":lint"))
 }

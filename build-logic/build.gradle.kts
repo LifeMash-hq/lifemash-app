@@ -11,6 +11,8 @@ dependencies {
     implementation(libs.compose.gradlePlugin)
 }
 
-gradlePlugin {
-    plugins {}
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }

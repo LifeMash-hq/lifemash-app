@@ -69,11 +69,13 @@ lint = "32.1.0"
 coreKtx = "1.18.0"
 
 # Backend (Core)
+ktor-openapi = "5.4.0"
 exposed = "0.58.0"
 postgresql = "42.7.5"
 hikaricp = "6.2.1"
 logback = "1.5.16"
 javaJwt = "4.5.0"
+bcrypt = "0.10.2"
 firebaseAdmin = "9.4.3"
 shadow = "9.0.0-beta12"
 uiTooling = "1.10.6"
@@ -225,6 +227,7 @@ ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
 ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+ktor-openapi = { module = "io.github.smiley4:ktor-openapi", version.ref = "ktor-openapi" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 
@@ -240,6 +243,7 @@ hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 
 # Auth / Firebase Admin / Logging
 java-jwt = { module = "com.auth0:java-jwt", version.ref = "javaJwt" }
+bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt" }
 firebase-admin-sdk = { module = "com.google.firebase:firebase-admin", version.ref = "firebaseAdmin" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }

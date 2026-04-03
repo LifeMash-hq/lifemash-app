@@ -86,6 +86,13 @@ include(
 )
 
 include(
+    ":feature:onboarding:api",
+    ":feature:onboarding:domain",
+    ":feature:onboarding:data",
+    ":feature:onboarding:ui",
+)
+
+include(
     ":shared:model",
     ":shared:network",
     ":shared:navigation",
