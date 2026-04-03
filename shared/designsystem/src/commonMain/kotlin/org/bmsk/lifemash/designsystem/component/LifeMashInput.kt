@@ -26,6 +26,8 @@ fun LifeMashInput(
     placeholder: String? = null,
     isError: Boolean = false,
     errorMessage: String? = null,
+    helperMessage: String? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     singleLine: Boolean = true,
     minLines: Int = 1,
@@ -56,6 +58,7 @@ fun LifeMashInput(
             placeholder = placeholder?.let {
                 { Text(it, color = semantic.textDisabled) }
             },
+            leadingIcon = leadingIcon,
             shape = RoundedCornerShape(LifeMashRadius.md),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = semantic.inputBg,
@@ -68,13 +71,23 @@ fun LifeMashInput(
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,
         )
-        if (isError && errorMessage != null) {
-            Spacer(modifier = Modifier.height(LifeMashSpacing.xxs))
-            Text(
-                text = errorMessage,
-                style = MaterialTheme.typography.labelSmall,
-                color = semantic.danger,
-            )
+        when {
+            isError && errorMessage != null -> {
+                Spacer(modifier = Modifier.height(LifeMashSpacing.xxs))
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = semantic.danger,
+                )
+            }
+            !isError && helperMessage != null -> {
+                Spacer(modifier = Modifier.height(LifeMashSpacing.xxs))
+                Text(
+                    text = helperMessage,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = semantic.success,
+                )
+            }
         }
     }
 }
