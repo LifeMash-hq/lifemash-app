@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bmsk.lifemash.auth.AuthService
+import org.bmsk.lifemash.model.auth.EmailSignInRequest
 import org.bmsk.lifemash.model.auth.GoogleSignInRequest
 import org.bmsk.lifemash.model.auth.KakaoSignInRequest
 import org.bmsk.lifemash.model.auth.RefreshTokenRequest
@@ -26,6 +27,12 @@ fun Route.authRoutes() {
         post("/google") {
             val request = call.receive<GoogleSignInRequest>()
             val token = authService.signInWithGoogle(request.idToken)
+            call.respond(token)
+        }
+
+        post("/email") {
+            val request = call.receive<EmailSignInRequest>()
+            val token = authService.signInWithEmail(request.email, request.password)
             call.respond(token)
         }
 

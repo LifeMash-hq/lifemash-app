@@ -1,9 +1,11 @@
 package org.bmsk.lifemash.auth
 
+import at.favre.lib.crypto.bcrypt.BCrypt
 import org.bmsk.lifemash.auth.oauth.GoogleOAuthClient
 import org.bmsk.lifemash.auth.oauth.KakaoOAuthClient
 import org.bmsk.lifemash.model.auth.AuthTokenDto
 import org.bmsk.lifemash.model.auth.AuthUserDto
+import org.bmsk.lifemash.plugins.ConflictException
 import org.bmsk.lifemash.plugins.UnauthorizedException
 import org.bmsk.lifemash.user.UserRepository
 import kotlin.uuid.Uuid
@@ -46,6 +48,31 @@ class AuthServiceImpl(
             nickname = googleUser.nickname,
             profileImage = googleUser.profileImage,
         )
+        return generateTokens(user)
+    }
+
+    /** 이메일/패스워드 로그인 또는 신규 가입 (email이 없으면 자동 가입) */
+    override fun signInWithEmail(email: String, password: String): AuthTokenDto {
+        require(email.isNotBlank() && password.length >= 8) { "이메일 또는 비밀번호가 올바르지 않습니다" }
+
+        val existing = userRepository.findByEmail(email)
+
+        if (existing != null && existing.provider != "EMAIL") {
+            throw ConflictException("이 이메일은 ${existing.provider} 로그인으로 가입되어 있습니다")
+        }
+
+        if (existing != null) {
+            val storedHash = userRepository.getPasswordHash(email)
+                ?: throw UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다")
+            val result = BCrypt.verifyer().verify(password.toCharArray(), storedHash)
+            if (!result.verified) throw UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다")
+            return generateTokens(existing)
+        }
+
+        val passwordHash = BCrypt.withDefaults().hashToString(12, password.toCharArray())
+        val baseNickname = email.substringBefore("@")
+        val nickname = "$baseNickname${(1000..9999).random()}"
+        val user = userRepository.upsertEmailUser(email, passwordHash, nickname)
         return generateTokens(user)
     }
 
