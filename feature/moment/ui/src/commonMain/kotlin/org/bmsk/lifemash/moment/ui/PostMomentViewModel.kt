@@ -7,6 +7,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import org.bmsk.lifemash.calendar.domain.model.Event
+import org.bmsk.lifemash.calendar.domain.repository.EventRepository
+import org.bmsk.lifemash.calendar.domain.repository.GroupRepository
 import org.bmsk.lifemash.moment.domain.model.MediaType
 import org.bmsk.lifemash.moment.domain.model.MomentMedia
 import org.bmsk.lifemash.moment.domain.model.Visibility
@@ -15,6 +22,8 @@ import org.bmsk.lifemash.moment.domain.usecase.CreateMomentUseCase
 @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
 internal class PostMomentViewModel(
     private val createMoment: CreateMomentUseCase,
+    private val eventRepository: EventRepository,
+    private val groupRepository: GroupRepository,
 ) : ViewModel() {
 
     private val _form = MutableStateFlow(PostMomentFormState())
@@ -22,6 +31,27 @@ internal class PostMomentViewModel(
 
     private val _uiState = MutableStateFlow<PostMomentUiState>(PostMomentUiState.Idle)
     val uiState: StateFlow<PostMomentUiState> = _uiState.asStateFlow()
+
+    private val _events = MutableStateFlow<List<Event>>(emptyList())
+    val events: StateFlow<List<Event>> = _events.asStateFlow()
+
+    init {
+        loadEvents()
+    }
+
+    private fun loadEvents() {
+        viewModelScope.launch {
+            runCatching {
+                val groups = groupRepository.getMyGroups()
+                val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                groups.flatMap { group ->
+                    eventRepository.getMonthEvents(group.id, now.year, now.month.number)
+                }.sortedBy { it.startAt }
+            }.onSuccess { events ->
+                _events.value = events
+            }
+        }
+    }
 
     fun onCaptionChange(value: String) {
         _form.update { it.copy(caption = value.take(200)) }

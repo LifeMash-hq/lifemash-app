@@ -2,8 +2,17 @@ package org.bmsk.lifemash.moment.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
+import org.bmsk.lifemash.feature.shared.common.rememberMediaPickerLauncher
+import org.bmsk.lifemash.model.upload.UploadService
+import org.bmsk.lifemash.moment.domain.model.MediaType
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -12,11 +21,32 @@ fun PostMomentRouteScreen(
     onClose: () -> Unit,
 ) {
     val viewModel: PostMomentViewModel = koinViewModel()
+    val uploadService: UploadService = koinInject()
     val form by viewModel.form.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    var showEventSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState) {
         if (uiState is PostMomentUiState.Success) onSuccess()
+    }
+
+    val pickMedia = rememberMediaPickerLauncher(maxItems = 10) { picked ->
+        picked.forEach { media ->
+            val mediaType = if (media.mimeType?.startsWith("video") == true) {
+                MediaType.VIDEO
+            } else {
+                MediaType.IMAGE
+            }
+            viewModel.onAddMedia(
+                uri = media.uri,
+                mediaType = mediaType,
+                durationMs = media.durationMs,
+                width = media.width,
+                height = media.height,
+            )
+        }
     }
 
     PostMomentScreen(
@@ -24,16 +54,23 @@ fun PostMomentRouteScreen(
         uiState = uiState,
         onCaptionChange = viewModel::onCaptionChange,
         onCycleVisibility = viewModel::onCycleVisibility,
-        onTagEventClick = { /* TODO: 일정 선택 바텀시트 */ },
-        onAddMedia = { /* TODO: 미디어 피커 (platform expect/actual) */ },
+        onTagEventClick = { showEventSheet = true },
+        onAddMedia = { pickMedia() },
         onRemoveMedia = viewModel::onRemoveMedia,
         onSubmit = {
-            viewModel.onSubmit { media ->
-                // TODO: presigned URL → S3 직접 업로드 구현 (platform-specific)
-                // 현재는 localUri를 그대로 반환 (개발 테스트용)
-                media.localUri
+            scope.launch {
+                viewModel.onSubmit { media ->
+                    uploadService.upload(media.localUri)
+                }
             }
         },
         onClose = onClose,
     )
+
+    if (showEventSheet) {
+        EventSelectSheet(
+            viewModel = viewModel,
+            onDismiss = { showEventSheet = false },
+        )
+    }
 }

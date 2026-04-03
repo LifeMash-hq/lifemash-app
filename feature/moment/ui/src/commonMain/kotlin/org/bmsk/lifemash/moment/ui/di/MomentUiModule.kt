@@ -7,5 +7,5 @@ import org.koin.dsl.module
 
 val momentUiModule = module {
     factory { CreateMomentUseCase(get()) }
-    viewModel { PostMomentViewModel(get()) }
+    viewModel { PostMomentViewModel(get(), get(), get()) }
 }

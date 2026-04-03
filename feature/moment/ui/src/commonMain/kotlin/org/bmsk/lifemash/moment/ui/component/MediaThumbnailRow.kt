@@ -80,13 +80,13 @@ private fun MediaThumb(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .background(Color.Black.copy(alpha = 0.4f), CircleShape)
-                    .padding(4.dp),
+                    .padding(LifeMashSpacing.xxs),
             ) {
                 Icon(
                     imageVector = Icons.Rounded.PlayArrow,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(LifeMashSpacing.xl),
                 )
             }
             item.durationMs?.let { ms ->
@@ -97,7 +97,7 @@ private fun MediaThumb(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .background(Color.Black.copy(alpha = 0.6f))
-                        .padding(horizontal = 4.dp, vertical = 2.dp),
+                        .padding(horizontal = LifeMashSpacing.xxs, vertical = LifeMashSpacing.micro),
                 )
             }
         }
@@ -106,7 +106,7 @@ private fun MediaThumb(
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(4.dp)
+                .padding(LifeMashSpacing.xxs)
                 .size(20.dp)
                 .background(Color.Black.copy(alpha = 0.5f), CircleShape)
                 .clickable(onClick = onRemove),
@@ -116,7 +116,7 @@ private fun MediaThumb(
                 imageVector = Icons.Rounded.Close,
                 contentDescription = "삭제",
                 tint = Color.White,
-                modifier = Modifier.size(12.dp),
+                modifier = Modifier.size(LifeMashSpacing.md),
             )
         }
     }
