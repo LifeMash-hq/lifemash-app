@@ -9,6 +9,7 @@ data class AuthUser(
     val nickname: String,
     val profileImage: String?,
     val provider: SocialProvider,
+    val username: String? = null,
 )
 
 @Serializable

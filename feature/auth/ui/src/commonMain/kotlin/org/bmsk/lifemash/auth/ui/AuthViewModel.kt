@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.auth.domain.repository.AuthRepository
 
@@ -16,18 +17,11 @@ internal class AuthViewModel(
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
     fun signInWithKakao(accessToken: String) {
-        println("KakaoLogin: signInWithKakao called, token=${accessToken.take(10)}...")
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
             runCatching { authRepository.signInWithKakao(accessToken) }
-                .onSuccess {
-                    println("KakaoLogin: signIn SUCCESS")
-                    _uiState.value = AuthUiState.Success
-                }
-                .onFailure {
-                    println("KakaoLogin: signIn FAILURE: ${it.message}")
-                    _uiState.value = AuthUiState.Error(it.message ?: "로그인 실패")
-                }
+                .onSuccess { emitSuccess() }
+                .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "로그인 실패") }
         }
     }
 
@@ -35,7 +29,7 @@ internal class AuthViewModel(
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
             runCatching { authRepository.signInWithGoogle(idToken) }
-                .onSuccess { _uiState.value = AuthUiState.Success }
+                .onSuccess { emitSuccess() }
                 .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "로그인 실패") }
         }
     }
@@ -44,8 +38,13 @@ internal class AuthViewModel(
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
             runCatching { authRepository.signInWithEmail(email, password) }
-                .onSuccess { _uiState.value = AuthUiState.Success }
+                .onSuccess { emitSuccess() }
                 .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "로그인 실패") }
         }
+    }
+
+    private suspend fun emitSuccess() {
+        val user = authRepository.getCurrentUser().first()
+        _uiState.value = AuthUiState.Success(isNewUser = user?.username == null)
     }
 }

@@ -59,11 +59,11 @@ internal fun WelcomeScreen(
                 modifier = Modifier
                     .size(80.dp)
                     .shadow(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(24.dp),
+                        elevation = LifeMashSpacing.sm,
+                        shape = RoundedCornerShape(LifeMashSpacing.xxl),
                         ambientColor = onPrimary.copy(alpha = 0.1f),
                     )
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(RoundedCornerShape(LifeMashSpacing.xxl))
                     .background(onPrimary.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center,
             ) {
@@ -107,21 +107,21 @@ internal fun WelcomeScreen(
                 // 활성 dot (더 넓음)
                 Box(
                     modifier = Modifier
-                        .width(20.dp)
-                        .height(6.dp)
+                        .width(LifeMashSpacing.xl)
+                        .height(LifeMashSpacing.xs)
                         .clip(CircleShape)
                         .background(onPrimary),
                 )
                 // 비활성 dot
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
+                        .size(LifeMashSpacing.xs)
                         .clip(CircleShape)
                         .background(onPrimary.copy(alpha = 0.35f)),
                 )
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
+                        .size(LifeMashSpacing.xs)
                         .clip(CircleShape)
                         .background(onPrimary.copy(alpha = 0.35f)),
                 )
@@ -139,7 +139,7 @@ internal fun WelcomeScreen(
                     contentColor = primary,
                 ),
                 elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 4.dp,
+                    defaultElevation = LifeMashSpacing.xxs,
                 ),
             ) {
                 Text(

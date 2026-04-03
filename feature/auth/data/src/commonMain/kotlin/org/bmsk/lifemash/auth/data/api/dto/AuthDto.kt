@@ -20,6 +20,7 @@ data class AuthUserDto(
     val nickname: String,
     val profileImage: String?,
     val provider: SocialProvider,
+    val username: String? = null,
 ) {
     fun toDomain() = AuthUser(
         id = id,
@@ -27,6 +28,7 @@ data class AuthUserDto(
         nickname = nickname,
         profileImage = profileImage,
         provider = provider,
+        username = username,
     )
 }
 

@@ -11,7 +11,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun AuthRouteScreen(
-    onSignInComplete: () -> Unit,
+    onSignInComplete: (isNewUser: Boolean) -> Unit,
     onShowErrorSnackbar: (Throwable?) -> Unit,
     viewModel: AuthViewModel = koinViewModel(),
 ) {
@@ -19,8 +19,9 @@ internal fun AuthRouteScreen(
     var showLogin by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(uiState) {
-        if (uiState is AuthUiState.Success) {
-            onSignInComplete()
+        val state = uiState
+        if (state is AuthUiState.Success) {
+            onSignInComplete(state.isNewUser)
         }
     }
 
