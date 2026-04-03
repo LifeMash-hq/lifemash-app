@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.GroupAdd
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,13 +47,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.bmsk.lifemash.calendar.domain.model.EventVisibility
+import org.bmsk.lifemash.calendar.domain.model.Follower
+import org.bmsk.lifemash.calendar.domain.model.Group
+import org.bmsk.lifemash.calendar.domain.model.GroupType
 import org.bmsk.lifemash.designsystem.component.LifeMashAvatar
 import org.bmsk.lifemash.designsystem.component.LifeMashButton
+import org.bmsk.lifemash.designsystem.component.LifeMashEmptyState
 import org.bmsk.lifemash.designsystem.component.LifeMashInput
 import org.bmsk.lifemash.designsystem.component.LifeMashSegmentControl
+import org.bmsk.lifemash.designsystem.component.LifeMashSkeleton
 import org.bmsk.lifemash.designsystem.theme.LifeMashRadius
 import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
+import org.koin.compose.viewmodel.koinViewModel
 
 // 디자인 스펙 아이콘 배경색 (데코레이션 상수, 라이트/다크 공통 적용)
 private val VIS_COLOR_PUBLIC = Color(0xFF0984E3)
@@ -86,14 +93,17 @@ private val VIS_OPTIONS = listOf(
     VisOption(EventVisibility.Private, "비공개", "나만 볼 수 있어요", VIS_COLOR_PRIVATE, Icons.Outlined.Lock),
 )
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun VisibilitySheet(
     currentVisibility: EventVisibility,
     onSelect: (EventVisibility) -> Unit,
     onDismiss: () -> Unit,
+    viewModel: VisibilitySheetViewModel = koinViewModel(),
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var step by remember { mutableStateOf<VisibilitySheetStep>(VisibilitySheetStep.PickType) }
 
     ModalBottomSheet(
@@ -109,27 +119,48 @@ internal fun VisibilitySheet(
                 },
                 onNavigate = { navStep -> step = navStep },
             )
-            VisibilitySheetStep.GroupList -> GroupListContent(
-                currentVisibility = currentVisibility,
-                onSelect = { groupId ->
-                    onSelect(EventVisibility.Group(groupId))
-                    onDismiss()
-                },
-                onCreateGroup = { step = VisibilitySheetStep.CreateGroup },
-                onBack = { step = VisibilitySheetStep.PickType },
-            )
-            VisibilitySheetStep.CreateGroup -> CreateGroupContent(
-                onBack = { step = VisibilitySheetStep.GroupList },
-                onCreate = { step = VisibilitySheetStep.GroupList },
-            )
-            VisibilitySheetStep.SelectPeople -> SelectPeopleContent(
-                currentVisibility = currentVisibility,
-                onConfirm = { userIds ->
-                    onSelect(EventVisibility.Specific(userIds))
-                    onDismiss()
-                },
-                onBack = { step = VisibilitySheetStep.PickType },
-            )
+            VisibilitySheetStep.GroupList -> when (val state = uiState) {
+                is VisibilitySheetUiState.Loading -> VisibilityLoadingContent(onBack = { step = VisibilitySheetStep.PickType })
+                is VisibilitySheetUiState.Ready -> GroupListContent(
+                    groups = state.groups,
+                    currentVisibility = currentVisibility,
+                    onSelect = { groupId ->
+                        onSelect(EventVisibility.Group(groupId))
+                        onDismiss()
+                    },
+                    onCreateGroup = { step = VisibilitySheetStep.CreateGroup },
+                    onBack = { step = VisibilitySheetStep.PickType },
+                )
+                is VisibilitySheetUiState.Error -> VisibilityErrorContent(
+                    message = state.message,
+                    onBack = { step = VisibilitySheetStep.PickType },
+                )
+            }
+            VisibilitySheetStep.CreateGroup -> {
+                val creationState = (uiState as? VisibilitySheetUiState.Ready)?.groupCreation
+                    ?: GroupCreationState.Idle
+                CreateGroupContent(
+                    creationState = creationState,
+                    onBack = { step = VisibilitySheetStep.GroupList },
+                    onCreate = { name, type -> viewModel.createGroup(name, type) },
+                )
+            }
+            VisibilitySheetStep.SelectPeople -> when (val state = uiState) {
+                is VisibilitySheetUiState.Loading -> VisibilityLoadingContent(onBack = { step = VisibilitySheetStep.PickType })
+                is VisibilitySheetUiState.Ready -> SelectPeopleContent(
+                    followers = state.followers,
+                    currentVisibility = currentVisibility,
+                    onConfirm = { userIds ->
+                        onSelect(EventVisibility.Specific(userIds))
+                        onDismiss()
+                    },
+                    onBack = { step = VisibilitySheetStep.PickType },
+                )
+                is VisibilitySheetUiState.Error -> VisibilityErrorContent(
+                    message = state.message,
+                    onBack = { step = VisibilitySheetStep.PickType },
+                )
+            }
         }
     }
 }
@@ -189,7 +220,7 @@ private fun VisibilityOptionRow(
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(LifeMashSpacing.huge)
                 .clip(CircleShape)
                 .background(option.iconBg),
             contentAlignment = Alignment.Center,
@@ -197,7 +228,7 @@ private fun VisibilityOptionRow(
             Icon(
                 imageVector = option.icon,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(LifeMashSpacing.xl),
                 tint = Color.White,
             )
         }
@@ -218,14 +249,66 @@ private fun VisibilityOptionRow(
             isSelected -> Icon(
                 imageVector = Icons.Outlined.Check,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(LifeMashSpacing.xl),
                 tint = MaterialTheme.colorScheme.primary,
             )
             option.navStep != null -> Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(LifeMashSpacing.xl),
                 tint = MaterialTheme.colorScheme.outlineVariant,
+            )
+        }
+    }
+}
+
+// ─── Loading / Error ──────────────────────────────────────────────────────────
+
+@Composable
+private fun VisibilityLoadingContent(onBack: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        VisibilitySubScreenHeader(title = "", onBack = onBack)
+        LifeMashSkeleton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = LifeMashSpacing.xl)
+                .size(200.dp),
+        )
+        Spacer(modifier = Modifier.navigationBarsPadding())
+    }
+}
+
+@Composable
+private fun VisibilityErrorContent(message: String, onBack: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        VisibilitySubScreenHeader(title = "", onBack = onBack)
+        LifeMashEmptyState(
+            icon = Icons.Outlined.ErrorOutline,
+            title = message,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(LifeMashSpacing.xl),
+        )
+        Spacer(modifier = Modifier.navigationBarsPadding())
+    }
+}
+
+@Composable
+private fun VisibilitySubScreenHeader(title: String, onBack: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = LifeMashSpacing.sm, vertical = LifeMashSpacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로")
+        }
+        if (title.isNotEmpty()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -233,29 +316,25 @@ private fun VisibilityOptionRow(
 
 // ─── Group List ───────────────────────────────────────────────────────────────
 
-private data class VisibilityGroup(
-    val id: String,
-    val emoji: String,
-    val name: String,
-    val memberCount: Int,
-    val isShared: Boolean,
-    val bgColor: Color,
-)
+@Composable
+private fun GroupType.toEmoji(): String = when (this) {
+    GroupType.COUPLE -> "♥"
+    GroupType.FAMILY -> "👨‍👩‍👧‍👦"
+    GroupType.FRIENDS -> "🎓"
+    GroupType.TEAM -> "💼"
+}
 
-private val MOCK_GROUPS = listOf(
-    VisibilityGroup("g1", "♥", "연인", 1, isShared = true, Color(0x26FF6B81)),
-    VisibilityGroup("g2", "🎓", "대학친구", 8, isShared = true, Color(0x1A6C5CE7)),
-    VisibilityGroup("g3", "💼", "회사팀", 5, isShared = false, Color(0x1A0984E3)),
-    VisibilityGroup("g4", "🏋️", "헬스메이트", 3, isShared = false, Color(0x1A00B894)),
-)
-
-private val SHARE_DESCRIPTIONS = listOf(
-    "이 그룹은 나만 알아요. 그룹으로 설정한 일정은 내가 지정한 멤버에게만 보여요.",
-    "멤버 모두가 그룹의 존재를 알아요. 서로의 그룹 공개 일정을 볼 수 있어요.",
-)
+@Composable
+private fun GroupType.toBgColor(): Color = when (this) {
+    GroupType.COUPLE -> MaterialTheme.colorScheme.errorContainer
+    GroupType.FAMILY -> MaterialTheme.colorScheme.primaryContainer
+    GroupType.FRIENDS -> MaterialTheme.colorScheme.secondaryContainer
+    GroupType.TEAM -> MaterialTheme.colorScheme.tertiaryContainer
+}
 
 @Composable
 internal fun GroupListContent(
+    groups: List<Group>,
     currentVisibility: EventVisibility,
     onSelect: (groupId: String) -> Unit,
     onCreateGroup: () -> Unit,
@@ -264,24 +343,10 @@ internal fun GroupListContent(
     val selectedGroupId = (currentVisibility as? EventVisibility.Group)?.groupId
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LifeMashSpacing.sm, vertical = LifeMashSpacing.xs),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로")
-            }
-            Text(
-                text = "그룹 선택",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.weight(1f),
-            )
-        }
+        VisibilitySubScreenHeader(title = "그룹 선택", onBack = onBack)
 
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            MOCK_GROUPS.forEachIndexed { index, group ->
+            groups.forEachIndexed { index, group ->
                 if (index > 0) {
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = LifeMashSpacing.xl),
@@ -299,15 +364,15 @@ internal fun GroupListContent(
                         modifier = Modifier
                             .size(44.dp)
                             .clip(RoundedCornerShape(LifeMashRadius.md))
-                            .background(group.bgColor),
+                            .background(group.type.toBgColor()),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(text = group.emoji, style = MaterialTheme.typography.titleMedium)
+                        Text(text = group.type.toEmoji(), style = MaterialTheme.typography.titleMedium)
                     }
                     Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = group.name,
+                            text = group.name ?: group.type.name,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -316,25 +381,25 @@ internal fun GroupListContent(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                text = "멤버 ${group.memberCount}명",
+                                text = "멤버 ${group.members.size}명",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            GroupTagChip(isShared = group.isShared)
+                            GroupTagChip(isShared = group.members.size > 1)
                         }
                     }
                     if (selectedGroupId == group.id) {
                         Icon(
                             imageVector = Icons.Outlined.Check,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(LifeMashSpacing.xl),
                             tint = MaterialTheme.colorScheme.primary,
                         )
                     } else {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(LifeMashSpacing.xl),
                             tint = MaterialTheme.colorScheme.outlineVariant,
                         )
                     }
@@ -364,7 +429,7 @@ internal fun GroupListContent(
                     Icon(
                         imageVector = Icons.Outlined.Add,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(LifeMashSpacing.xl),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -404,28 +469,15 @@ private fun GroupTagChip(isShared: Boolean) {
 
 @Composable
 internal fun CreateGroupContent(
+    creationState: GroupCreationState,
     onBack: () -> Unit,
-    onCreate: () -> Unit,
+    onCreate: (name: String, type: GroupType) -> Unit,
 ) {
     var groupName by remember { mutableStateOf("") }
-    var shareModeIndex by remember { mutableIntStateOf(0) }
+    var selectedType by remember { mutableStateOf(GroupType.FRIENDS) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LifeMashSpacing.sm, vertical = LifeMashSpacing.xs),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로")
-            }
-            Text(
-                text = "새 그룹",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.weight(1f),
-            )
-        }
+        VisibilitySubScreenHeader(title = "새 그룹", onBack = onBack)
 
         Column(
             modifier = Modifier
@@ -450,30 +502,34 @@ internal fun CreateGroupContent(
             Spacer(modifier = Modifier.size(LifeMashSpacing.xl))
 
             Text(
-                text = "공유 방식",
+                text = "그룹 유형",
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.size(LifeMashSpacing.sm))
             LifeMashSegmentControl(
-                options = listOf("나만 사용", "멤버 공유"),
-                selectedIndex = shareModeIndex,
-                onSelect = { shareModeIndex = it },
+                options = listOf("연인", "가족", "친구", "팀"),
+                selectedIndex = GroupType.entries.indexOf(selectedType),
+                onSelect = { selectedType = GroupType.entries[it] },
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(modifier = Modifier.size(LifeMashSpacing.sm))
-            Text(
-                text = SHARE_DESCRIPTIONS[shareModeIndex],
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+
+            if (creationState is GroupCreationState.Failed) {
+                Spacer(modifier = Modifier.size(LifeMashSpacing.md))
+                Text(
+                    text = creationState.message,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
 
             Spacer(modifier = Modifier.size(LifeMashSpacing.xxl))
 
             LifeMashButton(
                 text = "그룹 만들기",
-                onClick = onCreate,
+                onClick = { onCreate(groupName, selectedType) },
                 enabled = groupName.isNotBlank(),
+                isLoading = creationState is GroupCreationState.InProgress,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -485,19 +541,9 @@ internal fun CreateGroupContent(
 
 // ─── Select People ────────────────────────────────────────────────────────────
 
-private data class MockFollower(val id: String, val name: String, val handle: String)
-
-private val MOCK_FOLLOWERS = listOf(
-    MockFollower("u1", "김민지", "@minji_k"),
-    MockFollower("u2", "황수현", "@soohyun.h"),
-    MockFollower("u3", "정재원", "@jaewon.j"),
-    MockFollower("u4", "박현준", "@hjpark"),
-    MockFollower("u5", "최윤서", "@yuns_choi"),
-    MockFollower("u6", "강태양", "@taeyang.k"),
-)
-
 @Composable
 internal fun SelectPeopleContent(
+    followers: List<Follower>,
     currentVisibility: EventVisibility,
     onConfirm: (userIds: List<String>) -> Unit,
     onBack: () -> Unit,
@@ -506,28 +552,10 @@ internal fun SelectPeopleContent(
     var selectedIds by remember { mutableStateOf(initialIds.toSet()) }
     var searchQuery by remember { mutableStateOf("") }
 
-    val filtered = MOCK_FOLLOWERS.filter { follower ->
-        searchQuery.isBlank() ||
-            follower.name.contains(searchQuery, ignoreCase = true) ||
-            follower.handle.contains(searchQuery, ignoreCase = true)
-    }
+    val filtered = followers.filter { it.matchesQuery(searchQuery) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LifeMashSpacing.sm, vertical = LifeMashSpacing.xs),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로")
-            }
-            Text(
-                text = "특정인 선택",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.weight(1f),
-            )
-        }
+        VisibilitySubScreenHeader(title = "특정인 선택", onBack = onBack)
 
         LifeMashInput(
             value = searchQuery,
@@ -538,7 +566,7 @@ internal fun SelectPeopleContent(
                 .padding(horizontal = LifeMashSpacing.xl, vertical = LifeMashSpacing.sm),
         )
 
-        val selectedPeople = MOCK_FOLLOWERS.filter { it.id in selectedIds }
+        val selectedPeople = followers.filter { it.id in selectedIds }
         if (selectedPeople.isNotEmpty()) {
             Row(
                 modifier = Modifier
@@ -559,7 +587,7 @@ internal fun SelectPeopleContent(
                             horizontalArrangement = Arrangement.spacedBy(LifeMashSpacing.xxs),
                         ) {
                             Text(
-                                text = person.name,
+                                text = person.nickname,
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
@@ -576,7 +604,7 @@ internal fun SelectPeopleContent(
         }
 
         Text(
-            text = "팔로워 · ${MOCK_FOLLOWERS.size}명",
+            text = "팔로워 · ${followers.size}명",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = LifeMashSpacing.xl, vertical = LifeMashSpacing.sm),
@@ -598,19 +626,19 @@ internal fun SelectPeopleContent(
                             selectedIds = if (isChecked) selectedIds - follower.id
                             else selectedIds + follower.id
                         }
-                        .padding(horizontal = LifeMashSpacing.xl, vertical = 12.dp),
+                        .padding(horizontal = LifeMashSpacing.xl, vertical = LifeMashSpacing.md),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    LifeMashAvatar(name = follower.name)
+                    LifeMashAvatar(name = follower.nickname)
                     Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = follower.name,
+                            text = follower.nickname,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = follower.handle,
+                            text = follower.displayHandle,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

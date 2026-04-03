@@ -85,7 +85,7 @@ internal fun EventCreateScreen(
     var location by remember { mutableStateOf(existingEvent?.location ?: "") }
     var showLocationInput by remember { mutableStateOf(false) }
     var selectedColor by remember { mutableStateOf<String?>(existingEvent?.color) }
-    var visibility by remember { mutableStateOf<EventVisibility>(EventVisibility.Followers) }
+    var visibility by remember { mutableStateOf(existingEvent?.visibility ?: EventVisibility.Followers) }
     var showVisibilitySheet by remember { mutableStateOf(false) }
     var memo by remember { mutableStateOf(existingEvent?.description ?: "") }
     var eventDateTime by remember {
@@ -232,7 +232,7 @@ internal fun EventCreateScreen(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(Modifier.weight(1f))
-                LifeMashChip(text = visibility.label(), selected = true, onClick = {})
+                LifeMashChip(text = visibility.label(), selected = true, onClick = { showVisibilitySheet = true })
             }
 
             // 색상 행
@@ -276,7 +276,7 @@ internal fun EventCreateScreen(
                     imageVector = Icons.Outlined.Description,
                     contentDescription = null,
                     modifier = Modifier
-                        .padding(top = 2.dp)
+                        .padding(top = LifeMashSpacing.micro)
                         .size(18.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -462,7 +462,7 @@ private fun EventFormRow(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(LifeMashSpacing.lg),
                 tint = MaterialTheme.colorScheme.outlineVariant,
             )
         }

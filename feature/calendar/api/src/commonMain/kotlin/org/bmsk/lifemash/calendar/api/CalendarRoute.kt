@@ -23,6 +23,11 @@ data class EventEditRoute(
     val eventIsAllDay: Boolean = false,
     val eventStartAt: Long = 0L,
     val eventEndAt: Long? = null,
+    val eventLocation: String? = null,
+    val eventAuthorId: String = "",
+    val eventVisibility: String = "followers",
+    val eventCreatedAt: Long = 0L,
+    val eventUpdatedAt: Long = 0L,
 )
 
 const val CALENDAR_ROUTE = "calendar"

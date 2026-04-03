@@ -11,6 +11,8 @@ import org.bmsk.lifemash.calendar.api.CalendarRoute
 import org.bmsk.lifemash.calendar.api.EventCreateRoute
 import org.bmsk.lifemash.calendar.api.EventEditRoute
 import org.bmsk.lifemash.calendar.domain.model.Event
+import org.bmsk.lifemash.calendar.domain.model.parseEventVisibility
+import org.bmsk.lifemash.calendar.domain.model.toRouteString
 import kotlin.time.Instant
 
 fun NavGraphBuilder.calendarNavGraph(navInfo: CalendarNavGraphInfo, navController: NavController) {
@@ -34,6 +36,11 @@ fun NavGraphBuilder.calendarNavGraph(navInfo: CalendarNavGraphInfo, navControlle
                         eventIsAllDay = event.isAllDay,
                         eventStartAt = event.startAt.toEpochMilliseconds(),
                         eventEndAt = event.endAt?.toEpochMilliseconds(),
+                        eventLocation = event.location,
+                        eventAuthorId = event.authorId,
+                        eventVisibility = event.visibility.toRouteString(),
+                        eventCreatedAt = event.createdAt.toEpochMilliseconds(),
+                        eventUpdatedAt = event.updatedAt.toEpochMilliseconds(),
                     )
                 )
             },
@@ -68,16 +75,17 @@ fun NavGraphBuilder.calendarNavGraph(navInfo: CalendarNavGraphInfo, navControlle
         val existingEvent = Event(
             id = route.eventId,
             groupId = route.groupId,
-            authorId = "",
+            authorId = route.eventAuthorId,
             title = route.eventTitle,
             description = route.eventDescription,
-            location = null,
+            location = route.eventLocation,
             startAt = startAt,
             endAt = endAt,
             isAllDay = route.eventIsAllDay,
             color = route.eventColor,
-            createdAt = startAt,
-            updatedAt = startAt,
+            visibility = parseEventVisibility(route.eventVisibility),
+            createdAt = Instant.fromEpochMilliseconds(route.eventCreatedAt),
+            updatedAt = Instant.fromEpochMilliseconds(route.eventUpdatedAt),
         )
 
         EventEditRouteScreen(

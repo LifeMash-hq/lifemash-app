@@ -122,7 +122,7 @@ private fun CalendarContent(
     val groupId = uiState.selectedGroup?.id
 
     Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-        Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+        Column(Modifier.fillMaxSize().padding(horizontal = LifeMashSpacing.lg)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -143,7 +143,7 @@ private fun CalendarContent(
                     onSelectGroup = onSelectGroup,
                     onRenameGroup = { onShowOverlay(CalendarOverlay.GroupRename) },
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(LifeMashSpacing.sm))
             }
 
             MonthHeader(
@@ -175,7 +175,7 @@ private fun CalendarContent(
                 onDateSelect = onDateSelect,
             )
 
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(Modifier.padding(vertical = LifeMashSpacing.sm))
 
             val selectedEvents = uiState.events
                 .filter { event ->
@@ -189,10 +189,10 @@ private fun CalendarContent(
                     text = "선택한 날짜에 일정이 없습니다",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier.padding(top = LifeMashSpacing.lg),
                 )
 
-                else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(LifeMashSpacing.sm)) {
                     items(selectedEvents) { event ->
                         EventItem(
                             event = event,
@@ -212,7 +212,7 @@ private fun CalendarContent(
                     uiState.selectedGroup?.id,
                 )
             },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            modifier = Modifier.align(Alignment.BottomEnd).padding(LifeMashSpacing.lg),
         ) {
             Icon(Icons.Filled.Add, contentDescription = "일정 추가")
         }
@@ -237,8 +237,8 @@ internal fun EventDetailBottomSheet(
         sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = LifeMashSpacing.xxl, vertical = LifeMashSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(LifeMashSpacing.md),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -247,12 +247,12 @@ internal fun EventDetailBottomSheet(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(LifeMashSpacing.sm),
                 ) {
                     val eventColor = event.color
                     if (eventColor != null) {
                         Box(
-                            Modifier.size(12.dp)
+                            Modifier.size(LifeMashSpacing.md)
                                 .clip(CircleShape)
                                 .background(parseEventColor(eventColor))
                         )
@@ -293,7 +293,7 @@ internal fun EventDetailBottomSheet(
                 )
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(LifeMashSpacing.xxl))
         }
     }
 
@@ -367,7 +367,7 @@ private fun NoGroupContent(
     var inviteCode by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(32.dp),
+        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(LifeMashSpacing.xxxl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
     ) {
@@ -383,13 +383,13 @@ private fun NoGroupContent(
             text = "공유 캘린더를 시작하세요",
             style = MaterialTheme.typography.headlineSmall,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(LifeMashSpacing.sm))
         Text(
             text = "그룹을 만들거나 초대 코드로 참여하세요",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(LifeMashSpacing.xxxl))
 
         Button(
             onClick = { onCreateGroup(GroupType.COUPLE, null) },
@@ -397,15 +397,15 @@ private fun NoGroupContent(
             enabled = !isCreating,
         ) {
             if (isCreating) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                Spacer(Modifier.width(8.dp))
+                CircularProgressIndicator(modifier = Modifier.size(LifeMashSpacing.xl), strokeWidth = LifeMashSpacing.micro)
+                Spacer(Modifier.width(LifeMashSpacing.sm))
             }
             Text("그룹 만들기")
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(LifeMashSpacing.xxl))
         HorizontalDivider()
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(LifeMashSpacing.xxl))
 
         OutlinedTextField(
             value = inviteCode,
@@ -415,7 +415,7 @@ private fun NoGroupContent(
             singleLine = true,
             enabled = !isCreating,
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(LifeMashSpacing.md))
         OutlinedButton(
             onClick = { onJoinGroup(inviteCode) },
             modifier = Modifier.fillMaxWidth(),
@@ -435,7 +435,7 @@ private fun GroupSelector(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(LifeMashSpacing.sm),
     ) {
         groups.forEach { group ->
             FilterChip(
@@ -447,7 +447,7 @@ private fun GroupSelector(
                         Icon(
                             Icons.Filled.Edit,
                             contentDescription = "그룹명 변경",
-                            modifier = Modifier.size(16.dp).clickable { onRenameGroup(group.id) },
+                            modifier = Modifier.size(LifeMashSpacing.lg).clickable { onRenameGroup(group.id) },
                         )
                     }
                 } else null,
@@ -546,7 +546,7 @@ private fun MonthGrid(
                         )
                         if (hasEvent) {
                             Box(
-                                Modifier.size(4.dp)
+                                Modifier.size(LifeMashSpacing.xxs)
                                     .clip(CircleShape)
                                     .background(
                                         if (isSelected) {
@@ -569,15 +569,15 @@ private fun EventItem(event: Event, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(LifeMashSpacing.sm))
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp, horizontal = 4.dp),
+            .padding(vertical = LifeMashSpacing.sm, horizontal = LifeMashSpacing.xxs),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(LifeMashSpacing.sm),
     ) {
         val dotColor = event.color?.let { parseEventColor(it) } ?: MaterialTheme.colorScheme.primary
         Box(
-            Modifier.size(8.dp)
+            Modifier.size(LifeMashSpacing.sm)
                 .clip(CircleShape)
                 .background(dotColor)
         )
