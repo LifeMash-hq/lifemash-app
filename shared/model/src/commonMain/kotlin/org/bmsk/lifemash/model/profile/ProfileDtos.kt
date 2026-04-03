@@ -12,6 +12,7 @@ data class UserProfileDto(
     val provider: String,
     val followerCount: Int,
     val followingCount: Int,
+    val isFollowing: Boolean? = null,
 )
 
 @Serializable

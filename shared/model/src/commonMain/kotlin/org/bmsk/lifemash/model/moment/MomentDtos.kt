@@ -21,6 +21,13 @@ data class CreateMomentRequest(
 )
 
 @Serializable
+data class UpdateMomentRequest(
+    val caption: String? = null,
+    val visibility: String? = null,
+    val media: List<MediaItemDto>? = null,  // null = 변경 없음
+)
+
+@Serializable
 data class MomentDto(
     val id: String,
     val eventId: String? = null,

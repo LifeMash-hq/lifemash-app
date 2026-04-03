@@ -14,6 +14,7 @@ data class EventAttendeeDto(
     val id: String,
     val nickname: String,
     val profileImage: String? = null,
+    val status: String = "attending",  // "attending" | "maybe" | "declined"
 )
 
 /**

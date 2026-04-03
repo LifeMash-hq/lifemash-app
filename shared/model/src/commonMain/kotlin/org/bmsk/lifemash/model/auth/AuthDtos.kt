@@ -25,3 +25,6 @@ data class GoogleSignInRequest(val idToken: String)
 
 @Serializable
 data class RefreshTokenRequest(val refreshToken: String)
+
+@Serializable
+data class EmailSignInRequest(val email: String, val password: String)
