@@ -18,7 +18,7 @@ data class Comment(
     val id: String,
     val authorNickname: String,
     val content: String,
-    val createdAt: String,
+    val createdAt: Instant,
 )
 
 data class Attendee(
@@ -102,7 +102,7 @@ internal class EventDetailViewModel(
 }
 
 private fun EventAttendee.toUi() = Attendee(id = id, nickname = nickname, profileImage = profileImage)
-private fun EventComment.toUi() = Comment(id = id, authorNickname = authorNickname, content = content, createdAt = createdAt.formatDate())
+private fun EventComment.toUi() = Comment(id = id, authorNickname = authorNickname, content = content, createdAt = createdAt)
 
 @OptIn(kotlin.time.ExperimentalTime::class)
 private fun Instant.formatDate(): String {
