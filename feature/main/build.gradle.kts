@@ -1,5 +1,31 @@
+import java.util.Properties
+
 plugins {
     id("lifemash.kmp.compose")
+    alias(libs.plugins.kotlin.serialization)
+}
+
+val localProps = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+val iosDebugBackendUrl: String = localProps.getProperty("BACKEND_BASE_URL")
+    ?: "https://lifemash-backend.onrender.com"
+
+val generateIosBackendConfig by tasks.registering {
+    val outputDir = layout.buildDirectory.dir("generated/iosMain/kotlin")
+    outputs.dir(outputDir)
+    doLast {
+        val f = outputDir.get().asFile
+            .resolve("org/bmsk/lifemash/main/BackendConfig.kt")
+        f.parentFile.mkdirs()
+        f.writeText(
+            """
+            package org.bmsk.lifemash.main
+
+            internal const val IOS_DEBUG_BACKEND_URL = "$iosDebugBackendUrl"
+            """.trimIndent()
+        )
+    }
 }
 
 kotlin {
@@ -56,6 +82,10 @@ kotlin {
             implementation(project(":feature:moment:domain"))
             implementation(project(":feature:moment:data"))
             implementation(project(":feature:moment:ui"))
+            implementation(project(":feature:onboarding:api"))
+            implementation(project(":feature:onboarding:domain"))
+            implementation(project(":feature:onboarding:data"))
+            implementation(project(":feature:onboarding:ui"))
 
             implementation(libs.koin.core)
             implementation(libs.ktor.client.core)
@@ -68,8 +98,11 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.appcompat)
         }
-        iosMain.dependencies {
-            implementation(libs.gitlive.firebase.analytics)
+        iosMain {
+            kotlin.srcDir(generateIosBackendConfig.map { it.outputs.files.first() })
+            dependencies {
+                implementation(libs.gitlive.firebase.analytics)
+            }
         }
     }
 }

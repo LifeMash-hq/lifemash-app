@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
 import java.net.UnknownHostException
 import kotlin.system.exitProcess
+import androidx.compose.ui.platform.LocalResources
 
 internal class MainActivity : AppCompatActivity() {
     private var backPressedTime = 0L
@@ -39,7 +40,7 @@ internal class MainActivity : AppCompatActivity() {
             LifeMashTheme {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
-                val localContextResource = LocalContext.current.resources
+                val localContextResource = LocalResources.current
                 val onShowErrorSnackbar: (Throwable?) -> Unit = { throwable ->
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(

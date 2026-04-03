@@ -274,7 +274,7 @@ internal fun MemoCreateBottomSheet(
                 enabled = title.isNotBlank() && !isLoading,
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(LifeMashSpacing.xl), strokeWidth = 2.dp)
+                    CircularProgressIndicator(modifier = Modifier.size(LifeMashSpacing.xl), strokeWidth = LifeMashSpacing.micro)
                     Spacer(Modifier.width(LifeMashSpacing.sm))
                 }
                 Text(if (isEdit) "수정" else "저장")

@@ -5,35 +5,25 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.bmsk.lifemash.auth.api.AuthNavGraphInfo
 import org.bmsk.lifemash.auth.api.AuthRoute
 import org.bmsk.lifemash.auth.ui.authNavGraph
 import org.bmsk.lifemash.calendar.api.CalendarNavGraphInfo
 import org.bmsk.lifemash.calendar.ui.calendarNavGraph
+import org.bmsk.lifemash.eventdetail.api.EventDetailRoute
+import org.bmsk.lifemash.eventdetail.ui.eventDetailNavGraph
 import org.bmsk.lifemash.memo.api.MemoNavGraphInfo
 import org.bmsk.lifemash.memo.ui.memoNavGraph
-import org.bmsk.lifemash.designsystem.component.AdaptiveNavigation
-import org.bmsk.lifemash.eventdetail.api.EventDetailRoute
-import org.bmsk.lifemash.feed.api.FEED_ROUTE
-import org.bmsk.lifemash.feed.api.FeedNavGraphInfo
-import org.bmsk.lifemash.feed.api.FeedRoute
-import org.bmsk.lifemash.feed.ui.FeedTab
-import org.bmsk.lifemash.feed.ui.feedNavGraph
-import org.bmsk.lifemash.notification.api.NOTIFICATION_ROUTE
-import org.bmsk.lifemash.notification.api.NotificationNavGraphInfo
-import org.bmsk.lifemash.notification.api.NotificationRoute
-import org.bmsk.lifemash.notification.ui.NotificationTab
-import org.bmsk.lifemash.notification.ui.notificationNavGraph
-import org.bmsk.lifemash.profile.api.PROFILE_ROUTE
-import org.bmsk.lifemash.profile.api.ProfileNavGraphInfo
-import org.bmsk.lifemash.profile.api.ProfileRoute
-import org.bmsk.lifemash.profile.ui.ProfileTab
-import org.bmsk.lifemash.profile.ui.profileNavGraph
-import org.bmsk.lifemash.eventdetail.ui.eventDetailNavGraph
+import org.bmsk.lifemash.onboarding.api.OnboardingNavGraphInfo
+import org.bmsk.lifemash.onboarding.api.OnboardingRoute
+import org.bmsk.lifemash.onboarding.ui.onboardingNavGraph
+import org.bmsk.lifemash.profile.api.ProfileEditRoute
+import org.bmsk.lifemash.profile.api.UserProfileRoute
+import org.bmsk.lifemash.profile.ui.profileEditNavGraph
+import org.bmsk.lifemash.profile.ui.userProfileNavGraph
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -41,9 +31,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     onShowErrorSnackbar: (Throwable?) -> Unit = {}
 ) {
-    val navController = rememberNavController()
-    val tabs = listOf(ProfileTab, FeedTab, NotificationTab)
-
+    val rootNavController = rememberNavController()
     val mainViewModel = koinViewModel<MainViewModel>()
     val authState by mainViewModel.authState.collectAsStateWithLifecycle()
 
@@ -54,97 +42,88 @@ fun MainScreen(
         is AuthState.Unauthenticated, AuthState.Loading -> null
     }
 
-    val startDestination = if (currentUser != null) FeedRoute else AuthRoute
+    val startDestination: Any = if (currentUser != null) MainTabRoute else AuthRoute
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentTabRoute = navBackStackEntry?.destination?.let { dest ->
-        when {
-            dest.hasRoute<FeedRoute>() -> FEED_ROUTE
-            dest.hasRoute<NotificationRoute>() -> NOTIFICATION_ROUTE
-            dest.hasRoute<ProfileRoute>() -> PROFILE_ROUTE
-            else -> null
-        }
-    }
-
-    val tabRouteMap: Map<String, Any> = mapOf(
-        FEED_ROUTE to FeedRoute,
-        NOTIFICATION_ROUTE to NotificationRoute,
-        PROFILE_ROUTE to ProfileRoute,
-    )
-
-    AdaptiveNavigation(
-        tabs = tabs,
-        currentRoute = currentTabRoute,
-        showNavigation = currentTabRoute != null,
-        onItemClick = { tab ->
-            if (tab.route != FEED_ROUTE && currentUser == null) {
-                navController.navigate(AuthRoute)
-                return@AdaptiveNavigation
-            }
-            val destination = tabRouteMap[tab.route] ?: return@AdaptiveNavigation
-            navController.navigate(destination) {
-                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                launchSingleTop = true
-                restoreState = true
-            }
-        },
+    NavHost(
+        navController = rootNavController,
+        startDestination = startDestination,
         modifier = modifier.fillMaxSize(),
     ) {
-        NavHost(navController = navController, startDestination = startDestination) {
-            feedNavGraph(
-                FeedNavGraphInfo(
-                    onShowErrorSnackbar = onShowErrorSnackbar,
-                    onNavigateToEventDetail = { eventId ->
-                        navController.navigate(EventDetailRoute(eventId))
-                    },
-                    onNavigateToUserProfile = { /* TODO */ },
-                )
-            )
-            eventDetailNavGraph(onBack = { navController.popBackStack() })
-            notificationNavGraph(
-                NotificationNavGraphInfo(
-                    onShowErrorSnackbar = onShowErrorSnackbar,
-                    onBack = { navController.popBackStack() },
-                    onNavigateToEventDetail = { eventId ->
-                        navController.navigate(EventDetailRoute(eventId))
-                    },
-                )
-            )
-            profileNavGraph(
-                navInfo = ProfileNavGraphInfo(
-                    onShowErrorSnackbar = onShowErrorSnackbar,
-                    onNavigateToEventDetail = { eventId ->
-                        navController.navigate(EventDetailRoute(eventId))
-                    },
-                    onNavigateToUserProfile = { /* TODO */ },
-                ),
-                navController = navController,
-            )
-            calendarNavGraph(
-                navInfo = CalendarNavGraphInfo(
-                    onShowErrorSnackbar = onShowErrorSnackbar,
-                    onBack = { navController.popBackStack() },
-                ),
-                navController = navController,
-            )
-            memoNavGraph(
-                MemoNavGraphInfo(
-                    onShowErrorSnackbar = onShowErrorSnackbar,
-                    onBack = { navController.popBackStack() },
-                )
-            )
-            authNavGraph(
-                AuthNavGraphInfo(
-                    onSignInComplete = {
-                        navController.popBackStack()
-                        navController.navigate(FeedRoute) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                        }
-                    },
-                    onShowErrorSnackbar = onShowErrorSnackbar,
-                )
+        // 탭 화면 (바텀바는 MainTabScreen 내부에서 항상 표시)
+        composable<MainTabRoute> {
+            MainTabScreen(
+                currentUser = currentUser,
+                onShowErrorSnackbar = onShowErrorSnackbar,
+                onNavigateToEventDetail = { eventId ->
+                    rootNavController.navigate(EventDetailRoute(eventId))
+                },
+                onNavigateToProfileEdit = {
+                    rootNavController.navigate(ProfileEditRoute)
+                },
+                onNavigateToEventCreate = { year, month, day ->
+                    rootNavController.navigate(
+                        org.bmsk.lifemash.calendar.api.EventCreateRoute(year, month, day)
+                    )
+                },
+                onNavigateToUserProfile = { userId ->
+                    rootNavController.navigate(UserProfileRoute(userId))
+                },
+                onNavigateToAuth = {
+                    rootNavController.navigate(AuthRoute)
+                },
             )
         }
+
+        // 전체화면 routes (바텀바 없음)
+        eventDetailNavGraph(onBack = { rootNavController.popBackStack() })
+
+        calendarNavGraph(
+            navInfo = CalendarNavGraphInfo(
+                onShowErrorSnackbar = onShowErrorSnackbar,
+                onBack = { rootNavController.popBackStack() },
+            ),
+            navController = rootNavController,
+        )
+
+        memoNavGraph(
+            MemoNavGraphInfo(
+                onShowErrorSnackbar = onShowErrorSnackbar,
+                onBack = { rootNavController.popBackStack() },
+            )
+        )
+
+        profileEditNavGraph(onBack = { rootNavController.popBackStack() })
+
+        userProfileNavGraph(
+            onBack = { rootNavController.popBackStack() },
+            onNavigateToEventDetail = { eventId ->
+                rootNavController.navigate(EventDetailRoute(eventId))
+            },
+        )
+
+        authNavGraph(
+            AuthNavGraphInfo(
+                onSignInComplete = { isNewUser ->
+                    val destination = if (isNewUser) OnboardingRoute else MainTabRoute
+                    rootNavController.navigate(destination) {
+                        popUpTo(rootNavController.graph.startDestinationId) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onShowErrorSnackbar = onShowErrorSnackbar,
+            )
+        )
+
+        onboardingNavGraph(
+            OnboardingNavGraphInfo(
+                onOnboardingComplete = {
+                    rootNavController.navigate(MainTabRoute) {
+                        popUpTo(rootNavController.graph.startDestinationId) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onShowErrorSnackbar = onShowErrorSnackbar,
+            )
+        )
     }
 }

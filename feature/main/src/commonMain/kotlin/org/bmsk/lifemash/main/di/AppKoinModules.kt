@@ -14,6 +14,8 @@ import org.bmsk.lifemash.memo.data.di.memoDataModule
 import org.bmsk.lifemash.memo.ui.di.memoUiModule
 import org.bmsk.lifemash.moment.data.di.momentDataModule
 import org.bmsk.lifemash.moment.ui.di.momentUiModule
+import org.bmsk.lifemash.onboarding.data.di.onboardingDataModule
+import org.bmsk.lifemash.onboarding.ui.di.onboardingUiModule
 import org.bmsk.lifemash.main.MainViewModel
 import org.bmsk.lifemash.notification.data.di.notificationDataModule
 import org.bmsk.lifemash.notification.ui.di.notificationUiModule
@@ -52,4 +54,6 @@ fun appKoinModules(
     memoUiModule,
     momentDataModule,
     momentUiModule,
+    onboardingDataModule,
+    onboardingUiModule,
 )
