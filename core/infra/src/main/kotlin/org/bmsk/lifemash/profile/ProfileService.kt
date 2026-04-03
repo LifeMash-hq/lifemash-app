@@ -9,8 +9,8 @@ import kotlin.uuid.Uuid
 class ProfileService(
     private val profileRepository: ProfileRepository,
 ) {
-    fun getProfile(userId: Uuid): UserProfileDto {
-        return profileRepository.getProfile(userId)
+    fun getProfile(userId: Uuid, viewerId: Uuid? = null): UserProfileDto {
+        return profileRepository.getProfile(userId, viewerId)
             ?: throw NotFoundException("사용자를 찾을 수 없습니다")
     }
 

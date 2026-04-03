@@ -5,6 +5,7 @@ import org.bmsk.lifemash.db.tables.Users
 import org.bmsk.lifemash.model.profile.UserProfileDto
 import org.bmsk.lifemash.util.nowUtc
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -13,14 +14,21 @@ import kotlin.uuid.toJavaUuid
 
 class ExposedProfileRepository : ProfileRepository {
 
-    override fun getProfile(userId: Uuid): UserProfileDto? = transaction {
+    override fun getProfile(userId: Uuid, viewerId: Uuid?): UserProfileDto? = transaction {
         val javaId = userId.toJavaUuid()
+        val isFollowing = if (viewerId != null && viewerId != userId) {
+            Follows.selectAll().where {
+                (Follows.followerId eq viewerId.toJavaUuid()) and
+                    (Follows.followingId eq javaId)
+            }.count() > 0
+        } else null
 
         Users.selectAll().where { Users.id eq javaId }
             .singleOrNull()
             ?.toDto(
                 followerCount = countFollowers(javaId),
                 followingCount = countFollowing(javaId),
+                isFollowing = isFollowing,
             )
     }
 
@@ -44,7 +52,7 @@ class ExposedProfileRepository : ProfileRepository {
             ?.toDto(
                 followerCount = countFollowers(javaId),
                 followingCount = countFollowing(javaId),
-            )
+            )  // updateProfile: 본인 수정이므로 isFollowing = null
     }
 
     override fun getFollowerCount(userId: Uuid): Int = transaction {
@@ -68,7 +76,7 @@ class ExposedProfileRepository : ProfileRepository {
         Follows.selectAll().where { Follows.followerId eq javaId }.count().toInt()
 
     /** 순수 매핑 — DB 접근 없이 ResultRow → DTO 변환 */
-    private fun ResultRow.toDto(followerCount: Int, followingCount: Int) = UserProfileDto(
+    private fun ResultRow.toDto(followerCount: Int, followingCount: Int, isFollowing: Boolean? = null) = UserProfileDto(
         id = this[Users.id].toString(),
         email = this[Users.email],
         nickname = this[Users.nickname],
@@ -77,5 +85,6 @@ class ExposedProfileRepository : ProfileRepository {
         provider = this[Users.provider],
         followerCount = followerCount,
         followingCount = followingCount,
+        isFollowing = isFollowing,
     )
 }

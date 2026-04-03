@@ -15,50 +15,32 @@ fun Route.commentRoutes() {
     val commentService by inject<CommentService>()
 
     authenticate("auth-jwt") {
-        route("/events/{eventId}/comments") {
-            get {
-                val userId = call.principal<JWTPrincipal>()!!.userId()
-                val eventId = call.parameters["eventId"]!!
-                call.respond(commentService.getComments("", userId, eventId)) // groupId is not really used in current commentService getComments impl assuming eventId is globally unique
-            }
+        // calendar/{groupId}/... 경로의 groupId는 클라이언트 하위호환용 — 서버에선 무시
+        listOf(
+            "/events/{eventId}/comments",
+            "/calendar/{groupId}/events/{eventId}/comments",
+        ).forEach { path ->
+            route(path) {
+                get {
+                    val userId = call.principal<JWTPrincipal>()!!.userId()
+                    val eventId = call.parameters["eventId"]!!
+                    call.respond(commentService.getComments(userId, eventId))
+                }
 
-            post {
-                val userId = call.principal<JWTPrincipal>()!!.userId()
-                val eventId = call.parameters["eventId"]!!
-                val request = call.receive<CreateCommentRequest>()
-                call.respond(HttpStatusCode.Created, commentService.create("", userId, eventId, request))
-            }
+                post {
+                    val userId = call.principal<JWTPrincipal>()!!.userId()
+                    val eventId = call.parameters["eventId"]!!
+                    val request = call.receive<CreateCommentRequest>()
+                    call.respond(HttpStatusCode.Created, commentService.create(userId, eventId, request))
+                }
 
-            delete("/{commentId}") {
-                val userId = call.principal<JWTPrincipal>()!!.userId()
-                val commentId = call.parameters["commentId"]!!
-                commentService.delete("", userId, commentId)
-                call.respond(HttpStatusCode.NoContent)
-            }
-        }
-        
-        route("/calendar/{groupId}/events/{eventId}/comments") {
-            get {
-                val userId = call.principal<JWTPrincipal>()!!.userId()
-                val groupId = call.parameters["groupId"]!!
-                val eventId = call.parameters["eventId"]!!
-                call.respond(commentService.getComments(groupId, userId, eventId))
-            }
-
-            post {
-                val userId = call.principal<JWTPrincipal>()!!.userId()
-                val groupId = call.parameters["groupId"]!!
-                val eventId = call.parameters["eventId"]!!
-                val request = call.receive<CreateCommentRequest>()
-                call.respond(HttpStatusCode.Created, commentService.create(groupId, userId, eventId, request))
-            }
-
-            delete("/{commentId}") {
-                val userId = call.principal<JWTPrincipal>()!!.userId()
-                val groupId = call.parameters["groupId"]!!
-                val commentId = call.parameters["commentId"]!!
-                commentService.delete(groupId, userId, commentId)
-                call.respond(HttpStatusCode.NoContent)
+                delete("/{commentId}") {
+                    val userId = call.principal<JWTPrincipal>()!!.userId()
+                    val eventId = call.parameters["eventId"]!!
+                    val commentId = call.parameters["commentId"]!!
+                    commentService.delete(userId, eventId, commentId)
+                    call.respond(HttpStatusCode.NoContent)
+                }
             }
         }
     }

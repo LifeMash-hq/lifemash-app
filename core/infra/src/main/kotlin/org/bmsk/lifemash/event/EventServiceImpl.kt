@@ -46,17 +46,13 @@ class EventServiceImpl(
     }
 
     override fun getEventDetail(userId: String, eventId: String): EventDetailDto {
-        val event = eventRepository.findById(Uuid.parse(eventId))
-            ?: throw NotFoundException("Event not found")
-        membershipGuard.require(event.groupId, userId)
+        membershipGuard.requireByEvent(eventId, userId)
         return eventRepository.getEventDetail(Uuid.parse(eventId), Uuid.parse(userId))
             ?: throw NotFoundException("Event not found or access denied")
     }
 
     override fun toggleJoin(userId: String, eventId: String): Boolean {
-        val event = eventRepository.findById(Uuid.parse(eventId))
-            ?: throw NotFoundException("Event not found")
-        membershipGuard.require(event.groupId, userId)
+        membershipGuard.requireByEvent(eventId, userId)
         return eventRepository.toggleJoin(Uuid.parse(eventId), Uuid.parse(userId))
     }
 }

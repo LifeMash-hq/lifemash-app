@@ -36,7 +36,8 @@ fun Route.profileRoutes() {
 
             get("/{userId}") {
                 val userId = call.parameters["userId"]!!.toUUID()
-                call.respond(profileService.getProfile(userId))
+                val viewerId = call.currentUserId().toUUID()
+                call.respond(profileService.getProfile(userId, viewerId))
             }
         }
     }
