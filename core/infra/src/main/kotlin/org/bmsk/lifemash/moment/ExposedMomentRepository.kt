@@ -19,6 +19,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import kotlin.uuid.Uuid
 import kotlin.uuid.toJavaUuid
 
@@ -84,6 +85,29 @@ class ExposedMomentRepository : MomentRepository {
             .mapValues { (_, mediaRows) -> mediaRows.map { it.toMediaDto() } }
 
         rows.map { it.toDto(mediaByMoment[it[Moments.id]] ?: emptyList()) }
+    }
+
+    override fun update(momentId: Uuid, caption: String?, visibility: String?, media: List<MediaItemDto>?): MomentDto? = transaction {
+        val javaId = momentId.toJavaUuid()
+        Moments.update({ Moments.id eq javaId }) {
+            if (caption != null) it[Moments.caption] = caption
+            if (visibility != null) it[Moments.visibility] = visibility
+        }
+        if (media != null) {
+            MomentMedia.deleteWhere { MomentMedia.momentId eq javaId }
+            if (media.isNotEmpty()) {
+                MomentMedia.batchInsert(media) { item ->
+                    this[MomentMedia.momentId] = javaId
+                    this[MomentMedia.mediaUrl] = item.mediaUrl
+                    this[MomentMedia.mediaType] = item.mediaType
+                    this[MomentMedia.sortOrder] = item.sortOrder
+                    this[MomentMedia.width] = item.width
+                    this[MomentMedia.height] = item.height
+                    this[MomentMedia.durationMs] = item.durationMs
+                }
+            }
+        }
+        findById(momentId)
     }
 
     override fun delete(momentId: Uuid): Unit = transaction {
