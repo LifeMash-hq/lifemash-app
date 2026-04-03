@@ -4,6 +4,7 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.*
 import org.bmsk.lifemash.model.calendar.CreateEventRequest
@@ -135,7 +136,7 @@ class CalendarTool(
     private fun getTodayEvents(userId: Uuid, input: JsonObject): String {
         val tz = input["timezone"]?.jsonPrimitive?.contentOrNull ?: "Asia/Seoul"
         val today = Clock.System.now().toLocalDateTime(TimeZone.of(tz)).date
-        return getEventsForMonth(userId, today.year, today.monthNumber, today)
+        return getEventsForMonth(userId, today.year, today.month.number, today)
     }
 
     private fun getMonthEvents(userId: Uuid, input: JsonObject): String {

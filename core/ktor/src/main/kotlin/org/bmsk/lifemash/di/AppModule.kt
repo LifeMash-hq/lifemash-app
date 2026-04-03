@@ -83,7 +83,7 @@ val coreModule: Module = module {
 
     single<AuthService> { AuthServiceImpl(get(), get(), get()) }
     single<GroupService> { GroupServiceImpl(get()) }
-    single<MembershipGuard> { MembershipGuardImpl(get()) }
+    single<MembershipGuard> { MembershipGuardImpl(get(), get()) }  // GroupRepository, EventRepository
     single<EventService> { EventServiceImpl(get(), get(), get()) }
     single<CommentService> { CommentServiceImpl(get(), get(), get()) }
     single<MemoService> { MemoServiceImpl(get(), get(), get(), get()) }
@@ -95,6 +95,7 @@ val coreModule: Module = module {
     single { CalendarTool(get(), get(), get()) }
     single { ToolRegistry(get()) }
     single { ExternalToolExecutor(get()) }
+    single<AssistantService> { AssistantServiceImpl(get(), get(), get(), get(), get(), get()) }
 
     // 소셜 기능
     single<FollowRepository> { ExposedFollowRepository() }

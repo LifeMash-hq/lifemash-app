@@ -44,6 +44,9 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.resources)
 
+    // OpenAPI + Scalar UI
+    implementation(libs.ktor.openapi)
+
     // Ktor Client (for DI HttpClient creation)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)

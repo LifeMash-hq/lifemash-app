@@ -42,6 +42,9 @@ dependencies {
     // JWT
     implementation(libs.java.jwt)
 
+    // BCrypt (password hashing)
+    implementation(libs.bcrypt)
+
     // Firebase Admin
     implementation(libs.firebase.admin.sdk)
 
