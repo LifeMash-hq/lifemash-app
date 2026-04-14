@@ -11,6 +11,9 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
+import org.bmsk.lifemash.domain.calendar.Event
+import org.bmsk.lifemash.domain.profile.CalendarDayEvent
+import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.ProfileSettings
 import org.bmsk.lifemash.domain.profile.ProfileSubTab
 import org.bmsk.lifemash.domain.usecase.calendar.DeleteEventUseCase
@@ -64,44 +67,24 @@ internal class ProfileViewModel(
                             calendarViewMode = settings.myCalendarViewMode,
                         )
                     }
-                    loadMoments(userId)
-                    loadGroupAndEvents(now.year, now.month.number)
+
+                    runCatching { getProfileMomentsUseCase(userId) }
+                        .onSuccess { moments ->
+                            _uiState.update { it.copy(moments = moments) }
+                        }
+
+                    runCatching { fetchGroupId() }
+                        .onSuccess { gId ->
+                            if (gId == null) return@onSuccess
+                            _uiState.update { it.copy(groupId = gId) }
+                            runCatching { fetchEventsData(gId, now.year, now.month.number) }
+                                .onSuccess { data ->
+                                    _uiState.update {
+                                        it.copy(calendarEvents = data.calendarEvents, dayEvents = data.dayEvents)
+                                    }
+                                }
+                        }
                 }
-        }
-    }
-
-    private fun loadMoments(userId: String) {
-        viewModelScope.launch {
-            runCatching { getProfileMomentsUseCase(userId) }
-                .onSuccess { moments ->
-                    _uiState.update { it.copy(moments = moments) }
-                }
-        }
-    }
-
-    private fun loadGroupAndEvents(year: Int, month: Int) {
-        viewModelScope.launch {
-            runCatching {
-                val groups = getMyGroupsUseCase()
-                val firstGroup = groups.firstOrNull() ?: return@runCatching
-                _uiState.update { it.copy(groupId = firstGroup.id) }
-                loadEvents(firstGroup.id, year, month)
-            }
-        }
-    }
-
-    private suspend fun loadEvents(gId: String, year: Int, month: Int) {
-        runCatching {
-            val events = getMonthEventsUseCase(gId, year, month)
-            val tz = TimeZone.currentSystemDefault()
-            val grouped = events.groupBy { it.startAt.toLocalDateTime(tz).date.day }
-
-            _uiState.update {
-                it.copy(
-                    calendarEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toCalendarDayEvent() } },
-                    dayEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toProfileEvent() } },
-                )
-            }
         }
     }
 
@@ -109,7 +92,12 @@ internal class ProfileViewModel(
         val state = _uiState.value
         val gId = state.groupId ?: return
         viewModelScope.launch {
-            loadEvents(gId, state.selectedYear, state.selectedMonth)
+            runCatching { fetchEventsData(gId, state.selectedYear, state.selectedMonth) }
+                .onSuccess { data ->
+                    _uiState.update {
+                        it.copy(calendarEvents = data.calendarEvents, dayEvents = data.dayEvents)
+                    }
+                }
         }
     }
 
@@ -124,11 +112,14 @@ internal class ProfileViewModel(
     fun navigateMonth(delta: Int) {
         _uiState.update { it.withMonthDelta(delta) }
         val state = _uiState.value
-        val gId = state.groupId
-        if (gId != null) {
-            viewModelScope.launch {
-                loadEvents(gId, state.selectedYear, state.selectedMonth)
-            }
+        val gId = state.groupId ?: return
+        viewModelScope.launch {
+            runCatching { fetchEventsData(gId, state.selectedYear, state.selectedMonth) }
+                .onSuccess { data ->
+                    _uiState.update {
+                        it.copy(calendarEvents = data.calendarEvents, dayEvents = data.dayEvents)
+                    }
+                }
         }
     }
 
@@ -208,4 +199,30 @@ internal class ProfileViewModel(
     fun consumeEvent() {
         _uiState.update { it.copy(event = null) }
     }
+
+    // ─── private: 데이터 fetch만, 상태 변경 없음 ────────────────────────────
+
+    private suspend fun fetchGroupId(): String? {
+        val groups = getMyGroupsUseCase()
+        return groups.firstOrNull()?.id
+    }
+
+    private suspend fun fetchEventsData(
+        gId: String,
+        year: Int,
+        month: Int,
+    ): EventsData {
+        val events = getMonthEventsUseCase(gId, year, month)
+        val tz = TimeZone.currentSystemDefault()
+        val grouped = events.groupBy { it.startAt.toLocalDateTime(tz).date.day }
+        return EventsData(
+            calendarEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toCalendarDayEvent() } },
+            dayEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toProfileEvent() } },
+        )
+    }
 }
+
+private data class EventsData(
+    val calendarEvents: Map<Int, List<CalendarDayEvent>>,
+    val dayEvents: Map<Int, List<ProfileEvent>>,
+)
