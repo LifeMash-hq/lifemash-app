@@ -288,6 +288,54 @@ fun toggleFollow(userId: String) {
 
 sealed interface 기반에서는 `update` 안에서 매번 캐스팅이 필요해 `as`, `as?`, 헬퍼 함수 등이 개입된다. 단일 `data class`에서는 `it.copy(...)`만으로 완결되므로 동시성 원칙과 코드가 충돌하지 않는다.
 
+### 6.5 상태 변경은 public 함수에서만
+
+`_uiState.update` / `_uiState.value =` 호출은 **public 함수에서만** 허용한다. private 함수는 데이터를 **반환**만 하고, 상태 변경은 호출한 public 함수가 담당한다.
+
+**왜 이 규칙인가:**
+
+- 상태 변경 지점이 public 함수로 한정되면, 해당 ViewModel의 상태 흐름을 public 함수만 읽어서 파악할 수 있다
+- private 함수가 상태를 직접 변경하면 변경 지점이 흩어져 추적이 어렵고, 의도치 않은 순서로 상태가 바뀔 위험이 있다
+- 테스트에서도 public 함수 호출 → 상태 확인의 단순한 구조가 유지된다
+
+```kotlin
+// ❌ private 함수가 상태를 직접 변경 — 변경 지점이 흩어짐
+private suspend fun loadEvents(gId: String, year: Int, month: Int) {
+    val events = getMonthEventsUseCase(gId, year, month)
+    _uiState.update { it.copy(dayEvents = ...) }  // 여기서도 변경
+}
+
+fun reloadEvents() {
+    viewModelScope.launch {
+        loadEvents(...)  // 내부에서 상태가 바뀌는지 시그니처만 봐서는 알 수 없음
+    }
+}
+
+// ✅ private 함수는 결과만 반환 — 상태 변경은 public 함수에서만
+private suspend fun fetchEvents(gId: String, year: Int, month: Int): EventsData {
+    val events = getMonthEventsUseCase(gId, year, month)
+    val tz = TimeZone.currentSystemDefault()
+    val grouped = events.groupBy { it.startAt.toLocalDateTime(tz).date.day }
+    return EventsData(
+        calendarEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toCalendarDayEvent() } },
+        dayEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toProfileEvent() } },
+    )
+}
+
+fun reloadEvents() {
+    val gId = _uiState.value.groupId ?: return
+    val state = _uiState.value
+    viewModelScope.launch {
+        runCatching { fetchEvents(gId, state.selectedYear, state.selectedMonth) }
+            .onSuccess { data ->
+                _uiState.update { it.copy(calendarEvents = data.calendarEvents, dayEvents = data.dayEvents) }
+            }
+    }
+}
+```
+
+**예외:** `init` 블록에서의 초기 로딩은 사실상 public 진입점이므로 허용한다.
+
 ---
 
 ## 7. 상태 설계 원칙 — 변하지 않는 것들
