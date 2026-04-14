@@ -1,14 +1,9 @@
 package org.bmsk.lifemash.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +14,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.designsystem.theme.LifeMashGradient
-import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
 
 enum class AvatarSize(val dp: Dp) {
     Small(28.dp),
@@ -35,49 +29,13 @@ fun LifeMashAvatar(
     imageUrl: String? = null,
     name: String = "",
     size: AvatarSize = AvatarSize.Medium,
-    onEditClick: (() -> Unit)? = null,
-) {
-    Box(modifier = modifier) {
-        AvatarContent(
-            imageUrl = imageUrl,
-            name = name,
-            size = size,
-        )
-
-        if (onEditClick != null) {
-            Box(
-                modifier = Modifier
-                    .size(LifeMashSpacing.xxl)
-                    .align(Alignment.BottomEnd)
-                    .clip(CircleShape)
-                    .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
-                    .background(MaterialTheme.colorScheme.onSurface)
-                    .clickable(onClick = onEditClick),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.CameraAlt,
-                    contentDescription = null,
-                    modifier = Modifier.size(LifeMashSpacing.md),
-                    tint = MaterialTheme.colorScheme.surface,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AvatarContent(
-    imageUrl: String?,
-    name: String,
-    size: AvatarSize,
 ) {
     val initial = name.firstOrNull()?.toString().orEmpty()
 
     if (imageUrl != null) {
         NetworkImage(
             imageUrl = imageUrl,
-            modifier = Modifier
+            modifier = modifier
                 .size(size.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop,
@@ -85,7 +43,7 @@ private fun AvatarContent(
     } else {
         val gradient = LifeMashGradient.primaryBrush()
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .size(size.dp)
                 .clip(CircleShape)
                 .background(gradient),
