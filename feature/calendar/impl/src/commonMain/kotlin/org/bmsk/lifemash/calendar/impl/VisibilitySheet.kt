@@ -109,6 +109,8 @@ internal fun VisibilitySheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = LifeMashRadius.lg, topEnd = LifeMashRadius.lg),
+        dragHandle = null,
     ) {
         when (step) {
             VisibilitySheetStep.PickType -> VisibilityPickTypeContent(

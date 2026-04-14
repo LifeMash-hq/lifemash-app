@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.domain.calendar.Event
 import org.bmsk.lifemash.domain.calendar.EventVisibility
 import org.bmsk.lifemash.domain.usecase.calendar.CreateEventUseCase
@@ -19,51 +20,114 @@ internal class EventCreateViewModel(
     private val createEventUseCase: CreateEventUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(EventCreateUiState.Default)
     val uiState: StateFlow<EventCreateUiState> = _uiState.asStateFlow()
 
     private var resolvedGroupId: String? = null
 
-    fun loadGroup(groupId: String?) {
+    fun initForm(year: Int, month: Int, day: Int, groupId: String?, existingEvent: Event?) {
         if (groupId != null) {
             resolvedGroupId = groupId
-            return
+        } else {
+            viewModelScope.launch {
+                runCatching { getMyGroupsUseCase() }
+                    .onSuccess { groups -> resolvedGroupId = groups.firstOrNull()?.id }
+            }
         }
-        viewModelScope.launch {
-            runCatching {
-                val groups = getMyGroupsUseCase()
-                resolvedGroupId = groups.firstOrNull()?.id
-            }.onFailure { /* 그룹 없으면 무시 */ }
+
+        if (existingEvent != null) {
+            val tz = TimeZone.currentSystemDefault()
+            val startLocal = existingEvent.startAt.toLocalDateTime(tz)
+            val endLocal = existingEvent.endAt?.toLocalDateTime(tz)
+            _uiState.update {
+                it.copy(
+                    title = existingEvent.title,
+                    location = existingEvent.location ?: "",
+                    selectedColor = existingEvent.color,
+                    visibility = existingEvent.visibility,
+                    memo = existingEvent.description ?: "",
+                    eventDateTime = EventDateTime(
+                        date = startLocal.date,
+                        startTime = if (!existingEvent.isAllDay) TimeOfDay(startLocal.hour, startLocal.minute) else null,
+                        endTime = if (!existingEvent.isAllDay && endLocal != null) TimeOfDay(endLocal.hour, endLocal.minute) else null,
+                    ),
+                )
+            }
+        } else if (day > 0) {
+            _uiState.update { it.copy(eventDateTime = EventDateTime.of(year, month, day)) }
         }
     }
 
-    fun createEvent(
-        title: String,
-        color: String?,
-        dateTime: EventDateTime,
-        location: String?,
-        visibility: EventVisibility = EventVisibility.Followers,
-        memo: String? = null,
-    ) {
+    // ─── 탭 전환 ────────────────────────────────────────────────────────────
+
+    fun switchTab(tab: EventCreateTab) {
+        _uiState.update { it.copy(activeTab = tab) }
+    }
+
+    fun showVisibilitySheet() {
+        _uiState.update { it.copy(isVisibilitySheetVisible = true) }
+    }
+
+    fun dismissVisibilitySheet() {
+        _uiState.update { it.copy(isVisibilitySheetVisible = false) }
+    }
+
+    // ─── 폼 상태 업데이트 ───────────────────────────────────────────────────
+
+    fun updateTitle(value: String) {
+        _uiState.update { it.withTitle(value) }
+    }
+
+    fun updateLocation(value: String) {
+        _uiState.update { it.withLocation(value) }
+    }
+
+    fun updateMemo(value: String) {
+        _uiState.update { it.withMemo(value) }
+    }
+
+    fun selectColor(hex: String?) {
+        _uiState.update { it.copy(selectedColor = hex) }
+    }
+
+    fun selectVisibility(visibility: EventVisibility) {
+        _uiState.update { it.copy(visibility = visibility, isVisibilitySheetVisible = false) }
+    }
+
+    fun updateDateTime(dateTime: EventDateTime) {
+        _uiState.update { it.copy(eventDateTime = dateTime, activeTab = EventCreateTab.FORM) }
+    }
+
+    fun confirmLocation() {
+        _uiState.update { it.copy(activeTab = EventCreateTab.FORM) }
+    }
+
+    // ─── 저장 ───────────────────────────────────────────────────────────────
+
+    fun save() {
+        if (!_uiState.value.isSaveEnabled) return
+        val state = _uiState.value
         val gId = resolvedGroupId ?: return
+
         _uiState.update { it.copy(isSaving = true) }
 
         val tz = TimeZone.currentSystemDefault()
-        val startAt = dateTime.toStartInstant(tz)
-        val endAt = dateTime.toEndInstant(tz)
+        val startAt = state.eventDateTime.toStartInstant(tz)
+        val endAt = state.eventDateTime.toEndInstant(tz)
 
         viewModelScope.launch {
             runCatching {
                 createEventUseCase(
                     groupId = gId,
-                    title = title,
-                    description = memo,
-                    location = location,
+                    title = state.title,
+                    description = state.memo.ifBlank { null },
+                    location = state.location.ifBlank { null },
                     startAt = startAt,
                     endAt = endAt,
-                    isAllDay = dateTime.isAllDay,
-                    color = color,
-                    visibility = visibility,
+                    isAllDay = state.eventDateTime.isAllDay,
+                    color = state.selectedColor,
+                    visibility = state.visibility,
                 )
             }.onSuccess {
                 _uiState.update { it.copy(isSaving = false, event = EventCreateEvent.Saved) }
@@ -73,35 +137,27 @@ internal class EventCreateViewModel(
         }
     }
 
-    fun updateEvent(
-        groupId: String,
-        event: Event,
-        title: String,
-        color: String?,
-        dateTime: EventDateTime,
-        location: String?,
-        visibility: EventVisibility = EventVisibility.Followers,
-        memo: String? = null,
-    ) {
+    fun saveEdit(groupId: String, eventId: String) {
+        val state = _uiState.value
         _uiState.update { it.copy(isSaving = true) }
 
         val tz = TimeZone.currentSystemDefault()
-        val startAt = dateTime.toStartInstant(tz)
-        val endAt = dateTime.toEndInstant(tz)
+        val startAt = state.eventDateTime.toStartInstant(tz)
+        val endAt = state.eventDateTime.toEndInstant(tz)
 
         viewModelScope.launch {
             runCatching {
                 updateEventUseCase(
                     groupId = groupId,
-                    eventId = event.id,
-                    title = title,
-                    description = memo,
-                    location = location,
+                    eventId = eventId,
+                    title = state.title,
+                    description = state.memo.ifBlank { null },
+                    location = state.location.ifBlank { null },
                     startAt = startAt,
                     endAt = endAt,
-                    isAllDay = dateTime.isAllDay,
-                    color = color,
-                    visibility = visibility,
+                    isAllDay = state.eventDateTime.isAllDay,
+                    color = state.selectedColor,
+                    visibility = state.visibility,
                 )
             }.onSuccess {
                 _uiState.update { it.copy(isSaving = false, event = EventCreateEvent.Saved) }

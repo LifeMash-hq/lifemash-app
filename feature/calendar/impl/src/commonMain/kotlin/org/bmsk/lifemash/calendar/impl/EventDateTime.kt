@@ -6,14 +6,15 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
-internal data class TimeOfDay(val hour: Int, val minute: Int) {
+data class TimeOfDay(val hour: Int, val minute: Int) {
     fun formatted(): String =
         "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
 }
 
-internal data class EventDateTime(
+data class EventDateTime(
     val date: LocalDate,
     val startTime: TimeOfDay? = null,
     val endTime: TimeOfDay? = null,
@@ -50,11 +51,15 @@ internal data class EventDateTime(
         val end = endTime ?: return null
         return LocalDateTime(date, LocalTime(end.hour, end.minute)).toInstant(tz)
     }
-}
 
-internal sealed interface DateTimePickerStep {
-    data object Hidden : DateTimePickerStep
-    data object PickDate : DateTimePickerStep
-    data object PickStartTime : DateTimePickerStep
-    data object PickEndTime : DateTimePickerStep
+    companion object {
+        fun now(): EventDateTime {
+            val tz = TimeZone.currentSystemDefault()
+            val today = kotlin.time.Clock.System.now().toLocalDateTime(tz).date
+            return EventDateTime(date = today)
+        }
+
+        fun of(year: Int, month: Int, day: Int): EventDateTime =
+            EventDateTime(date = LocalDate(year, month, day))
+    }
 }

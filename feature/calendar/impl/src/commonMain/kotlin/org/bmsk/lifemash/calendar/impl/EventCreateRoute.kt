@@ -2,8 +2,8 @@ package org.bmsk.lifemash.calendar.impl
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.bmsk.lifemash.domain.calendar.Event
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -20,7 +20,7 @@ internal fun EventCreateRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loadGroup(groupId)
+        viewModel.initForm(year, month, day, groupId, existingEvent = null)
     }
 
     LaunchedEffect(uiState.event) {
@@ -32,21 +32,18 @@ internal fun EventCreateRoute(
 
     EventCreateScreen(
         uiState = uiState,
-        year = year,
-        month = month,
-        day = day,
-        existingEvent = null,
-        onSave = { title, color, dateTime, location, visibility, memo ->
-            viewModel.createEvent(
-                title = title,
-                color = color,
-                dateTime = dateTime,
-                location = location,
-                visibility = visibility,
-                memo = memo,
-            )
-        },
         onCancel = onBack,
+        onSave = viewModel::save,
+        onTitleChange = viewModel::updateTitle,
+        onLocationChange = viewModel::updateLocation,
+        onMemoChange = viewModel::updateMemo,
+        onColorSelect = viewModel::selectColor,
+        onVisibilitySelect = viewModel::selectVisibility,
+        onDateTimeChange = viewModel::updateDateTime,
+        onSwitchTab = viewModel::switchTab,
+        onShowVisibilitySheet = viewModel::showVisibilitySheet,
+        onDismissVisibilitySheet = viewModel::dismissVisibilitySheet,
+        onConfirmLocation = viewModel::confirmLocation,
     )
 }
 
@@ -60,6 +57,10 @@ internal fun EventEditRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.initForm(0, 0, 0, groupId, existingEvent)
+    }
+
     LaunchedEffect(uiState.event) {
         if (uiState.event is EventCreateEvent.Saved) {
             viewModel.consumeEvent()
@@ -69,22 +70,18 @@ internal fun EventEditRoute(
 
     EventCreateScreen(
         uiState = uiState,
-        year = 0,
-        month = 0,
-        day = 0,
-        existingEvent = existingEvent,
-        onSave = { title, color, dateTime, location, visibility, memo ->
-            viewModel.updateEvent(
-                groupId = groupId,
-                event = existingEvent,
-                title = title,
-                color = color,
-                dateTime = dateTime,
-                location = location,
-                visibility = visibility,
-                memo = memo,
-            )
-        },
+        isEdit = true,
         onCancel = onBack,
+        onSave = { viewModel.saveEdit(groupId, existingEvent.id) },
+        onTitleChange = viewModel::updateTitle,
+        onLocationChange = viewModel::updateLocation,
+        onMemoChange = viewModel::updateMemo,
+        onColorSelect = viewModel::selectColor,
+        onVisibilitySelect = viewModel::selectVisibility,
+        onDateTimeChange = viewModel::updateDateTime,
+        onSwitchTab = viewModel::switchTab,
+        onShowVisibilitySheet = viewModel::showVisibilitySheet,
+        onDismissVisibilitySheet = viewModel::dismissVisibilitySheet,
+        onConfirmLocation = viewModel::confirmLocation,
     )
 }
