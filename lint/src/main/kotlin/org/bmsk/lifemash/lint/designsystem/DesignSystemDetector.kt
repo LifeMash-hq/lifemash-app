@@ -24,13 +24,23 @@ class DesignSystemDetector : Detector(), Detector.UastScanner {
             override fun visitCallExpression(node: UCallExpression) {
                 val name = node.methodName ?: return
                 val preferredName = METHOD_NAMES[name] ?: return
-                reportIssue(context, node, name, preferredName)
+                reportIssue(
+                    context,
+                    node,
+                    name,
+                    preferredName,
+                )
             }
 
             override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression) {
                 val name = node.receiver.asRenderString()
                 val preferredName = RECEIVER_NAMES[name] ?: return
-                reportIssue(context, node, name, preferredName)
+                reportIssue(
+                    context,
+                    node,
+                    name,
+                    preferredName,
+                )
             }
         }
 

@@ -10,7 +10,11 @@ import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
 
 private val twoOptions = listOf("일정", "할 일")
-private val threeOptions = listOf("전체", "팀", "개인")
+private val threeOptions = listOf(
+    "전체",
+    "팀",
+    "개인",
+)
 
 @Preview(name = "Light - 첫 번째 선택", showBackground = true)
 @Preview(name = "Dark - 첫 번째 선택", showBackground = true, uiMode = UI_MODE_NIGHT_YES)

@@ -8,23 +8,23 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import org.bmsk.lifemash.auth.domain.model.AuthUser
+import org.bmsk.lifemash.domain.auth.AuthUser
 import org.bmsk.lifemash.designsystem.component.AdaptiveNavigation
 import org.bmsk.lifemash.feed.api.FEED_ROUTE
 import org.bmsk.lifemash.feed.api.FeedNavGraphInfo
 import org.bmsk.lifemash.feed.api.FeedRoute
-import org.bmsk.lifemash.feed.ui.FeedTab
-import org.bmsk.lifemash.feed.ui.feedNavGraph
+import org.bmsk.lifemash.feed.impl.FeedTab
+import org.bmsk.lifemash.feed.impl.feedNavGraph
 import org.bmsk.lifemash.notification.api.NOTIFICATION_ROUTE
 import org.bmsk.lifemash.notification.api.NotificationNavGraphInfo
 import org.bmsk.lifemash.notification.api.NotificationRoute
-import org.bmsk.lifemash.notification.ui.NotificationTab
-import org.bmsk.lifemash.notification.ui.notificationNavGraph
+import org.bmsk.lifemash.notification.impl.NotificationTab
+import org.bmsk.lifemash.notification.impl.notificationNavGraph
 import org.bmsk.lifemash.profile.api.PROFILE_ROUTE
 import org.bmsk.lifemash.profile.api.ProfileNavGraphInfo
 import org.bmsk.lifemash.profile.api.ProfileRoute
-import org.bmsk.lifemash.profile.ui.ProfileTab
-import org.bmsk.lifemash.profile.ui.profileNavGraph
+import org.bmsk.lifemash.profile.impl.ProfileTab
+import org.bmsk.lifemash.profile.impl.profileNavGraph
 
 @Composable
 internal fun MainTabScreen(
@@ -37,7 +37,11 @@ internal fun MainTabScreen(
     onNavigateToAuth: () -> Unit,
 ) {
     val tabNavController = rememberNavController()
-    val tabs = listOf(ProfileTab, FeedTab, NotificationTab)
+    val tabs = listOf(
+        ProfileTab,
+        FeedTab,
+        NotificationTab,
+    )
 
     val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
     val currentTabRoute = navBackStackEntry?.destination?.let { dest ->

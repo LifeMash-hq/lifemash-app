@@ -229,3 +229,6 @@ fabric.properties
 
 # Environment secrets
 .env
+
+# Claude
+CLAUDE.md

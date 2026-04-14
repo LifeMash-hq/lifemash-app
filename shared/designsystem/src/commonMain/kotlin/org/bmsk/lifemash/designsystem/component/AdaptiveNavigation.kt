@@ -37,9 +37,23 @@ fun AdaptiveNavigation(
         val isExpanded = maxWidth >= EXPANDED_BREAKPOINT_DP.dp
 
         if (isExpanded) {
-            ExpandedLayout(tabs, currentRoute, onItemClick, Modifier, showNavigation, content)
+            ExpandedLayout(
+                tabs,
+                currentRoute,
+                onItemClick,
+                Modifier,
+                showNavigation,
+                content,
+            )
         } else {
-            CompactLayout(tabs, currentRoute, onItemClick, Modifier, showNavigation, content)
+            CompactLayout(
+                tabs,
+                currentRoute,
+                onItemClick,
+                Modifier,
+                showNavigation,
+                content,
+            )
         }
     }
 }

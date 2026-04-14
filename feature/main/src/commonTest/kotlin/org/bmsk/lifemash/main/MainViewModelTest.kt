@@ -8,10 +8,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.bmsk.lifemash.auth.domain.model.AuthToken
-import org.bmsk.lifemash.auth.domain.model.AuthUser
-import org.bmsk.lifemash.auth.domain.model.SocialProvider
-import org.bmsk.lifemash.auth.domain.repository.AuthRepository
+import org.bmsk.lifemash.domain.auth.AuthToken
+import org.bmsk.lifemash.domain.auth.AuthUser
+import org.bmsk.lifemash.domain.auth.SocialProvider
+import org.bmsk.lifemash.domain.auth.AuthRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -24,8 +24,12 @@ class MainViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
 
     private val testUser = AuthUser(
-        id = "u-1", email = "test@example.com", nickname = "테스터",
-        profileImage = null, provider = SocialProvider.EMAIL, username = "tester",
+        id = "u-1",
+        email = "test@example.com",
+        nickname = "테스터",
+        profileImage = null,
+        provider = SocialProvider.EMAIL,
+        username = "tester",
     )
 
     private val currentUserFlow = MutableStateFlow<AuthUser?>(null)

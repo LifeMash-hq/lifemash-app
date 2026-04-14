@@ -22,7 +22,11 @@ fun LifeMashPrivacyLabel(
 ) {
     val semantic = LocalLifeMashColors.current
 
-    val (bgColor, textColor, label) = when (level) {
+    val (
+        bgColor,
+        textColor,
+        label,
+    ) = when (level) {
         PrivacyLevel.Public -> Triple(
             Color(0x1F00B894),
             Color(0xFF00B894),

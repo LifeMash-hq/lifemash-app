@@ -31,4 +31,6 @@ subprojects {
 
 apply {
     from("gradle/dependencyGraph.gradle")
+    from("gradle/check-inline-fqn.gradle.kts")
+    from("gradle/check-param-format.gradle.kts")
 }

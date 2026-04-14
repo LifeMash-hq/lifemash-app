@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.bmsk.lifemash.auth.domain.model.AuthUser
-import org.bmsk.lifemash.auth.domain.repository.AuthRepository
+import org.bmsk.lifemash.domain.auth.AuthUser
+import org.bmsk.lifemash.domain.auth.AuthRepository
 
 sealed interface AuthState {
     data object Loading : AuthState
@@ -20,5 +20,9 @@ internal class MainViewModel(
 ) : ViewModel() {
     val authState: StateFlow<AuthState> = authRepository.getCurrentUser()
         .map { user -> if (user != null) AuthState.Authenticated(user) else AuthState.Unauthenticated }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, AuthState.Loading)
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            AuthState.Loading,
+        )
 }

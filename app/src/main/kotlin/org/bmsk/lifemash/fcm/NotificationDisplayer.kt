@@ -8,14 +8,18 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import org.bmsk.lifemash.feature.shared.error.ErrorReporter
+import org.bmsk.lifemash.domain.error.ErrorReporter
 
 class NotificationDisplayer(
     private val context: Context,
     private val errorReporter: ErrorReporter,
 ) {
 
-    fun show(title: String, body: String, articleUrl: String?) {
+    fun show(
+        title: String,
+        body: String,
+        articleUrl: String?,
+    ) {
         ensureChannel()
 
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
@@ -24,7 +28,9 @@ class NotificationDisplayer(
         } ?: return
 
         val pendingIntent = PendingIntent.getActivity(
-            context, System.currentTimeMillis().toInt(), intent,
+            context,
+            System.currentTimeMillis().toInt(),
+            intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
@@ -45,7 +51,11 @@ class NotificationDisplayer(
 
     private fun ensureChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "키워드 알림", NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "키워드 알림",
+                NotificationManager.IMPORTANCE_DEFAULT,
+            )
             context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
         }
     }

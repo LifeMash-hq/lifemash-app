@@ -1,7 +1,7 @@
 package org.bmsk.lifemash.error
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import org.bmsk.lifemash.feature.shared.error.ErrorReporter
+import org.bmsk.lifemash.domain.error.ErrorReporter
 
 class CrashlyticsErrorReporter : ErrorReporter {
     private val crashlytics = FirebaseCrashlytics.getInstance()

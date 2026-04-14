@@ -2,7 +2,7 @@ package org.bmsk.lifemash.fcm
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import org.bmsk.lifemash.feature.shared.error.ErrorReporter
+import org.bmsk.lifemash.domain.error.ErrorReporter
 import org.koin.android.ext.android.inject
 
 class LifeMashFcmService : FirebaseMessagingService() {
@@ -19,6 +19,10 @@ class LifeMashFcmService : FirebaseMessagingService() {
         val title = message.notification?.title ?: "LifeMash"
         val body = message.notification?.body ?: return
         val articleUrl = message.data["url"]
-        displayer.show(title, body, articleUrl)
+        displayer.show(
+            title,
+            body,
+            articleUrl,
+        )
     }
 }

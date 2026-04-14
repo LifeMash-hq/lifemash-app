@@ -62,7 +62,11 @@ fun LifeMashButton(
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             ),
         ) {
-            ButtonContent(text = text, textStyle = textStyle, isLoading = isLoading)
+            ButtonContent(
+                text = text,
+                textStyle = textStyle,
+                isLoading = isLoading,
+            )
         }
 
         LifeMashButtonStyle.Secondary -> Button(
@@ -76,7 +80,11 @@ fun LifeMashButton(
                 contentColor = MaterialTheme.colorScheme.onSurface,
             ),
         ) {
-            ButtonContent(text = text, textStyle = textStyle, isLoading = isLoading)
+            ButtonContent(
+                text = text,
+                textStyle = textStyle,
+                isLoading = isLoading,
+            )
         }
 
         LifeMashButtonStyle.Ghost -> TextButton(
@@ -105,7 +113,11 @@ fun LifeMashButton(
                 contentColor = semantic.onDanger,
             ),
         ) {
-            ButtonContent(text = text, textStyle = textStyle, isLoading = isLoading)
+            ButtonContent(
+                text = text,
+                textStyle = textStyle,
+                isLoading = isLoading,
+            )
         }
 
         LifeMashButtonStyle.Outline -> OutlinedButton(
@@ -143,6 +155,10 @@ private fun ButtonContent(
             color = if (textColor != Color.Unspecified) textColor else LocalContentColor.current,
         )
     } else {
-        Text(text, style = textStyle, color = textColor)
+        Text(
+            text,
+            style = textStyle,
+            color = textColor,
+        )
     }
 }

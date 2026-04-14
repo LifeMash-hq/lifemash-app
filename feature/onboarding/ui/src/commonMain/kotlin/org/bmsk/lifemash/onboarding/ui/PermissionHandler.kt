@@ -1,9 +1,0 @@
-package org.bmsk.lifemash.onboarding.ui
-
-import androidx.compose.runtime.Composable
-
-@Composable
-expect fun rememberCalendarPermissionLauncher(onResult: (Boolean) -> Unit): () -> Unit
-
-@Composable
-expect fun rememberNotificationPermissionLauncher(onResult: (Boolean) -> Unit): () -> Unit

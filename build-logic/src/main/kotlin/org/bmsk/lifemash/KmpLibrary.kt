@@ -18,7 +18,6 @@ internal fun Project.configureKmpLibrary() {
             minSdk = AndroidSdk.MIN_SDK
             compilerOptions {
                 jvmTarget.set(JvmTarget.JVM_17)
-                freeCompilerArgs.add("-Xexpect-actual-classes")
             }
         }
 

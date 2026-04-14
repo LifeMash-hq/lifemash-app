@@ -10,21 +10,22 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.bmsk.lifemash.auth.api.AuthNavGraphInfo
 import org.bmsk.lifemash.auth.api.AuthRoute
-import org.bmsk.lifemash.auth.ui.authNavGraph
+import org.bmsk.lifemash.auth.impl.authNavGraph
 import org.bmsk.lifemash.calendar.api.CalendarNavGraphInfo
-import org.bmsk.lifemash.calendar.ui.calendarNavGraph
+import org.bmsk.lifemash.calendar.impl.calendarNavGraph
 import org.bmsk.lifemash.eventdetail.api.EventDetailRoute
-import org.bmsk.lifemash.eventdetail.ui.eventDetailNavGraph
+import org.bmsk.lifemash.eventdetail.impl.eventDetailNavGraph
 import org.bmsk.lifemash.memo.api.MemoNavGraphInfo
-import org.bmsk.lifemash.memo.ui.memoNavGraph
+import org.bmsk.lifemash.memo.impl.memoNavGraph
 import org.bmsk.lifemash.onboarding.api.OnboardingNavGraphInfo
 import org.bmsk.lifemash.onboarding.api.OnboardingRoute
-import org.bmsk.lifemash.onboarding.ui.onboardingNavGraph
+import org.bmsk.lifemash.onboarding.impl.onboardingNavGraph
 import org.bmsk.lifemash.profile.api.ProfileEditRoute
 import org.bmsk.lifemash.profile.api.UserProfileRoute
-import org.bmsk.lifemash.profile.ui.profileEditNavGraph
-import org.bmsk.lifemash.profile.ui.userProfileNavGraph
+import org.bmsk.lifemash.profile.impl.profileEditNavGraph
+import org.bmsk.lifemash.profile.impl.userProfileNavGraph
 import org.koin.compose.viewmodel.koinViewModel
+import org.bmsk.lifemash.calendar.api.EventCreateRoute
 
 @Composable
 fun MainScreen(
@@ -62,7 +63,7 @@ fun MainScreen(
                 },
                 onNavigateToEventCreate = { year, month, day ->
                     rootNavController.navigate(
-                        org.bmsk.lifemash.calendar.api.EventCreateRoute(year, month, day)
+                        EventCreateRoute(year, month, day)
                     )
                 },
                 onNavigateToUserProfile = { userId ->

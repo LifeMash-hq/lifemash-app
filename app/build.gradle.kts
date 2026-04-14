@@ -41,7 +41,8 @@ android {
 
 dependencies {
     implementation(projects.feature.main)
-    implementation(projects.shared.common)
+    implementation(projects.shared.platform)
+    implementation(projects.domain)
     implementation(projects.shared.fcm)
     implementation(libs.koin.android)
     implementation(libs.kakao.user)

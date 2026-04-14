@@ -30,81 +30,60 @@ include(
 )
 
 include(
-    ":feature:calendar:domain",
-    ":feature:calendar:data",
-    ":feature:calendar:api",
-    ":feature:calendar:ui",
-)
-
-include(
-    ":feature:notification:domain",
-    ":feature:notification:data",
-    ":feature:notification:api",
-    ":feature:notification:ui",
-)
-
-include(
-    ":feature:auth:domain",
-    ":feature:auth:data",
     ":feature:auth:api",
-    ":feature:auth:ui",
+    ":feature:auth:impl",
+)
+
+include(
+    ":feature:calendar:api",
+    ":feature:calendar:impl",
 )
 
 include(
     ":feature:profile:api",
-    ":feature:profile:domain",
-    ":feature:profile:data",
-    ":feature:profile:ui",
+    ":feature:profile:impl",
 )
 
 include(
     ":feature:event-detail:api",
-    ":feature:event-detail:domain",
-    ":feature:event-detail:data",
-    ":feature:event-detail:ui",
+    ":feature:event-detail:impl",
 )
 
 include(
     ":feature:feed:api",
-    ":feature:feed:domain",
-    ":feature:feed:data",
-    ":feature:feed:ui",
+    ":feature:feed:impl",
 )
 
 include(
     ":feature:memo:api",
-    ":feature:memo:domain",
-    ":feature:memo:data",
-    ":feature:memo:ui",
+    ":feature:memo:impl",
 )
 
 include(
     ":feature:moment:api",
-    ":feature:moment:domain",
-    ":feature:moment:data",
-    ":feature:moment:ui",
+    ":feature:moment:impl",
 )
 
 include(
     ":feature:onboarding:api",
-    ":feature:onboarding:domain",
-    ":feature:onboarding:data",
-    ":feature:onboarding:ui",
+    ":feature:onboarding:impl",
 )
 
 include(
-    ":shared:model",
-    ":shared:network",
-    ":shared:navigation",
+    ":feature:notification:api",
+    ":feature:notification:impl",
+)
+
+include(":domain")
+
+include(
+    ":data:core",
+    ":data:remote",
+    ":data:local",
+)
+
+include(
     ":shared:designsystem",
-    ":shared:common",
+    ":shared:platform",
     ":shared:fcm",
-    ":shared:validation",
-)
-
-// Core (Backend)
-include(
-    ":core:domain",
-    ":core:infra",
-    ":core:ktor",
 )

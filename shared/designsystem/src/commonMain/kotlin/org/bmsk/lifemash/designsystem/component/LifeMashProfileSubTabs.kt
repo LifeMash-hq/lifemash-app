@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun LifeMashProfileSubTabs(
@@ -52,7 +53,7 @@ fun LifeMashProfileSubTabs(
                         .padding(vertical = LifeMashSpacing.md),
                     style = MaterialTheme.typography.labelLarge,
                     color = textColor,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    textAlign = TextAlign.Center,
                 )
             }
         }

@@ -72,11 +72,6 @@ internal fun Project.configureKotlin() {
             jvmTarget.set(JvmTarget.JVM_17)
             val warningsAsErrors: String? by project
             allWarningsAsErrors.set(warningsAsErrors.toBoolean())
-            freeCompilerArgs.set(
-                freeCompilerArgs.get() + listOf(
-                    "-opt-in=kotlin.RequiresOptIn",
-                )
-            )
         }
     }
 }

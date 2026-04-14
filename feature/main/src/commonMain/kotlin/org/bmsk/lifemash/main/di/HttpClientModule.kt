@@ -12,9 +12,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import org.bmsk.lifemash.auth.data.api.AuthApi
-import org.bmsk.lifemash.auth.data.storage.TokenStorage
-import org.bmsk.lifemash.data.network.engine.createPlatformHttpClientEngine
+import org.bmsk.lifemash.data.remote.auth.AuthApi
+import org.bmsk.lifemash.data.local.auth.TokenStorage
+import org.bmsk.lifemash.data.remote.engine.createPlatformHttpClientEngine
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -46,18 +46,18 @@ fun httpClientModule(backendBaseUrl: String) = module {
             install(Auth) {
                 bearer {
                     loadTokens {
-                        tokenStorage.get()?.let {
-                            BearerTokens(it.accessToken, it.refreshToken)
-                        }
+                        val access = tokenStorage.getAccessToken() ?: return@loadTokens null
+                        val refresh = tokenStorage.getRefreshToken() ?: return@loadTokens null
+                        BearerTokens(access, refresh)
                     }
                     refreshTokens {
-                        val stored = tokenStorage.get() ?: return@refreshTokens null
+                        val refresh = tokenStorage.getRefreshToken() ?: return@refreshTokens null
                         try {
-                            val newToken = authApi.refreshToken(stored.refreshToken).toDomain()
-                            tokenStorage.save(newToken)
+                            val newToken = authApi.refreshToken(refresh)
+                            tokenStorage.saveTokens(newToken.accessToken, newToken.refreshToken)
                             BearerTokens(newToken.accessToken, newToken.refreshToken)
                         } catch (_: Exception) {
-                            tokenStorage.clear()
+                            tokenStorage.clearTokens()
                             tokenStorage.clearUser()
                             null
                         }

@@ -63,6 +63,13 @@
 
 <br>
 
+## 문서
+
+- [코딩 컨벤션](.docs/convention.md) — 아키텍처 철학과 코딩 패턴
+- [상태 설계 원칙](.docs/state-design-principles.md) — UiState 타입 설계 원칙
+- [Rich UiState](.docs/rich-uistate.md) — UiState를 빈약한 데이터 홀더에서 Rich Model로
+<br>
+
 ## 시작하기
 
 ### APK 다운로드
