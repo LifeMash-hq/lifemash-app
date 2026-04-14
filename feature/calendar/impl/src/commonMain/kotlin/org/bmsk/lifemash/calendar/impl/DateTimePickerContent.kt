@@ -1,41 +1,48 @@
 package org.bmsk.lifemash.calendar.impl
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimeInput
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.datetime.DateTimeUnit
@@ -50,7 +57,6 @@ import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
 
 private val DAYS_OF_WEEK = listOf("월", "화", "수", "목", "금", "토", "일")
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DateTimePickerContent(
     dateTime: EventDateTime,
@@ -256,7 +262,6 @@ private fun CalendarDayCell(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimeRow(
     label: String,
@@ -268,7 +273,6 @@ private fun TimeRow(
     val timeParts = value.split(":")
     val hour = timeParts.getOrNull(0)?.toIntOrNull() ?: 9
     val minute = timeParts.getOrNull(1)?.toIntOrNull() ?: 0
-    val timeState = rememberTimePickerState(initialHour = hour, initialMinute = minute)
 
     Column {
         Row(
@@ -286,9 +290,11 @@ private fun TimeRow(
             Box(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
-                    .background(
-                        if (isExpanded) MaterialTheme.colorScheme.primaryContainer
-                        else MaterialTheme.colorScheme.surfaceVariant,
+                    .then(
+                        if (isExpanded) Modifier
+                            .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                        else Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
                     )
                     .padding(horizontal = LifeMashSpacing.md, vertical = LifeMashSpacing.xs),
             ) {
@@ -301,16 +307,121 @@ private fun TimeRow(
         }
 
         if (isExpanded) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center,
-            ) {
-                TimeInput(state = timeState)
-            }
-            // TimeInput 값 변경 시 반영
-            val newTime = TimeOfDay(timeState.hour, timeState.minute)
-            if (newTime.hour != hour || newTime.minute != minute) {
-                onTimeChange(newTime)
+            WheelTimePicker(
+                hour = hour,
+                minute = minute,
+                onTimeChange = onTimeChange,
+            )
+        }
+    }
+}
+
+private val HOURS = (0..23).toList()
+private val MINUTES = (0..55 step 5).toList()
+private const val VISIBLE_ITEMS = 5
+
+@Composable
+private fun WheelTimePicker(
+    hour: Int,
+    minute: Int,
+    onTimeChange: (TimeOfDay) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = LifeMashSpacing.sm),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        WheelColumn(
+            items = HOURS,
+            selectedItem = hour,
+            onItemSelected = { h -> onTimeChange(TimeOfDay(h, minute)) },
+            labelOf = { it.toString().padStart(2, '0') },
+        )
+        Text(
+            text = ":",
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(horizontal = LifeMashSpacing.md),
+        )
+        WheelColumn(
+            items = MINUTES,
+            selectedItem = minute,
+            onItemSelected = { m -> onTimeChange(TimeOfDay(hour, m)) },
+            labelOf = { it.toString().padStart(2, '0') },
+        )
+    }
+}
+
+@Composable
+private fun WheelColumn(
+    items: List<Int>,
+    selectedItem: Int,
+    onItemSelected: (Int) -> Unit,
+    labelOf: (Int) -> String,
+) {
+    val itemHeight = 40.dp
+    val selectedIndex = items.indexOf(selectedItem).coerceAtLeast(0)
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = (selectedIndex - VISIBLE_ITEMS / 2).coerceAtLeast(0))
+
+    val centerIndex by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val viewportCenter = layoutInfo.viewportStartOffset + layoutInfo.viewportSize.height / 2
+            layoutInfo.visibleItemsInfo.minByOrNull {
+                kotlin.math.abs((it.offset + it.size / 2) - viewportCenter)
+            }?.index ?: selectedIndex
+        }
+    }
+
+    LaunchedEffect(centerIndex) {
+        val item = items.getOrNull(centerIndex)
+        if (item != null && item != selectedItem) {
+            onItemSelected(item)
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .height(itemHeight * VISIBLE_ITEMS)
+            .width(56.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        // 중앙 하이라이트
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(itemHeight)
+                .clip(MaterialTheme.shapes.small)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+        )
+
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.height(itemHeight * VISIBLE_ITEMS),
+            flingBehavior = rememberSnapFlingBehavior(lazyListState = listState),
+            contentPadding = PaddingValues(vertical = itemHeight * (VISIBLE_ITEMS / 2)),
+        ) {
+            items(items.size) { index ->
+                val isCenterItem = index == centerIndex
+                Box(
+                    modifier = Modifier
+                        .height(itemHeight)
+                        .fillMaxWidth()
+                        .clickable {
+                            onItemSelected(items[index])
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = labelOf(items[index]),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = if (isCenterItem) FontWeight.Bold else FontWeight.Normal,
+                        ),
+                        color = if (isCenterItem) MaterialTheme.colorScheme.onSurface
+                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
+                    )
+                }
             }
         }
     }
