@@ -1,5 +1,7 @@
 package org.bmsk.lifemash.main
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +51,10 @@ fun MainScreen(
         navController = rootNavController,
         startDestination = startDestination,
         modifier = modifier.fillMaxSize(),
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
     ) {
         // 탭 화면 (바텀바는 MainTabScreen 내부에서 항상 표시)
         composable<MainTabRoute> {

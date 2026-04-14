@@ -1,9 +1,14 @@
 package org.bmsk.lifemash.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +34,49 @@ fun LifeMashAvatar(
     imageUrl: String? = null,
     name: String = "",
     size: AvatarSize = AvatarSize.Medium,
+    onEditClick: (() -> Unit)? = null,
+) {
+    if (onEditClick != null) {
+        Box(modifier = modifier) {
+            AvatarContent(
+                imageUrl = imageUrl,
+                name = name,
+                size = size,
+            )
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .align(Alignment.BottomEnd)
+                    .clip(CircleShape)
+                    .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
+                    .background(MaterialTheme.colorScheme.onSurface)
+                    .clickable(onClick = onEditClick),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.CameraAlt,
+                    contentDescription = "프로필 사진 변경",
+                    modifier = Modifier.size(12.dp),
+                    tint = MaterialTheme.colorScheme.surface,
+                )
+            }
+        }
+    } else {
+        AvatarContent(
+            imageUrl = imageUrl,
+            name = name,
+            size = size,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun AvatarContent(
+    imageUrl: String?,
+    name: String,
+    size: AvatarSize,
+    modifier: Modifier = Modifier,
 ) {
     val initial = name.firstOrNull()?.toString().orEmpty()
 
