@@ -73,17 +73,16 @@ internal class ProfileViewModel(
                             _uiState.update { it.copy(moments = moments) }
                         }
 
-                    runCatching { fetchGroupId() }
-                        .onSuccess { gId ->
-                            if (gId == null) return@onSuccess
-                            _uiState.update { it.copy(groupId = gId) }
-                            runCatching { fetchEventsData(gId, now.year, now.month.number) }
-                                .onSuccess { data ->
-                                    _uiState.update {
-                                        it.copy(calendarEvents = data.calendarEvents, dayEvents = data.dayEvents)
-                                    }
+                    val gId = getMyGroupsUseCase().firstOrNull()?.id
+                    if (gId != null) {
+                        _uiState.update { it.copy(groupId = gId) }
+                        runCatching { fetchEventsData(gId, now.year, now.month.number) }
+                            .onSuccess { data ->
+                                _uiState.update {
+                                    it.copy(calendarEvents = data.calendarEvents, dayEvents = data.dayEvents)
                                 }
-                        }
+                            }
+                    }
                 }
         }
     }
@@ -201,11 +200,6 @@ internal class ProfileViewModel(
     }
 
     // ─── private: 데이터 fetch만, 상태 변경 없음 ────────────────────────────
-
-    private suspend fun fetchGroupId(): String? {
-        val groups = getMyGroupsUseCase()
-        return groups.firstOrNull()?.id
-    }
 
     private suspend fun fetchEventsData(
         gId: String,
