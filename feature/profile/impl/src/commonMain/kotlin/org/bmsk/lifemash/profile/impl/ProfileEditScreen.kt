@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.designsystem.component.AvatarSize
 import org.bmsk.lifemash.designsystem.component.LifeMashAvatar
+import org.bmsk.lifemash.designsystem.component.LifeMashCenterTopBar
 import org.bmsk.lifemash.designsystem.component.LifeMashInput
 import org.bmsk.lifemash.designsystem.component.LifeMashSegmentControl
 import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
@@ -52,39 +53,34 @@ fun ProfileEditScreen(
             .statusBarsPadding()
             .background(MaterialTheme.colorScheme.background),
     ) {
-        // 상단 바
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LifeMashSpacing.xl, vertical = LifeMashSpacing.md),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            TextButton(onClick = onCancel) {
-                Text(
-                    text = "취소",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Text(
-                text = "프로필 편집",
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                textAlign = TextAlign.Center,
-            )
-            if (uiState.isSaving) {
-                CircularProgressIndicator(modifier = Modifier.size(LifeMashSpacing.xl), strokeWidth = LifeMashSpacing.micro)
-            } else {
-                TextButton(onClick = onSave) {
+        LifeMashCenterTopBar(
+            title = "프로필 편집",
+            navigationIcon = {
+                TextButton(onClick = onCancel) {
                     Text(
-                        text = "저장",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary,
+                        text = "취소",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-            }
-        }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            },
+            actions = {
+                if (uiState.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(LifeMashSpacing.xl),
+                        strokeWidth = LifeMashSpacing.micro,
+                    )
+                } else {
+                    TextButton(onClick = onSave) {
+                        Text(
+                            text = "저장",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
+            },
+        )
 
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             // 아바타 섹션
