@@ -11,10 +11,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import org.bmsk.lifemash.domain.calendar.Event
-import org.bmsk.lifemash.domain.profile.CalendarDayEvent
-import org.bmsk.lifemash.domain.profile.CalendarViewMode
-import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.ProfileSettings
 import org.bmsk.lifemash.domain.profile.ProfileSubTab
 import org.bmsk.lifemash.domain.usecase.calendar.DeleteEventUseCase
@@ -42,8 +38,6 @@ internal class ProfileViewModel(
 
     private val _uiState = MutableStateFlow(ProfileUiState.Default)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
-
-    private var groupId: String? = null
 
     fun loadProfile(userId: String) {
         val tz = TimeZone.currentSystemDefault()
@@ -90,7 +84,7 @@ internal class ProfileViewModel(
             runCatching {
                 val groups = getMyGroupsUseCase()
                 val firstGroup = groups.firstOrNull() ?: return@runCatching
-                groupId = firstGroup.id
+                _uiState.update { it.copy(groupId = firstGroup.id) }
                 loadEvents(firstGroup.id, year, month)
             }
         }
@@ -100,7 +94,6 @@ internal class ProfileViewModel(
         runCatching {
             val events = getMonthEventsUseCase(gId, year, month)
             val tz = TimeZone.currentSystemDefault()
-
             val grouped = events.groupBy { it.startAt.toLocalDateTime(tz).date.day }
 
             _uiState.update {
@@ -113,8 +106,8 @@ internal class ProfileViewModel(
     }
 
     fun reloadEvents() {
-        val gId = groupId ?: return
         val state = _uiState.value
+        val gId = state.groupId ?: return
         viewModelScope.launch {
             loadEvents(gId, state.selectedYear, state.selectedMonth)
         }
@@ -129,15 +122,9 @@ internal class ProfileViewModel(
     }
 
     fun navigateMonth(delta: Int) {
-        _uiState.update { state ->
-            var month = state.selectedMonth + delta
-            var year = state.selectedYear
-            if (month > 12) { month = 1; year++ }
-            if (month < 1) { month = 12; year-- }
-            state.copy(selectedYear = year, selectedMonth = month)
-        }
+        _uiState.update { it.withMonthDelta(delta) }
         val state = _uiState.value
-        val gId = groupId
+        val gId = state.groupId
         if (gId != null) {
             viewModelScope.launch {
                 loadEvents(gId, state.selectedYear, state.selectedMonth)
@@ -146,7 +133,7 @@ internal class ProfileViewModel(
     }
 
     fun updateEvent(eventId: String, title: String?, color: String?) {
-        val gId = groupId ?: return
+        val gId = _uiState.value.groupId ?: return
         viewModelScope.launch {
             runCatching {
                 updateEventUseCase(
@@ -169,7 +156,7 @@ internal class ProfileViewModel(
     }
 
     fun deleteEvent(eventId: String) {
-        val gId = groupId ?: return
+        val gId = _uiState.value.groupId ?: return
         viewModelScope.launch {
             runCatching {
                 deleteEventUseCase(gId, eventId)
@@ -221,30 +208,4 @@ internal class ProfileViewModel(
     fun consumeEvent() {
         _uiState.update { it.copy(event = null) }
     }
-
-    private fun Event.toCalendarDayEvent() = CalendarDayEvent(
-        id = id,
-        title = title,
-        color = color ?: DEFAULT_EVENT_COLOR,
-    )
-
-    private fun Event.toProfileEvent(): ProfileEvent {
-        val tz = TimeZone.currentSystemDefault()
-        val start = startAt.toLocalDateTime(tz)
-        val end = endAt?.toLocalDateTime(tz)
-        return ProfileEvent(
-            id = id,
-            title = title,
-            startTime = start.formatTime(),
-            endTime = end?.formatTime() ?: "",
-            color = color ?: DEFAULT_EVENT_COLOR,
-        )
-    }
-
-    companion object {
-        private const val DEFAULT_EVENT_COLOR = "#4F6AF5"
-    }
 }
-
-private fun kotlinx.datetime.LocalDateTime.formatTime(): String =
-    "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"

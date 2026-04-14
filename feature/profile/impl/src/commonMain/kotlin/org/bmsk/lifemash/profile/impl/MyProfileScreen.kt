@@ -136,16 +136,10 @@ fun MyProfileScreen(
                                         onNextMonth = { onNavigateMonth(1) },
                                     )
                                 }
-                                val selectedDay = uiState.selectedCalendarDay
-                                val selectedDayEvents = if (selectedDay != null) {
-                                    uiState.dayEvents[selectedDay] ?: emptyList()
-                                } else {
-                                    uiState.todayEvents
-                                }
                                 item {
                                     SelectedDayEventsSection(
-                                        label = if (selectedDay != null) "${uiState.selectedMonth}월 ${selectedDay}일" else "오늘",
-                                        events = selectedDayEvents,
+                                        label = uiState.selectedDayLabel,
+                                        events = uiState.selectedDayEvents,
                                         onCameraClick = onCameraClick,
                                         onEventClick = onEventClick,
                                     )

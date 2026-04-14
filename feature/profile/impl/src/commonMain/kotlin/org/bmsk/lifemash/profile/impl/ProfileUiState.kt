@@ -16,6 +16,7 @@ sealed interface ScreenPhase {
 data class ProfileUiState(
     val screenPhase: ScreenPhase,
     val profile: UserProfile?,
+    val groupId: String?,
     val moments: List<Moment>,
     val calendarEvents: Map<Int, List<CalendarDayEvent>>,
     val dayEvents: Map<Int, List<ProfileEvent>>,
@@ -30,16 +31,39 @@ data class ProfileUiState(
     val errorMessage: String?,
     val event: ProfileUiEvent?,
 ) {
+    // ─── 파생 속성 ──────────────────────────────────────────────────────────
+
     val isReady: Boolean by lazy { screenPhase is ScreenPhase.Ready }
 
     val todayEvents: List<ProfileEvent> by lazy {
         dayEvents[todayDay] ?: emptyList()
     }
 
+    val selectedDayLabel: String by lazy {
+        if (selectedCalendarDay != null) "${selectedMonth}월 ${selectedCalendarDay}일"
+        else "오늘"
+    }
+
+    val selectedDayEvents: List<ProfileEvent> by lazy {
+        if (selectedCalendarDay != null) dayEvents[selectedCalendarDay] ?: emptyList()
+        else todayEvents
+    }
+
+    // ─── 변환 함수 ──────────────────────────────────────────────────────────
+
+    fun withMonthDelta(delta: Int): ProfileUiState {
+        var month = selectedMonth + delta
+        var year = selectedYear
+        if (month > 12) { month = 1; year++ }
+        if (month < 1) { month = 12; year-- }
+        return copy(selectedYear = year, selectedMonth = month, selectedCalendarDay = null)
+    }
+
     companion object {
         val Default = ProfileUiState(
             screenPhase = ScreenPhase.Initializing,
             profile = null,
+            groupId = null,
             moments = emptyList(),
             calendarEvents = emptyMap(),
             dayEvents = emptyMap(),
