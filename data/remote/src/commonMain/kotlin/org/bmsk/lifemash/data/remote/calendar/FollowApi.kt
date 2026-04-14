@@ -16,8 +16,8 @@ class FollowApi(private val client: HttpClient) {
         client.get("/api/v1/follow/$userId/following").body()
 
     suspend fun follow(userId: String): Unit =
-        client.post("/api/v1/users/$userId/follow").body()
+        client.post("/api/v1/follow/$userId").body()
 
     suspend fun unfollow(userId: String): Unit =
-        client.delete("/api/v1/users/$userId/follow").body()
+        client.delete("/api/v1/follow/$userId").body()
 }

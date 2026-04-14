@@ -4,9 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -21,21 +18,17 @@ internal fun ProfileRouteScreen(
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var showFollowSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadProfile("me")
     }
 
-    LaunchedEffect(uiState) {
-        val state = uiState
-        if (state is ProfileUiState.Loaded && state.errorMessage != null) {
-            onShowErrorSnackbar(Exception(state.errorMessage))
-            viewModel.clearError()
-        }
+    LaunchedEffect(uiState.errorMessage) {
+        val msg = uiState.errorMessage ?: return@LaunchedEffect
+        onShowErrorSnackbar(Exception(msg))
+        viewModel.clearError()
     }
 
-    // 일정 생성 완료 결과 수신
     LaunchedEffect(navController) {
         val savedStateHandle = navController?.currentBackStackEntry?.savedStateHandle ?: return@LaunchedEffect
         savedStateHandle.getStateFlow("event_created", false).collect { created ->
@@ -46,28 +39,24 @@ internal fun ProfileRouteScreen(
         }
     }
 
-    val profileUserId = (uiState as? ProfileUiState.Loaded)?.profile?.id
-
     MyProfileScreen(
         uiState = uiState,
         onEditClick = onNavigateToProfileEdit,
-        onFollowerClick = { showFollowSheet = true },
-        onFollowingClick = { showFollowSheet = true },
+        onFollowerClick = viewModel::showFollowSheet,
+        onFollowingClick = viewModel::showFollowSheet,
         onSubTabSelect = viewModel::selectSubTab,
         onCalendarDaySelect = viewModel::selectCalendarDay,
         onNavigateMonth = viewModel::navigateMonth,
-        onNavigateToEventCreate = { year, month, day ->
-            onNavigateToEventCreate(year, month, day)
-        },
+        onNavigateToEventCreate = onNavigateToEventCreate,
         onEventClick = onNavigateToEventDetail,
     )
 
-    if (showFollowSheet && profileUserId != null) {
+    if (uiState.isFollowSheetVisible && uiState.profile != null) {
         FollowListSheet(
-            profileUserId = profileUserId,
-            onDismiss = { showFollowSheet = false },
+            profileUserId = uiState.profile!!.id,
+            onDismiss = viewModel::dismissFollowSheet,
             onUserClick = { userId ->
-                showFollowSheet = false
+                viewModel.dismissFollowSheet()
                 onNavigateToUserProfile(userId)
             },
         )

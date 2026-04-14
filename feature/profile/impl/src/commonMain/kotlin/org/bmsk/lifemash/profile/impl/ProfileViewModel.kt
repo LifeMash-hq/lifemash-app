@@ -14,8 +14,8 @@ import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.domain.calendar.Event
 import org.bmsk.lifemash.domain.profile.CalendarDayEvent
-import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.CalendarViewMode
+import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.ProfileSettings
 import org.bmsk.lifemash.domain.profile.ProfileSubTab
 import org.bmsk.lifemash.domain.usecase.calendar.DeleteEventUseCase
@@ -40,7 +40,8 @@ internal class ProfileViewModel(
     private val followUserUseCase: FollowUserUseCase,
     private val unfollowUserUseCase: UnfollowUserUseCase,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
+
+    private val _uiState = MutableStateFlow(ProfileUiState.Default)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     private var groupId: String? = null
@@ -51,19 +52,23 @@ internal class ProfileViewModel(
             val settings = runCatching { getProfileSettingsUseCase() }
                 .getOrElse { ProfileSettings.Default }
 
-            val defaultSubTab = settings.defaultSubTab
-            val viewMode = settings.myCalendarViewMode
-
             getUserProfileUseCase(userId)
-                .catch { _uiState.value = ProfileUiState.Error(it.message ?: "알 수 없는 오류") }
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(screenPhase = ScreenPhase.FatalError(e.message ?: "알 수 없는 오류"))
+                    }
+                }
                 .collect { profile ->
-                    _uiState.value = ProfileUiState.Loaded(
-                        profile = profile,
-                        selectedYear = now.year,
-                        selectedMonth = now.month.number,
-                        selectedSubTab = defaultSubTab,
-                        calendarViewMode = viewMode,
-                    )
+                    _uiState.update {
+                        it.copy(
+                            screenPhase = ScreenPhase.Ready,
+                            profile = profile,
+                            selectedYear = now.year,
+                            selectedMonth = now.month.number,
+                            selectedSubTab = settings.defaultSubTab,
+                            calendarViewMode = settings.myCalendarViewMode,
+                        )
+                    }
                     loadMoments(userId)
                     loadGroupAndEvents(now.year, now.month.number)
                 }
@@ -74,9 +79,7 @@ internal class ProfileViewModel(
         viewModelScope.launch {
             runCatching { getProfileMomentsUseCase(userId) }
                 .onSuccess { moments ->
-                    _uiState.update { state ->
-                        if (state is ProfileUiState.Loaded) state.copy(moments = moments) else state
-                    }
+                    _uiState.update { it.copy(moments = moments) }
                 }
         }
     }
@@ -88,7 +91,7 @@ internal class ProfileViewModel(
                 val firstGroup = groups.firstOrNull() ?: return@runCatching
                 groupId = firstGroup.id
                 loadEvents(firstGroup.id, year, month)
-            }.onFailure { /* 그룹이 없으면 무시 */ }
+            }
         }
     }
 
@@ -114,55 +117,43 @@ internal class ProfileViewModel(
                 event.startAt.toLocalDateTime(TimeZone.currentSystemDefault()).date == today
             }.map { it.toProfileEvent() }
 
-            _uiState.update { state ->
-                if (state is ProfileUiState.Loaded) {
-                    state.copy(
-                        calendarEvents = calendarMap,
-                        dayEvents = dayEventsMap,
-                        todayEvents = todayEvents,
-                    )
-                } else state
+            _uiState.update {
+                it.copy(
+                    calendarEvents = calendarMap,
+                    dayEvents = dayEventsMap,
+                    todayEvents = todayEvents,
+                )
             }
-        }.onFailure { /* 이벤트 로드 실패 무시 */ }
+        }
     }
 
     fun reloadEvents() {
-        val state = _uiState.value as? ProfileUiState.Loaded ?: return
         val gId = groupId ?: return
+        val state = _uiState.value
         viewModelScope.launch {
             loadEvents(gId, state.selectedYear, state.selectedMonth)
         }
     }
 
     fun selectSubTab(tab: ProfileSubTab) {
-        _uiState.update { state ->
-            if (state is ProfileUiState.Loaded) state.copy(selectedSubTab = tab) else state
-        }
+        _uiState.update { it.copy(selectedSubTab = tab) }
     }
 
     fun selectCalendarDay(day: Int?) {
-        _uiState.update { state ->
-            if (state is ProfileUiState.Loaded) state.copy(selectedCalendarDay = day) else state
-        }
+        _uiState.update { it.copy(selectedCalendarDay = day) }
     }
 
     fun navigateMonth(delta: Int) {
         _uiState.update { state ->
-            if (state is ProfileUiState.Loaded) {
-                var month = state.selectedMonth + delta
-                var year = state.selectedYear
-                if (month > 12) {
-                    month = 1; year++
-                }
-                if (month < 1) {
-                    month = 12; year--
-                }
-                state.copy(selectedYear = year, selectedMonth = month)
-            } else state
+            var month = state.selectedMonth + delta
+            var year = state.selectedYear
+            if (month > 12) { month = 1; year++ }
+            if (month < 1) { month = 12; year-- }
+            state.copy(selectedYear = year, selectedMonth = month)
         }
         val state = _uiState.value
         val gId = groupId
-        if (state is ProfileUiState.Loaded && gId != null) {
+        if (gId != null) {
             viewModelScope.launch {
                 loadEvents(gId, state.selectedYear, state.selectedMonth)
             }
@@ -187,10 +178,7 @@ internal class ProfileViewModel(
             }.onSuccess {
                 reloadEvents()
             }.onFailure { e ->
-                _uiState.update { state ->
-                    if (state is ProfileUiState.Loaded) state.copy(errorMessage = e.message ?: "일정 수정 실패")
-                    else state
-                }
+                _uiState.update { it.copy(errorMessage = e.message ?: "일정 수정 실패") }
             }
         }
     }
@@ -203,34 +191,50 @@ internal class ProfileViewModel(
             }.onSuccess {
                 reloadEvents()
             }.onFailure { e ->
-                _uiState.update { state ->
-                    if (state is ProfileUiState.Loaded) state.copy(errorMessage = e.message ?: "일정 삭제 실패")
-                    else state
-                }
+                _uiState.update { it.copy(errorMessage = e.message ?: "일정 삭제 실패") }
             }
         }
     }
 
     fun clearError() {
-        _uiState.update { state ->
-            if (state is ProfileUiState.Loaded) state.copy(errorMessage = null) else state
-        }
+        _uiState.update { it.copy(errorMessage = null) }
     }
 
-    fun toggleFollow(loaded: ProfileUiState.Loaded, userId: String) {
-        val wasFollowing = loaded.profile.isFollowing
-        _uiState.value = loaded.copy(profile = loaded.profile.copy(isFollowing = !wasFollowing))
+    fun toggleFollow(userId: String) {
+        if (_uiState.value.isFollowInProgress) return
+        val wasFollowing = _uiState.value.profile?.isFollowing ?: return
+
+        _uiState.value = _uiState.value.copy(
+            isFollowInProgress = true,
+            profile = _uiState.value.profile?.copy(isFollowing = !wasFollowing),
+        )
+
         viewModelScope.launch {
             runCatching {
                 if (wasFollowing) unfollowUserUseCase(userId) else followUserUseCase(userId)
+            }.onSuccess {
+                _uiState.update { it.copy(isFollowInProgress = false) }
             }.onFailure {
-                _uiState.update { state ->
-                    if (state is ProfileUiState.Loaded)
-                        state.copy(profile = state.profile.copy(isFollowing = wasFollowing))
-                    else state
+                _uiState.update {
+                    it.copy(
+                        isFollowInProgress = false,
+                        profile = it.profile?.copy(isFollowing = wasFollowing),
+                    )
                 }
             }
         }
+    }
+
+    fun showFollowSheet() {
+        _uiState.update { it.copy(isFollowSheetVisible = true) }
+    }
+
+    fun dismissFollowSheet() {
+        _uiState.update { it.copy(isFollowSheetVisible = false) }
+    }
+
+    fun consumeEvent() {
+        _uiState.update { it.copy(event = null) }
     }
 
     private fun Event.toCalendarDayEvent() = CalendarDayEvent(

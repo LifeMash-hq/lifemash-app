@@ -75,23 +75,24 @@ fun MyProfileScreen(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize().statusBarsPadding()) {
-        when (uiState) {
-            is ProfileUiState.Loading -> {
+        when (val phase = uiState.screenPhase) {
+            is ScreenPhase.Initializing -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
-            is ProfileUiState.Error -> {
+            is ScreenPhase.FatalError -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(uiState.message)
+                    Text(phase.message)
                 }
             }
-            is ProfileUiState.Loaded -> {
+            is ScreenPhase.Ready -> {
+                val profile = uiState.profile ?: return@Box
                 Box(Modifier.fillMaxSize()) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
                             ProfileHeader(
-                                profile = uiState.profile,
+                                profile = profile,
                                 momentCount = uiState.moments.size,
                                 selectedSubTab = uiState.selectedSubTab,
                                 onFollowerClick = onFollowerClick,

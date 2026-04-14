@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
 import org.bmsk.lifemash.domain.moment.Moment
+import org.bmsk.lifemash.domain.moment.Visibility
 import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.UserProfile
 
@@ -12,7 +13,7 @@ private val sampleProfile = UserProfile(
     id = "u1",
     email = "bmsk@lifemash.app",
     nickname = "bmsk",
-    bio = "캘린더 기반 소셜 앱 개발 중 🚀",
+    bio = "캘린더 기반 소셜 앱 개발 중",
     followerCount = 128,
     followingCount = 64,
     isFollowing = false,
@@ -26,16 +27,8 @@ private val sampleMoments = listOf(
         authorNickname = "bmsk",
         media = emptyList(),
         caption = "스프린트 완료!",
+        visibility = Visibility.PUBLIC,
         createdAt = "2024-03-15",
-    ),
-    Moment(
-        id = "m2",
-        eventId = "e2",
-        authorId = "u1",
-        authorNickname = "bmsk",
-        media = emptyList(),
-        caption = "팀 회식 🍻",
-        createdAt = "2024-03-10",
     ),
 )
 
@@ -47,13 +40,6 @@ private val sampleTodayEvents = listOf(
         endTime = "10:15",
         color = "#4F6AF5",
     ),
-    ProfileEvent(
-        id = "e2",
-        title = "코드 리뷰",
-        startTime = "14:00",
-        endTime = "15:00",
-        color = "#F5A623",
-    ),
 )
 
 @Preview(name = "Light - Loaded", showBackground = true)
@@ -62,7 +48,8 @@ private val sampleTodayEvents = listOf(
 fun MyProfileScreenPreview_Loaded() {
     LifeMashTheme {
         MyProfileScreen(
-            uiState = ProfileUiState.Loaded(
+            uiState = ProfileUiState.Default.copy(
+                screenPhase = ScreenPhase.Ready,
                 profile = sampleProfile,
                 moments = sampleMoments,
                 todayEvents = sampleTodayEvents,
@@ -78,6 +65,6 @@ fun MyProfileScreenPreview_Loaded() {
 @Composable
 fun MyProfileScreenPreview_Loading() {
     LifeMashTheme {
-        MyProfileScreen(uiState = ProfileUiState.Loading)
+        MyProfileScreen(uiState = ProfileUiState.Default)
     }
 }

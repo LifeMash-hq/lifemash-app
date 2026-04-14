@@ -7,22 +7,52 @@ import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.ProfileSubTab
 import org.bmsk.lifemash.domain.profile.UserProfile
 
-sealed interface ProfileUiState {
-    data object Loading : ProfileUiState
-    data class Loaded(
-        val profile: UserProfile,
-        val moments: List<Moment> = emptyList(),
-        val followers: List<UserProfile> = emptyList(),
-        val following: List<UserProfile> = emptyList(),
-        val todayEvents: List<ProfileEvent> = emptyList(),
-        val calendarEvents: Map<Int, List<CalendarDayEvent>> = emptyMap(),
-        val dayEvents: Map<Int, List<ProfileEvent>> = emptyMap(),
-        val selectedYear: Int = 0,
-        val selectedMonth: Int = 0,
-        val selectedSubTab: ProfileSubTab = ProfileSubTab.MOMENTS,
-        val selectedCalendarDay: Int? = null,
-        val calendarViewMode: CalendarViewMode = CalendarViewMode.DOT,
-        val errorMessage: String? = null,
-    ) : ProfileUiState
-    data class Error(val message: String) : ProfileUiState
+sealed interface ScreenPhase {
+    data object Initializing : ScreenPhase
+    data object Ready : ScreenPhase
+    data class FatalError(val message: String) : ScreenPhase
+}
+
+data class ProfileUiState(
+    val screenPhase: ScreenPhase,
+    val profile: UserProfile?,
+    val moments: List<Moment>,
+    val todayEvents: List<ProfileEvent>,
+    val calendarEvents: Map<Int, List<CalendarDayEvent>>,
+    val dayEvents: Map<Int, List<ProfileEvent>>,
+    val selectedYear: Int,
+    val selectedMonth: Int,
+    val selectedSubTab: ProfileSubTab,
+    val selectedCalendarDay: Int?,
+    val calendarViewMode: CalendarViewMode,
+    val isFollowInProgress: Boolean,
+    val isFollowSheetVisible: Boolean,
+    val errorMessage: String?,
+    val event: ProfileUiEvent?,
+) {
+    val isReady: Boolean by lazy { screenPhase is ScreenPhase.Ready }
+
+    companion object {
+        val Default = ProfileUiState(
+            screenPhase = ScreenPhase.Initializing,
+            profile = null,
+            moments = emptyList(),
+            todayEvents = emptyList(),
+            calendarEvents = emptyMap(),
+            dayEvents = emptyMap(),
+            selectedYear = 0,
+            selectedMonth = 0,
+            selectedSubTab = ProfileSubTab.MOMENTS,
+            selectedCalendarDay = null,
+            calendarViewMode = CalendarViewMode.DOT,
+            isFollowInProgress = false,
+            isFollowSheetVisible = false,
+            errorMessage = null,
+            event = null,
+        )
+    }
+}
+
+sealed interface ProfileUiEvent {
+    data object NavigateBack : ProfileUiEvent
 }
