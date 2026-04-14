@@ -17,9 +17,9 @@ data class ProfileUiState(
     val screenPhase: ScreenPhase,
     val profile: UserProfile?,
     val moments: List<Moment>,
-    val todayEvents: List<ProfileEvent>,
     val calendarEvents: Map<Int, List<CalendarDayEvent>>,
     val dayEvents: Map<Int, List<ProfileEvent>>,
+    val todayDay: Int,
     val selectedYear: Int,
     val selectedMonth: Int,
     val selectedSubTab: ProfileSubTab,
@@ -32,14 +32,18 @@ data class ProfileUiState(
 ) {
     val isReady: Boolean by lazy { screenPhase is ScreenPhase.Ready }
 
+    val todayEvents: List<ProfileEvent> by lazy {
+        dayEvents[todayDay] ?: emptyList()
+    }
+
     companion object {
         val Default = ProfileUiState(
             screenPhase = ScreenPhase.Initializing,
             profile = null,
             moments = emptyList(),
-            todayEvents = emptyList(),
             calendarEvents = emptyMap(),
             dayEvents = emptyMap(),
+            todayDay = 0,
             selectedYear = 0,
             selectedMonth = 0,
             selectedSubTab = ProfileSubTab.MOMENTS,

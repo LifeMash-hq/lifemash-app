@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
@@ -47,7 +46,8 @@ internal class ProfileViewModel(
     private var groupId: String? = null
 
     fun loadProfile(userId: String) {
-        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val tz = TimeZone.currentSystemDefault()
+        val now = Clock.System.now().toLocalDateTime(tz)
         viewModelScope.launch {
             val settings = runCatching { getProfileSettingsUseCase() }
                 .getOrElse { ProfileSettings.Default }
@@ -63,6 +63,7 @@ internal class ProfileViewModel(
                         it.copy(
                             screenPhase = ScreenPhase.Ready,
                             profile = profile,
+                            todayDay = now.day,
                             selectedYear = now.year,
                             selectedMonth = now.month.number,
                             selectedSubTab = settings.defaultSubTab,
@@ -98,30 +99,14 @@ internal class ProfileViewModel(
     private suspend fun loadEvents(gId: String, year: Int, month: Int) {
         runCatching {
             val events = getMonthEventsUseCase(gId, year, month)
-            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-            val today = LocalDate(now.year, now.month, now.day)
+            val tz = TimeZone.currentSystemDefault()
 
-            val calendarMap = events.groupBy { event ->
-                event.startAt.toLocalDateTime(TimeZone.currentSystemDefault()).date.day
-            }.mapValues { (_, dayEvents) ->
-                dayEvents.map { it.toCalendarDayEvent() }
-            }
-
-            val dayEventsMap = events.groupBy { event ->
-                event.startAt.toLocalDateTime(TimeZone.currentSystemDefault()).date.day
-            }.mapValues { (_, dayEvents) ->
-                dayEvents.map { it.toProfileEvent() }
-            }
-
-            val todayEvents = events.filter { event ->
-                event.startAt.toLocalDateTime(TimeZone.currentSystemDefault()).date == today
-            }.map { it.toProfileEvent() }
+            val grouped = events.groupBy { it.startAt.toLocalDateTime(tz).date.day }
 
             _uiState.update {
                 it.copy(
-                    calendarEvents = calendarMap,
-                    dayEvents = dayEventsMap,
-                    todayEvents = todayEvents,
+                    calendarEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toCalendarDayEvent() } },
+                    dayEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toProfileEvent() } },
                 )
             }
         }
@@ -240,7 +225,7 @@ internal class ProfileViewModel(
     private fun Event.toCalendarDayEvent() = CalendarDayEvent(
         id = id,
         title = title,
-        color = color ?: "#4F6AF5",
+        color = color ?: DEFAULT_EVENT_COLOR,
     )
 
     private fun Event.toProfileEvent(): ProfileEvent {
@@ -250,9 +235,16 @@ internal class ProfileViewModel(
         return ProfileEvent(
             id = id,
             title = title,
-            startTime = "${start.hour.toString().padStart(2, '0')}:${start.minute.toString().padStart(2, '0')}",
-            endTime = end?.let { "${it.hour.toString().padStart(2, '0')}:${it.minute.toString().padStart(2, '0')}" } ?: "",
-            color = color ?: "#4F6AF5",
+            startTime = start.formatTime(),
+            endTime = end?.formatTime() ?: "",
+            color = color ?: DEFAULT_EVENT_COLOR,
         )
     }
+
+    companion object {
+        private const val DEFAULT_EVENT_COLOR = "#4F6AF5"
+    }
 }
+
+private fun kotlinx.datetime.LocalDateTime.formatTime(): String =
+    "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
