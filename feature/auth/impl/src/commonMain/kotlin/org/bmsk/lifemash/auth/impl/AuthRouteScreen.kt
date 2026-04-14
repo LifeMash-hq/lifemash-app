@@ -18,22 +18,15 @@ internal fun AuthRouteScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showLogin by rememberSaveable { mutableStateOf(false) }
 
-    println("[AuthDiag] AuthRouteScreen recompose, uiState=$uiState")
-
     LaunchedEffect(uiState) {
-        println("[AuthDiag] LaunchedEffect uiState=$uiState")
         val state = uiState
         if (state is AuthUiState.Success) {
-            println("[AuthDiag] → onSignInComplete(isNewUser=${state.isNewUser})")
             onSignInComplete(state.isNewUser)
-            println("[AuthDiag] → onSignInComplete returned")
         }
     }
 
     val launchKakaoLogin = rememberKakaoLoginLauncher { result ->
-        println("[AuthDiag] KakaoCallback result=$result")
         result.onSuccess { accessToken ->
-            println("[AuthDiag] → signInWithKakao()")
             viewModel.signInWithKakao(accessToken)
         }.onFailure { error ->
             onShowErrorSnackbar(error)

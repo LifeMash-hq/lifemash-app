@@ -4,7 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
-import org.bmsk.lifemash.domain.profile.Moment
+import org.bmsk.lifemash.domain.moment.Moment
 import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.UserProfile
 

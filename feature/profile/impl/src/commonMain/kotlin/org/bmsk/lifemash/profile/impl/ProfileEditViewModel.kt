@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bmsk.lifemash.domain.moment.UploadService
+import org.bmsk.lifemash.domain.profile.CalendarViewMode
 import org.bmsk.lifemash.domain.profile.ProfileSettings
+import org.bmsk.lifemash.domain.profile.ProfileSubTab
 import org.bmsk.lifemash.domain.usecase.profile.GetProfileSettingsUseCase
 import org.bmsk.lifemash.domain.usecase.profile.GetUserProfileUseCase
 import org.bmsk.lifemash.domain.usecase.profile.UpdateProfileSettingsUseCase
@@ -35,9 +37,9 @@ internal class ProfileEditViewModel(
                             username = p.username.orEmpty(),
                             bio = p.bio.orEmpty(),
                             profileImageUrl = p.profileImage,
-                            defaultSubTab = if (settings.defaultSubTab == "calendar") 1 else 0,
-                            myCalendarView = if (settings.myCalendarViewMode == "chip") 1 else 0,
-                            othersCalendarView = if (settings.othersCalendarViewMode == "chip") 1 else 0,
+                            defaultSubTab = settings.defaultSubTab.ordinal,
+                            myCalendarView = settings.myCalendarViewMode.ordinal,
+                            othersCalendarView = settings.othersCalendarViewMode.ordinal,
                             defaultVisibility = when (settings.defaultEventVisibility) {
                                 "friend" -> 1
                                 "private" -> 2
@@ -106,9 +108,9 @@ internal class ProfileEditViewModel(
                 )
                 updateProfileSettingsUseCase(
                     ProfileSettings(
-                        defaultSubTab = if (state.defaultSubTab == 1) "calendar" else "moments",
-                        myCalendarViewMode = if (state.myCalendarView == 1) "chip" else "dot",
-                        othersCalendarViewMode = if (state.othersCalendarView == 1) "chip" else "dot",
+                        defaultSubTab = ProfileSubTab.entries[state.defaultSubTab],
+                        myCalendarViewMode = CalendarViewMode.entries[state.myCalendarView],
+                        othersCalendarViewMode = CalendarViewMode.entries[state.othersCalendarView],
                         defaultEventVisibility = when (state.defaultVisibility) {
                             1 -> "friend"
                             2 -> "private"

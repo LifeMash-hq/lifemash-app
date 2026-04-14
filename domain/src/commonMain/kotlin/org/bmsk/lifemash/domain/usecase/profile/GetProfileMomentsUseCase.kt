@@ -1,9 +1,9 @@
 package org.bmsk.lifemash.domain.usecase.profile
 
-import kotlinx.coroutines.flow.Flow
-import org.bmsk.lifemash.domain.profile.Moment
-import org.bmsk.lifemash.domain.profile.ProfileRepository
+import org.bmsk.lifemash.domain.moment.Moment
+import org.bmsk.lifemash.domain.moment.MomentRepository
 
-class GetProfileMomentsUseCase(private val repository: ProfileRepository) {
-    operator fun invoke(userId: String): Flow<List<Moment>> = repository.getMoments(userId)
+class GetProfileMomentsUseCase(private val repository: MomentRepository) {
+    suspend operator fun invoke(userId: String): List<Moment> =
+        repository.getUserMoments(userId)
 }

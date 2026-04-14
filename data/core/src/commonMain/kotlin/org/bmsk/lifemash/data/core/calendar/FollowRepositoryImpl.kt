@@ -11,4 +11,8 @@ internal class FollowRepositoryImpl(private val api: FollowApi) : FollowReposito
 
     override suspend fun getFollowing(userId: String): List<Follower> =
         api.getFollowing(userId).map { it.toDomain() }
+
+    override suspend fun follow(userId: String) = api.follow(userId)
+
+    override suspend fun unfollow(userId: String) = api.unfollow(userId)
 }

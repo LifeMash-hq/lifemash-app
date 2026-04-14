@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import org.bmsk.lifemash.designsystem.component.LifeMashButton
 import org.bmsk.lifemash.designsystem.component.LifeMashButtonStyle
 import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
+import org.bmsk.lifemash.domain.profile.ProfileSubTab
 import androidx.compose.material.icons.filled.Add
 
 @Composable
@@ -86,7 +87,7 @@ internal fun UserProfileScreen(
                             )
                         }
                         when (uiState.selectedSubTab) {
-                            ProfileSubTab.Moments -> {
+                            ProfileSubTab.MOMENTS -> {
                                 item {
                                     PhotoGrid(
                                         moments = uiState.moments,
@@ -100,7 +101,7 @@ internal fun UserProfileScreen(
                                     )
                                 }
                             }
-                            ProfileSubTab.Calendar -> {
+                            ProfileSubTab.CALENDAR -> {
                                 item {
                                     CalendarSection(
                                         year = uiState.selectedYear,
@@ -132,7 +133,7 @@ internal fun UserProfileScreen(
                         }
                     }
 
-                    if (uiState.selectedSubTab == ProfileSubTab.Calendar) {
+                    if (uiState.selectedSubTab == ProfileSubTab.CALENDAR) {
                         FloatingActionButton(
                             onClick = {
                                 onNavigateToEventCreate(

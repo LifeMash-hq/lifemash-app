@@ -2,10 +2,8 @@ package org.bmsk.lifemash.data.remote.profile
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -22,12 +20,6 @@ class ProfileApi(private val client: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(body)
         }.body()
-
-    suspend fun follow(userId: String): Unit =
-        client.post("/api/v1/users/$userId/follow").body()
-
-    suspend fun unfollow(userId: String): Unit =
-        client.delete("/api/v1/users/$userId/follow").body()
 
     suspend fun getMoments(userId: String): List<MomentDto> =
         client.get("/api/v1/users/$userId/moments").body()

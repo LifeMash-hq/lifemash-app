@@ -15,7 +15,9 @@ import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.domain.calendar.Event
 import org.bmsk.lifemash.domain.profile.CalendarDayEvent
 import org.bmsk.lifemash.domain.profile.ProfileEvent
+import org.bmsk.lifemash.domain.profile.CalendarViewMode
 import org.bmsk.lifemash.domain.profile.ProfileSettings
+import org.bmsk.lifemash.domain.profile.ProfileSubTab
 import org.bmsk.lifemash.domain.usecase.calendar.DeleteEventUseCase
 import org.bmsk.lifemash.domain.usecase.calendar.GetMonthEventsUseCase
 import org.bmsk.lifemash.domain.usecase.calendar.GetMyGroupsUseCase
@@ -47,10 +49,10 @@ internal class ProfileViewModel(
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         viewModelScope.launch {
             val settings = runCatching { getProfileSettingsUseCase() }
-                .getOrElse { ProfileSettings() }
+                .getOrElse { ProfileSettings.Default }
 
-            val defaultSubTab = if (settings.defaultSubTab == "calendar") ProfileSubTab.Calendar else ProfileSubTab.Moments
-            val viewMode = if (settings.myCalendarViewMode == "chip") CalendarViewMode.Chip else CalendarViewMode.Dot
+            val defaultSubTab = settings.defaultSubTab
+            val viewMode = settings.myCalendarViewMode
 
             getUserProfileUseCase(userId)
                 .catch { _uiState.value = ProfileUiState.Error(it.message ?: "알 수 없는 오류") }
@@ -70,9 +72,8 @@ internal class ProfileViewModel(
 
     private fun loadMoments(userId: String) {
         viewModelScope.launch {
-            getProfileMomentsUseCase(userId)
-                .catch { e -> e.printStackTrace() }
-                .collect { moments ->
+            runCatching { getProfileMomentsUseCase(userId) }
+                .onSuccess { moments ->
                     _uiState.update { state ->
                         if (state is ProfileUiState.Loaded) state.copy(moments = moments) else state
                     }

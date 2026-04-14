@@ -52,7 +52,9 @@ import org.bmsk.lifemash.designsystem.component.NetworkImage
 import org.bmsk.lifemash.designsystem.theme.LifeMashShadow
 import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
 import org.bmsk.lifemash.domain.profile.CalendarDayEvent
-import org.bmsk.lifemash.domain.profile.Moment
+import org.bmsk.lifemash.domain.profile.ProfileSubTab
+import org.bmsk.lifemash.domain.profile.CalendarViewMode
+import org.bmsk.lifemash.domain.moment.Moment
 import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.UserProfile
 import androidx.compose.ui.text.style.TextOverflow
@@ -106,7 +108,7 @@ fun MyProfileScreen(
                             )
                         }
                         when (uiState.selectedSubTab) {
-                            ProfileSubTab.Moments -> {
+                            ProfileSubTab.MOMENTS -> {
                                 item {
                                     PhotoGrid(
                                         moments = uiState.moments,
@@ -120,7 +122,7 @@ fun MyProfileScreen(
                                     )
                                 }
                             }
-                            ProfileSubTab.Calendar -> {
+                            ProfileSubTab.CALENDAR -> {
                                 item {
                                     CalendarSection(
                                         year = uiState.selectedYear,
@@ -152,7 +154,7 @@ fun MyProfileScreen(
                         }
                     }
 
-                    if (uiState.selectedSubTab == ProfileSubTab.Calendar) {
+                    if (uiState.selectedSubTab == ProfileSubTab.CALENDAR) {
                         FloatingActionButton(
                             onClick = {
                                 onNavigateToEventCreate(
@@ -240,11 +242,11 @@ internal fun ProfileHeader(
         LifeMashProfileSubTabs(
             tabs = listOf("순간", "캘린더"),
             selectedIndex = when (selectedSubTab) {
-                ProfileSubTab.Moments -> 0
-                ProfileSubTab.Calendar -> 1
+                ProfileSubTab.MOMENTS -> 0
+                ProfileSubTab.CALENDAR -> 1
             },
             onTabSelect = { index ->
-                onSubTabSelect(if (index == 0) ProfileSubTab.Moments else ProfileSubTab.Calendar)
+                onSubTabSelect(if (index == 0) ProfileSubTab.MOMENTS else ProfileSubTab.CALENDAR)
             },
         )
     }
@@ -505,7 +507,7 @@ internal fun CalendarSection(
                             val events = calendarEvents[day] ?: emptyList()
                             val isSelected = day == selectedDay
 
-                            if (viewMode == CalendarViewMode.Chip) {
+                            if (viewMode == CalendarViewMode.CHIP) {
                                 CalendarChipDayCell(
                                     day = day,
                                     events = events,

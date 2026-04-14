@@ -15,7 +15,7 @@ import org.bmsk.lifemash.domain.calendar.Group
 import org.bmsk.lifemash.domain.calendar.GroupType
 import org.bmsk.lifemash.domain.calendar.EventRepository
 import org.bmsk.lifemash.domain.calendar.GroupRepository
-import org.bmsk.lifemash.domain.profile.Moment
+import org.bmsk.lifemash.domain.moment.Moment
 import org.bmsk.lifemash.domain.profile.ProfileSettings
 import org.bmsk.lifemash.domain.profile.UserProfile
 import org.bmsk.lifemash.domain.profile.ProfileRepository
@@ -169,10 +169,10 @@ class ProfileViewModelTest {
         val viewModel = createViewModel()
         viewModel.loadProfile("user-1")
 
-        viewModel.selectSubTab(ProfileSubTab.Calendar)
+        viewModel.selectSubTab(ProfileSubTab.CALENDAR)
 
         val state = viewModel.uiState.value as ProfileUiState.Loaded
-        assertEquals(ProfileSubTab.Calendar, state.selectedSubTab)
+        assertEquals(ProfileSubTab.CALENDAR, state.selectedSubTab)
     }
 
     // ─── selectCalendarDay ─────────────────────────────────────────────────────

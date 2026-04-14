@@ -2,10 +2,10 @@ package org.bmsk.lifemash.main
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +13,7 @@ import org.bmsk.lifemash.auth.api.AuthNavGraphInfo
 import org.bmsk.lifemash.auth.api.AuthRoute
 import org.bmsk.lifemash.auth.impl.authNavGraph
 import org.bmsk.lifemash.calendar.api.CalendarNavGraphInfo
+import org.bmsk.lifemash.calendar.api.EventCreateRoute
 import org.bmsk.lifemash.calendar.impl.calendarNavGraph
 import org.bmsk.lifemash.eventdetail.api.EventDetailRoute
 import org.bmsk.lifemash.eventdetail.impl.eventDetailNavGraph
@@ -26,7 +27,6 @@ import org.bmsk.lifemash.profile.api.UserProfileRoute
 import org.bmsk.lifemash.profile.impl.profileEditNavGraph
 import org.bmsk.lifemash.profile.impl.userProfileNavGraph
 import org.koin.compose.viewmodel.koinViewModel
-import org.bmsk.lifemash.calendar.api.EventCreateRoute
 
 @Composable
 fun MainScreen(
@@ -36,9 +36,6 @@ fun MainScreen(
     val rootNavController = rememberNavController()
     val mainViewModel = koinViewModel<MainViewModel>()
     val authState by mainViewModel.authState.collectAsStateWithLifecycle()
-
-    println("[AuthDiag] MainScreen recompose, authState=$authState")
-
     if (authState is AuthState.Loading) return
 
     val currentUser = when (val state = authState) {
@@ -47,7 +44,6 @@ fun MainScreen(
     }
 
     val startDestination: Any = remember { if (currentUser != null) MainTabRoute else AuthRoute }
-    println("[AuthDiag] MainScreen startDest=$startDestination, currentUser=${currentUser?.nickname}, backStack=${rootNavController.currentDestination?.route}")
 
     NavHost(
         navController = rootNavController,
@@ -80,7 +76,9 @@ fun MainScreen(
         }
 
         // 전체화면 routes (바텀바 없음)
-        eventDetailNavGraph(onBack = { rootNavController.popBackStack() })
+        eventDetailNavGraph(
+            onBack = { rootNavController.popBackStack() }
+        )
 
         calendarNavGraph(
             navInfo = CalendarNavGraphInfo(
@@ -97,7 +95,9 @@ fun MainScreen(
             )
         )
 
-        profileEditNavGraph(onBack = { rootNavController.popBackStack() })
+        profileEditNavGraph(
+            onBack = { rootNavController.popBackStack() }
+        )
 
         userProfileNavGraph(
             onBack = { rootNavController.popBackStack() },
@@ -110,12 +110,10 @@ fun MainScreen(
             AuthNavGraphInfo(
                 onSignInComplete = { isNewUser ->
                     val destination = if (isNewUser) OnboardingRoute else MainTabRoute
-                    println("[AuthDiag] onSignInComplete navigate to $destination, current=${rootNavController.currentDestination?.route}")
                     rootNavController.navigate(destination) {
                         popUpTo(rootNavController.graph.startDestinationId) { inclusive = true }
                         launchSingleTop = true
                     }
-                    println("[AuthDiag] onSignInComplete navigate done")
                 },
                 onShowErrorSnackbar = onShowErrorSnackbar,
             )

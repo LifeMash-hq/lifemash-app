@@ -9,9 +9,4 @@ interface ProfileRepository {
         bio: String?,
         profileImage: String?,
     ): UserProfile
-    suspend fun follow(userId: String)
-    suspend fun unfollow(userId: String)
-    fun getMoments(userId: String): Flow<List<Moment>>
-    suspend fun getProfileSettings(): ProfileSettings
-    suspend fun updateProfileSettings(settings: ProfileSettings)
 }

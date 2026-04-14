@@ -7,7 +7,7 @@ import org.bmsk.lifemash.onboarding.api.OnboardingRoute
 
 fun NavGraphBuilder.onboardingNavGraph(navInfo: OnboardingNavGraphInfo) {
     composable<OnboardingRoute> {
-        OnboardingRouteScreen(
+        OnboardingRoute(
             onOnboardingComplete = navInfo.onOnboardingComplete,
             onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
         )

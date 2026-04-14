@@ -3,8 +3,10 @@ package org.bmsk.lifemash.data.core.profile
 import org.bmsk.lifemash.data.remote.profile.dto.MomentDto
 import org.bmsk.lifemash.data.remote.profile.dto.MomentMediaDto
 import org.bmsk.lifemash.data.remote.profile.dto.ProfileDto
-import org.bmsk.lifemash.domain.profile.Moment
-import org.bmsk.lifemash.domain.profile.ProfileMomentMedia
+import org.bmsk.lifemash.domain.moment.MediaType
+import org.bmsk.lifemash.domain.moment.Moment
+import org.bmsk.lifemash.domain.moment.MomentMedia
+import org.bmsk.lifemash.domain.moment.Visibility
 import org.bmsk.lifemash.domain.profile.UserProfile
 
 internal fun ProfileDto.toDomain(isFollowing: Boolean = false): UserProfile =
@@ -26,15 +28,17 @@ internal fun MomentDto.toDomain(): Moment =
         eventTitle = eventTitle,
         authorId = authorId,
         authorNickname = authorNickname,
-        media = media.map { it.toDomain() },
         caption = caption,
-        visibility = visibility,
+        visibility = runCatching { Visibility.valueOf(visibility.uppercase()) }
+            .getOrDefault(Visibility.PUBLIC),
+        media = media.map { it.toDomain() },
         createdAt = createdAt,
     )
 
-private fun MomentMediaDto.toDomain(): ProfileMomentMedia =
-    ProfileMomentMedia(
+private fun MomentMediaDto.toDomain(): MomentMedia =
+    MomentMedia(
         mediaUrl = mediaUrl,
-        mediaType = mediaType,
+        mediaType = runCatching { MediaType.valueOf(mediaType.uppercase()) }
+            .getOrDefault(MediaType.IMAGE),
         sortOrder = sortOrder,
     )
