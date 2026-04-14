@@ -26,7 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -195,35 +195,29 @@ internal fun DateTimePickerContent(
             TimeRow(
                 label = "시작 시간",
                 value = localDateTime.startTime?.formatted() ?: "09:00",
-                onClick = { showTimePicker = TimePickerTarget.START },
+                isExpanded = showTimePicker == TimePickerTarget.START,
+                onClick = {
+                    showTimePicker = if (showTimePicker == TimePickerTarget.START) null
+                    else TimePickerTarget.START
+                },
+                onTimeChange = { time ->
+                    localDateTime = localDateTime.copy(startTime = time)
+                },
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             TimeRow(
                 label = "종료 시간",
                 value = localDateTime.endTime?.formatted() ?: "11:00",
-                onClick = { showTimePicker = TimePickerTarget.END },
+                isExpanded = showTimePicker == TimePickerTarget.END,
+                onClick = {
+                    showTimePicker = if (showTimePicker == TimePickerTarget.END) null
+                    else TimePickerTarget.END
+                },
+                onTimeChange = { time ->
+                    localDateTime = localDateTime.copy(endTime = time)
+                },
             )
         }
-    }
-
-    // 시간 선택 다이얼로그
-    showTimePicker?.let { target ->
-        val initial = when (target) {
-            TimePickerTarget.START -> localDateTime.startTime ?: TimeOfDay(9, 0)
-            TimePickerTarget.END -> localDateTime.endTime ?: TimeOfDay(11, 0)
-        }
-        TimePickerDialog(
-            title = if (target == TimePickerTarget.START) "시작 시간" else "종료 시간",
-            initialTime = initial,
-            onConfirm = { time ->
-                localDateTime = when (target) {
-                    TimePickerTarget.START -> localDateTime.copy(startTime = time)
-                    TimePickerTarget.END -> localDateTime.copy(endTime = time)
-                }
-                showTimePicker = null
-            },
-            onDismiss = { showTimePicker = null },
-        )
     }
 }
 
@@ -262,64 +256,64 @@ private fun CalendarDayCell(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimeRow(
     label: String,
     value: String,
+    isExpanded: Boolean,
     onClick: () -> Unit,
+    onTimeChange: (TimeOfDay) -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = LifeMashSpacing.xl, vertical = LifeMashSpacing.md),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Box(
+    val timeParts = value.split(":")
+    val hour = timeParts.getOrNull(0)?.toIntOrNull() ?: 9
+    val minute = timeParts.getOrNull(1)?.toIntOrNull() ?: 0
+    val timeState = rememberTimePickerState(initialHour = hour, initialMinute = minute)
+
+    Column {
+        Row(
             modifier = Modifier
-                .clip(MaterialTheme.shapes.small)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(horizontal = LifeMashSpacing.md, vertical = LifeMashSpacing.xs),
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = LifeMashSpacing.xl, vertical = LifeMashSpacing.md),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = value,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                color = MaterialTheme.colorScheme.primary,
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
             )
+            Box(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .background(
+                        if (isExpanded) MaterialTheme.colorScheme.primaryContainer
+                        else MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                    .padding(horizontal = LifeMashSpacing.md, vertical = LifeMashSpacing.xs),
+            ) {
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+
+        if (isExpanded) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                TimeInput(state = timeState)
+            }
+            // TimeInput 값 변경 시 반영
+            val newTime = TimeOfDay(timeState.hour, timeState.minute)
+            if (newTime.hour != hour || newTime.minute != minute) {
+                onTimeChange(newTime)
+            }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TimePickerDialog(
-    title: String,
-    initialTime: TimeOfDay,
-    onConfirm: (TimeOfDay) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val state = rememberTimePickerState(
-        initialHour = initialTime.hour,
-        initialMinute = initialTime.minute,
-    )
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(title) },
-        text = { TimePicker(state = state) },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(TimeOfDay(state.hour, state.minute)) }) {
-                Text("확인")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("취소") }
-        },
-    )
 }
 
 private fun buildCalendarCells(year: Int, month: Int): List<Int?> {
