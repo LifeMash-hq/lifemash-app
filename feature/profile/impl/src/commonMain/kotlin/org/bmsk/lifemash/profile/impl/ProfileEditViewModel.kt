@@ -15,10 +15,10 @@ import org.bmsk.lifemash.domain.usecase.profile.UpdateProfileSettingsUseCase
 import org.bmsk.lifemash.domain.usecase.profile.UpdateProfileUseCase
 
 internal class ProfileEditViewModel(
-    private val getUserProfile: GetUserProfileUseCase,
-    private val getProfileSettings: GetProfileSettingsUseCase,
-    private val updateProfile: UpdateProfileUseCase,
-    private val updateProfileSettings: UpdateProfileSettingsUseCase,
+    private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val getProfileSettingsUseCase: GetProfileSettingsUseCase,
+    private val updateProfileUseCase: UpdateProfileUseCase,
+    private val updateProfileSettingsUseCase: UpdateProfileSettingsUseCase,
     private val uploadService: UploadService,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileEditUiState.Default)
@@ -27,8 +27,8 @@ internal class ProfileEditViewModel(
     fun load() {
         viewModelScope.launch {
             runCatching {
-                val settings = getProfileSettings()
-                getUserProfile("me").collect { p ->
+                val settings = getProfileSettingsUseCase()
+                getUserProfileUseCase("me").collect { p ->
                     _uiState.update {
                         it.copy(
                             name = p.nickname,
@@ -99,12 +99,12 @@ internal class ProfileEditViewModel(
 
         viewModelScope.launch {
             runCatching {
-                updateProfile(
+                updateProfileUseCase(
                     nickname = state.name.takeIf { it.isNotBlank() },
                     bio = state.bio.takeIf { it.isNotBlank() },
                     profileImage = state.profileImageUrl,
                 )
-                updateProfileSettings(
+                updateProfileSettingsUseCase(
                     ProfileSettings(
                         defaultSubTab = if (state.defaultSubTab == 1) "calendar" else "moments",
                         myCalendarViewMode = if (state.myCalendarView == 1) "chip" else "dot",

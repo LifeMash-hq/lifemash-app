@@ -9,7 +9,7 @@ val localProps = Properties().apply {
     rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 val iosDebugBackendUrl: String = localProps.getProperty("BACKEND_BASE_URL")
-    ?: "https://lifemash-backend.onrender.com"
+    ?: "https://dev.lifemash.app"
 
 val generateIosBackendConfig by tasks.registering {
     val outputDir = layout.buildDirectory.dir("generated/iosMain/kotlin")

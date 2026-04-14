@@ -17,10 +17,10 @@ import org.bmsk.lifemash.domain.usecase.calendar.GetMyGroupsUseCase
 import org.bmsk.lifemash.domain.usecase.follow.GetFollowersUseCase
 
 internal class VisibilitySheetViewModel(
-    private val getCurrentUser: GetCurrentUserUseCase,
-    private val getMyGroups: GetMyGroupsUseCase,
-    private val getFollowers: GetFollowersUseCase,
-    private val createGroup: CreateGroupUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val getMyGroupsUseCase: GetMyGroupsUseCase,
+    private val getFollowersUseCase: GetFollowersUseCase,
+    private val createGroupUseCase: CreateGroupUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<VisibilitySheetUiState>(VisibilitySheetUiState.Loading)
@@ -34,10 +34,10 @@ internal class VisibilitySheetViewModel(
         _uiState.value = VisibilitySheetUiState.Loading
         viewModelScope.launch {
             runCatching {
-                val userId = getCurrentUser().first()?.id
+                val userId = getCurrentUserUseCase().first()?.id
                     ?: error("로그인 필요")
-                val groupsDeferred = async { getMyGroups() }
-                val followersDeferred = async { getFollowers(userId) }
+                val groupsDeferred = async { getMyGroupsUseCase() }
+                val followersDeferred = async { getFollowersUseCase(userId) }
                 VisibilitySheetUiState.Ready(
                     groups = groupsDeferred.await(),
                     followers = followersDeferred.await(),
@@ -53,7 +53,7 @@ internal class VisibilitySheetViewModel(
         val current = _uiState.value as? VisibilitySheetUiState.Ready ?: return
         _uiState.value = current.copy(groupCreation = GroupCreationState.InProgress)
         viewModelScope.launch {
-            runCatching { createGroup(type, name) }
+            runCatching { createGroupUseCase(type, name) }
                 .fold(
                     onSuccess = { load() },
                     onFailure = { e ->

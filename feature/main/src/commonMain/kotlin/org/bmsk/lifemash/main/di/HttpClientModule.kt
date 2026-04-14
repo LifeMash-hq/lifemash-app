@@ -28,7 +28,7 @@ fun httpClientModule(backendBaseUrl: String) = module {
             install(ContentNegotiation) {
                 json(Json { ignoreUnknownKeys = true; isLenient = true })
             }
-            install(Logging) { level = LogLevel.BODY }
+            install(Logging) { level = LogLevel.HEADERS }
         }
     }
 
@@ -64,13 +64,13 @@ fun httpClientModule(backendBaseUrl: String) = module {
                     }
                 }
             }
-            install(Logging) { level = LogLevel.BODY }
+            install(Logging) { level = LogLevel.HEADERS }
         }
     }
 
     single<HttpClient>(named("upload")) {
         HttpClient(createPlatformHttpClientEngine()) {
-            install(Logging) { level = LogLevel.BODY }
+            install(Logging) { level = LogLevel.HEADERS }
         }
     }
 }

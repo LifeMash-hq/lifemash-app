@@ -8,9 +8,10 @@ plugins {
 
 val localProps = gradleLocalProperties(rootDir, providers)
 val kakaoNativeAppKey: String = localProps.getProperty("KAKAO_NATIVE_APP_KEY", "")
-val backendBaseUrl = "https://lifemash-backend.onrender.com"
+val prodBackendBaseUrl = "https://lifemash.app"
+val devBackendBaseUrl = "https://dev.lifemash.app"
 val debugBackendUrl: String = localProps.getProperty("BACKEND_BASE_URL", null)
-    ?: backendBaseUrl
+    ?: devBackendBaseUrl
 
 android {
     defaultConfig {
@@ -31,7 +32,7 @@ android {
         }
         release {
             signingConfig = signingConfigs.getByName("release")
-            buildConfigField("String", "BACKEND_BASE_URL", "\"$backendBaseUrl\"")
+            buildConfigField("String", "BACKEND_BASE_URL", "\"$prodBackendBaseUrl\"")
         }
     }
     buildFeatures {

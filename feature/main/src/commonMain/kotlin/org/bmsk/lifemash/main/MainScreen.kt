@@ -2,6 +2,7 @@ package org.bmsk.lifemash.main
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -36,6 +37,8 @@ fun MainScreen(
     val mainViewModel = koinViewModel<MainViewModel>()
     val authState by mainViewModel.authState.collectAsStateWithLifecycle()
 
+    println("[AuthDiag] MainScreen recompose, authState=$authState")
+
     if (authState is AuthState.Loading) return
 
     val currentUser = when (val state = authState) {
@@ -43,7 +46,8 @@ fun MainScreen(
         is AuthState.Unauthenticated, AuthState.Loading -> null
     }
 
-    val startDestination: Any = if (currentUser != null) MainTabRoute else AuthRoute
+    val startDestination: Any = remember { if (currentUser != null) MainTabRoute else AuthRoute }
+    println("[AuthDiag] MainScreen startDest=$startDestination, currentUser=${currentUser?.nickname}, backStack=${rootNavController.currentDestination?.route}")
 
     NavHost(
         navController = rootNavController,
@@ -106,10 +110,12 @@ fun MainScreen(
             AuthNavGraphInfo(
                 onSignInComplete = { isNewUser ->
                     val destination = if (isNewUser) OnboardingRoute else MainTabRoute
+                    println("[AuthDiag] onSignInComplete navigate to $destination, current=${rootNavController.currentDestination?.route}")
                     rootNavController.navigate(destination) {
                         popUpTo(rootNavController.graph.startDestinationId) { inclusive = true }
                         launchSingleTop = true
                     }
+                    println("[AuthDiag] onSignInComplete navigate done")
                 },
                 onShowErrorSnackbar = onShowErrorSnackbar,
             )

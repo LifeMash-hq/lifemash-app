@@ -15,9 +15,9 @@ import org.bmsk.lifemash.domain.usecase.calendar.GetMyGroupsUseCase
 import org.bmsk.lifemash.domain.usecase.calendar.UpdateEventUseCase
 
 internal class EventCreateViewModel(
-    private val getMyGroups: GetMyGroupsUseCase,
-    private val createEvent: CreateEventUseCase,
-    private val updateEvent: UpdateEventUseCase,
+    private val getMyGroupsUseCase: GetMyGroupsUseCase,
+    private val createEventUseCase: CreateEventUseCase,
+    private val updateEventUseCase: UpdateEventUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(EventCreateUiState.Default)
     val uiState: StateFlow<EventCreateUiState> = _uiState.asStateFlow()
@@ -31,7 +31,7 @@ internal class EventCreateViewModel(
         }
         viewModelScope.launch {
             runCatching {
-                val groups = getMyGroups()
+                val groups = getMyGroupsUseCase()
                 resolvedGroupId = groups.firstOrNull()?.id
             }.onFailure { /* 그룹 없으면 무시 */ }
         }
@@ -54,7 +54,7 @@ internal class EventCreateViewModel(
 
         viewModelScope.launch {
             runCatching {
-                createEvent(
+                createEventUseCase(
                     groupId = gId,
                     title = title,
                     description = memo,
@@ -91,7 +91,7 @@ internal class EventCreateViewModel(
 
         viewModelScope.launch {
             runCatching {
-                updateEvent(
+                updateEventUseCase(
                     groupId = groupId,
                     eventId = event.id,
                     title = title,

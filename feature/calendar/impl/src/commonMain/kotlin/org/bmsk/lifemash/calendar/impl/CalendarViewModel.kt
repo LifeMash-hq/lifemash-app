@@ -21,12 +21,12 @@ import org.bmsk.lifemash.domain.usecase.calendar.JoinGroupUseCase
 import org.bmsk.lifemash.domain.usecase.calendar.UpdateGroupNameUseCase
 
 internal class CalendarViewModel(
-    private val getMonthEvents: GetMonthEventsUseCase,
-    private val getMyGroups: GetMyGroupsUseCase,
-    private val createGroup: CreateGroupUseCase,
-    private val joinGroup: JoinGroupUseCase,
-    private val updateGroupName: UpdateGroupNameUseCase,
-    private val deleteEvent: DeleteEventUseCase,
+    private val getMonthEventsUseCase: GetMonthEventsUseCase,
+    private val getMyGroupsUseCase: GetMyGroupsUseCase,
+    private val createGroupUseCase: CreateGroupUseCase,
+    private val joinGroupUseCase: JoinGroupUseCase,
+    private val updateGroupNameUseCase: UpdateGroupNameUseCase,
+    private val deleteEventUseCase: DeleteEventUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalendarUiState.Default)
@@ -44,7 +44,7 @@ internal class CalendarViewModel(
         _uiState.update { it.copy(currentYear = year, currentMonth = month) }
         viewModelScope.launch {
             runCatching {
-                getMonthEvents(groupId, year, month)
+                getMonthEventsUseCase(groupId, year, month)
             }.onFailure { e ->
                 _uiState.update { it.copy(errorMessage = e.message ?: "일정 로드 실패") }
             }.onSuccess { events ->
@@ -60,7 +60,7 @@ internal class CalendarViewModel(
         val state = _uiState.value
         viewModelScope.launch {
             runCatching {
-                getMonthEvents(groupId, state.currentYear, state.currentMonth)
+                getMonthEventsUseCase(groupId, state.currentYear, state.currentMonth)
             }.onFailure { e ->
                 _uiState.update { it.copy(errorMessage = e.message ?: "일정 로드 실패") }
             }.onSuccess { events ->
@@ -85,7 +85,7 @@ internal class CalendarViewModel(
         _uiState.update { it.copy(isCreatingGroup = true) }
         viewModelScope.launch {
             runCatching {
-                val group = this@CalendarViewModel.createGroup.invoke(type, name)
+                val group = createGroupUseCase(type, name)
                 _uiState.update { state ->
                     state.copy(
                         groups = (state.groups.toList() + group).toPersistentList(),
@@ -94,7 +94,7 @@ internal class CalendarViewModel(
                     )
                 }
                 val state = _uiState.value
-                val events = getMonthEvents(group.id, state.currentYear, state.currentMonth)
+                val events = getMonthEventsUseCase(group.id, state.currentYear, state.currentMonth)
                 _uiState.update { it.copy(events = events.toPersistentList()) }
             }.onFailure { e ->
                 _uiState.update { it.copy(isCreatingGroup = false, errorMessage = e.message ?: "그룹 생성 실패") }
@@ -106,7 +106,7 @@ internal class CalendarViewModel(
         _uiState.update { it.copy(isCreatingGroup = true) }
         viewModelScope.launch {
             runCatching {
-                val group = this@CalendarViewModel.joinGroup.invoke(inviteCode)
+                val group = joinGroupUseCase(inviteCode)
                 _uiState.update { state ->
                     state.copy(
                         groups = (state.groups.toList() + group).toPersistentList(),
@@ -115,7 +115,7 @@ internal class CalendarViewModel(
                     )
                 }
                 val state = _uiState.value
-                val events = getMonthEvents(group.id, state.currentYear, state.currentMonth)
+                val events = getMonthEventsUseCase(group.id, state.currentYear, state.currentMonth)
                 _uiState.update { it.copy(events = events.toPersistentList()) }
             }.onFailure { e ->
                 _uiState.update { it.copy(isCreatingGroup = false, errorMessage = e.message ?: "그룹 참여 실패") }
@@ -128,7 +128,7 @@ internal class CalendarViewModel(
         val groupId = state.selectedGroup?.id ?: return
         viewModelScope.launch {
             runCatching {
-                val events = getMonthEvents(groupId, state.currentYear, state.currentMonth)
+                val events = getMonthEventsUseCase(groupId, state.currentYear, state.currentMonth)
                 _uiState.update { it.copy(events = events.toPersistentList()) }
             }.onFailure { e ->
                 _uiState.update { it.copy(errorMessage = e.message ?: "일정 로드 실패") }
@@ -139,10 +139,10 @@ internal class CalendarViewModel(
     fun deleteEvent(groupId: String, eventId: String) {
         viewModelScope.launch {
             runCatching {
-                this@CalendarViewModel.deleteEvent.invoke(groupId, eventId)
+                deleteEventUseCase(groupId, eventId)
                 _uiState.update { it.copy(overlay = CalendarOverlay.None) }
                 val state = _uiState.value
-                val events = getMonthEvents(groupId, state.currentYear, state.currentMonth)
+                val events = getMonthEventsUseCase(groupId, state.currentYear, state.currentMonth)
                 _uiState.update { it.copy(events = events.toPersistentList()) }
             }.onFailure { e ->
                 _uiState.update { it.copy(errorMessage = e.message ?: "일정 삭제 실패") }
@@ -154,7 +154,7 @@ internal class CalendarViewModel(
         _uiState.update { it.copy(isRenamingGroup = true) }
         viewModelScope.launch {
             runCatching {
-                val updatedGroup = this@CalendarViewModel.updateGroupName.invoke(groupId, name)
+                val updatedGroup = updateGroupNameUseCase(groupId, name)
                 _uiState.update { state ->
                     state.copy(
                         groups = state.groups.map {
@@ -174,7 +174,7 @@ internal class CalendarViewModel(
     internal fun loadGroups() {
         viewModelScope.launch {
             runCatching {
-                val groups = getMyGroups()
+                val groups = getMyGroupsUseCase()
                 val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 val monthInt = now.month.ordinal + 1
                 _uiState.update {
@@ -188,7 +188,7 @@ internal class CalendarViewModel(
                     )
                 }
                 groups.firstOrNull()?.let { group ->
-                    val events = getMonthEvents(group.id, now.year, monthInt)
+                    val events = getMonthEventsUseCase(group.id, now.year, monthInt)
                     _uiState.update { it.copy(events = events.toPersistentList()) }
                 }
             }.onFailure { e ->

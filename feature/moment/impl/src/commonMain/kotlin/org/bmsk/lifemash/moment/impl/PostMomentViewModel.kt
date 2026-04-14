@@ -16,8 +16,8 @@ import org.bmsk.lifemash.domain.usecase.moment.GetCurrentMonthGroupEventsUseCase
 
 @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
 internal class PostMomentViewModel(
-    private val createMoment: CreateMomentUseCase,
-    private val getCurrentMonthGroupEvents: GetCurrentMonthGroupEventsUseCase,
+    private val createMomentUseCase: CreateMomentUseCase,
+    private val getCurrentMonthGroupEventsUseCase: GetCurrentMonthGroupEventsUseCase,
 ) : ViewModel() {
 
     private val _form = MutableStateFlow(PostMomentFormState.Default)
@@ -35,7 +35,7 @@ internal class PostMomentViewModel(
 
     private fun loadEvents() {
         viewModelScope.launch {
-            runCatching { getCurrentMonthGroupEvents() }
+            runCatching { getCurrentMonthGroupEventsUseCase() }
                 .onSuccess { events -> _events.value = events }
         }
     }
@@ -98,7 +98,7 @@ internal class PostMomentViewModel(
                     )
                 }
 
-                createMoment(
+                createMomentUseCase(
                     eventId = state.eventId,
                     caption = state.caption.ifBlank { null },
                     visibility = state.visibility,

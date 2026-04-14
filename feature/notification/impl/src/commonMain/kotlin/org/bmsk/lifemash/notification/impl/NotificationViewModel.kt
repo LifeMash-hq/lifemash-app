@@ -11,8 +11,8 @@ import org.bmsk.lifemash.domain.usecase.notification.GetNotificationsUseCase
 import org.bmsk.lifemash.domain.usecase.notification.MarkNotificationReadUseCase
 
 internal class NotificationViewModel(
-    private val getNotifications: GetNotificationsUseCase,
-    private val markNotificationRead: MarkNotificationReadUseCase,
+    private val getNotificationsUseCase: GetNotificationsUseCase,
+    private val markNotificationReadUseCase: MarkNotificationReadUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<NotificationUiState>(NotificationUiState.Loading)
@@ -25,7 +25,7 @@ internal class NotificationViewModel(
     fun loadNotifications() {
         viewModelScope.launch {
             _uiState.value = NotificationUiState.Loading
-            runCatching { getNotifications() }
+            runCatching { getNotificationsUseCase() }
                 .onSuccess { notifications ->
                     _uiState.value = if (notifications.isEmpty()) {
                         NotificationUiState.Empty
@@ -46,7 +46,7 @@ internal class NotificationViewModel(
 
         viewModelScope.launch {
             unread.forEach { notification ->
-                runCatching { markNotificationRead(notification.id) }
+                runCatching { markNotificationReadUseCase(notification.id) }
             }
             loadNotifications()
         }

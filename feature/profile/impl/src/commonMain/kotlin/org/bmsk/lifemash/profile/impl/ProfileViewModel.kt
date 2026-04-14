@@ -28,15 +28,15 @@ import org.bmsk.lifemash.domain.usecase.profile.GetUserProfileUseCase
 import kotlin.time.Clock
 
 internal class ProfileViewModel(
-    private val getUserProfile: GetUserProfileUseCase,
-    private val getProfileSettings: GetProfileSettingsUseCase,
-    private val getProfileMoments: GetProfileMomentsUseCase,
-    private val getMyGroups: GetMyGroupsUseCase,
-    private val getMonthEvents: GetMonthEventsUseCase,
-    private val updateEvent: UpdateEventUseCase,
-    private val deleteEvent: DeleteEventUseCase,
-    private val followUser: FollowUserUseCase,
-    private val unfollowUser: UnfollowUserUseCase,
+    private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val getProfileSettingsUseCase: GetProfileSettingsUseCase,
+    private val getProfileMomentsUseCase: GetProfileMomentsUseCase,
+    private val getMyGroupsUseCase: GetMyGroupsUseCase,
+    private val getMonthEventsUseCase: GetMonthEventsUseCase,
+    private val updateEventUseCase: UpdateEventUseCase,
+    private val deleteEventUseCase: DeleteEventUseCase,
+    private val followUserUseCase: FollowUserUseCase,
+    private val unfollowUserUseCase: UnfollowUserUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
@@ -46,13 +46,13 @@ internal class ProfileViewModel(
     fun loadProfile(userId: String) {
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         viewModelScope.launch {
-            val settings = runCatching { getProfileSettings() }
+            val settings = runCatching { getProfileSettingsUseCase() }
                 .getOrElse { ProfileSettings() }
 
             val defaultSubTab = if (settings.defaultSubTab == "calendar") ProfileSubTab.Calendar else ProfileSubTab.Moments
             val viewMode = if (settings.myCalendarViewMode == "chip") CalendarViewMode.Chip else CalendarViewMode.Dot
 
-            getUserProfile(userId)
+            getUserProfileUseCase(userId)
                 .catch { _uiState.value = ProfileUiState.Error(it.message ?: "알 수 없는 오류") }
                 .collect { profile ->
                     _uiState.value = ProfileUiState.Loaded(
@@ -70,7 +70,7 @@ internal class ProfileViewModel(
 
     private fun loadMoments(userId: String) {
         viewModelScope.launch {
-            getProfileMoments(userId)
+            getProfileMomentsUseCase(userId)
                 .catch { e -> e.printStackTrace() }
                 .collect { moments ->
                     _uiState.update { state ->
@@ -83,7 +83,7 @@ internal class ProfileViewModel(
     private fun loadGroupAndEvents(year: Int, month: Int) {
         viewModelScope.launch {
             runCatching {
-                val groups = getMyGroups()
+                val groups = getMyGroupsUseCase()
                 val firstGroup = groups.firstOrNull() ?: return@runCatching
                 groupId = firstGroup.id
                 loadEvents(firstGroup.id, year, month)
@@ -93,7 +93,7 @@ internal class ProfileViewModel(
 
     private suspend fun loadEvents(gId: String, year: Int, month: Int) {
         runCatching {
-            val events = getMonthEvents(gId, year, month)
+            val events = getMonthEventsUseCase(gId, year, month)
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val today = LocalDate(now.year, now.month, now.day)
 
@@ -172,7 +172,7 @@ internal class ProfileViewModel(
         val gId = groupId ?: return
         viewModelScope.launch {
             runCatching {
-                updateEvent(
+                updateEventUseCase(
                     groupId = gId,
                     eventId = eventId,
                     title = title,
@@ -198,7 +198,7 @@ internal class ProfileViewModel(
         val gId = groupId ?: return
         viewModelScope.launch {
             runCatching {
-                deleteEvent(gId, eventId)
+                deleteEventUseCase(gId, eventId)
             }.onSuccess {
                 reloadEvents()
             }.onFailure { e ->
@@ -221,7 +221,7 @@ internal class ProfileViewModel(
         _uiState.value = loaded.copy(profile = loaded.profile.copy(isFollowing = !wasFollowing))
         viewModelScope.launch {
             runCatching {
-                if (wasFollowing) unfollowUser(userId) else followUser(userId)
+                if (wasFollowing) unfollowUserUseCase(userId) else followUserUseCase(userId)
             }.onFailure {
                 _uiState.update { state ->
                     if (state is ProfileUiState.Loaded)

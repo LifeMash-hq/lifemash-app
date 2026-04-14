@@ -18,16 +18,16 @@ import org.bmsk.lifemash.domain.usecase.eventdetail.ToggleEventJoinUseCase
 import kotlin.time.Instant
 
 internal class EventDetailViewModel(
-    private val getEventDetail: GetEventDetailUseCase,
-    private val toggleEventJoin: ToggleEventJoinUseCase,
-    private val addEventComment: AddEventCommentUseCase,
+    private val getEventDetailUseCase: GetEventDetailUseCase,
+    private val toggleEventJoinUseCase: ToggleEventJoinUseCase,
+    private val addEventCommentUseCase: AddEventCommentUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<EventDetailUiState>(EventDetailUiState.Loading)
     val uiState: StateFlow<EventDetailUiState> = _uiState.asStateFlow()
 
     fun loadEvent(eventId: String) {
         viewModelScope.launch {
-            runCatching { getEventDetail(eventId) }
+            runCatching { getEventDetailUseCase(eventId) }
                 .onSuccess { detail ->
                     _uiState.value = EventDetailUiState.Loaded(
                         eventId = detail.id,
@@ -55,7 +55,7 @@ internal class EventDetailViewModel(
     fun toggleJoin(loaded: EventDetailUiState.Loaded) {
         _uiState.value = loaded.copy(isJoined = !loaded.isJoined)
         viewModelScope.launch {
-            runCatching { toggleEventJoin(loaded.eventId) }
+            runCatching { toggleEventJoinUseCase(loaded.eventId) }
                 .onFailure {
                     _uiState.value = loaded.copy(isJoined = loaded.isJoined)
                 }
@@ -64,7 +64,7 @@ internal class EventDetailViewModel(
 
     fun addComment(loaded: EventDetailUiState.Loaded, content: String) {
         viewModelScope.launch {
-            runCatching { addEventComment(loaded.eventId, content) }
+            runCatching { addEventCommentUseCase(loaded.eventId, content) }
                 .onSuccess { comment ->
                     _uiState.value = loaded.copy(
                         comments = loaded.comments + comment.toUi(),

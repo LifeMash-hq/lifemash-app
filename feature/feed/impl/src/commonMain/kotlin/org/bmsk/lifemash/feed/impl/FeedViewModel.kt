@@ -15,10 +15,10 @@ import org.bmsk.lifemash.domain.usecase.feed.GetFeedUseCase
 import org.bmsk.lifemash.domain.usecase.feed.ToggleFeedLikeUseCase
 
 internal class FeedViewModel(
-    private val getFeed: GetFeedUseCase,
-    private val toggleFeedLike: ToggleFeedLikeUseCase,
-    private val getFeedComments: GetFeedCommentsUseCase,
-    private val createFeedComment: CreateFeedCommentUseCase,
+    private val getFeedUseCase: GetFeedUseCase,
+    private val toggleFeedLikeUseCase: ToggleFeedLikeUseCase,
+    private val getFeedCommentsUseCase: GetFeedCommentsUseCase,
+    private val createFeedCommentUseCase: CreateFeedCommentUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<FeedUiState>(FeedUiState.Loading)
     val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()
@@ -30,7 +30,7 @@ internal class FeedViewModel(
         viewModelScope.launch {
             _uiState.value = FeedUiState.Loading
             runCatching {
-                getFeed(
+                getFeedUseCase(
                     filter = _selectedFilter.value,
                     cursor = null,
                     limit = 20,
@@ -71,7 +71,7 @@ internal class FeedViewModel(
         }
         viewModelScope.launch {
             runCatching {
-                toggleFeedLike(postId, wasLiked)
+                toggleFeedLikeUseCase(postId, wasLiked)
             }.onFailure {
                 _uiState.update { state ->
                     if (state is FeedUiState.Loaded) {
@@ -93,14 +93,14 @@ internal class FeedViewModel(
 
     fun loadComments(postId: String) {
         viewModelScope.launch {
-            runCatching { getFeedComments(postId) }
+            runCatching { getFeedCommentsUseCase(postId) }
                 .onSuccess { _comments.value = it }
         }
     }
 
     fun submitComment(postId: String, content: String) {
         viewModelScope.launch {
-            runCatching { createFeedComment(postId, content) }
+            runCatching { createFeedCommentUseCase(postId, content) }
                 .onSuccess { comment ->
                     _comments.update { it + comment }
                     _uiState.update { state ->
@@ -122,7 +122,7 @@ internal class FeedViewModel(
         val cursor = loaded.nextCursor ?: return
         viewModelScope.launch {
             runCatching {
-                getFeed(
+                getFeedUseCase(
                     filter = _selectedFilter.value,
                     cursor = cursor,
                     limit = 20,

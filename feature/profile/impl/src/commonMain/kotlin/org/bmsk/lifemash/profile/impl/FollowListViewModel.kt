@@ -14,11 +14,11 @@ import org.bmsk.lifemash.domain.usecase.follow.GetFollowingUseCase
 import org.bmsk.lifemash.domain.usecase.follow.UnfollowUserUseCase
 
 internal class FollowListViewModel(
-    private val getFollowers: GetFollowersUseCase,
-    private val getFollowing: GetFollowingUseCase,
-    private val getMyGroups: GetMyGroupsUseCase,
-    private val followUser: FollowUserUseCase,
-    private val unfollowUser: UnfollowUserUseCase,
+    private val getFollowersUseCase: GetFollowersUseCase,
+    private val getFollowingUseCase: GetFollowingUseCase,
+    private val getMyGroupsUseCase: GetMyGroupsUseCase,
+    private val followUserUseCase: FollowUserUseCase,
+    private val unfollowUserUseCase: UnfollowUserUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<FollowListUiState>(FollowListUiState.Loading)
     val uiState: StateFlow<FollowListUiState> = _uiState.asStateFlow()
@@ -33,7 +33,7 @@ internal class FollowListViewModel(
         viewModelScope.launch {
             _uiState.value = FollowListUiState.Loading
             runCatching {
-                getFollowers(userId)
+                getFollowersUseCase(userId)
             }.onSuccess { followers ->
                 _uiState.value = FollowListUiState.Loaded(followers = followers)
             }.onFailure { e ->
@@ -46,7 +46,7 @@ internal class FollowListViewModel(
         viewModelScope.launch {
             _followingState.value = FollowListUiState.Loading
             runCatching {
-                getFollowing(userId)
+                getFollowingUseCase(userId)
             }.onSuccess { following ->
                 _followingState.value = FollowListUiState.Loaded(followers = following)
             }.onFailure { e ->
@@ -71,7 +71,7 @@ internal class FollowListViewModel(
         viewModelScope.launch {
             _groupsState.value = GroupsUiState.Loading
             runCatching {
-                getMyGroups()
+                getMyGroupsUseCase()
             }.onSuccess { groups ->
                 _groupsState.value = GroupsUiState.Loaded(groups = groups)
             }.onFailure { e ->
@@ -90,8 +90,8 @@ internal class FollowListViewModel(
         }
         viewModelScope.launch {
             runCatching {
-                if (willUnfollow) unfollowUser(userId)
-                else followUser(userId)
+                if (willUnfollow) unfollowUserUseCase(userId)
+                else followUserUseCase(userId)
             }.onFailure {
                 _followingState.update { state ->
                     if (state is FollowListUiState.Loaded)
@@ -105,8 +105,8 @@ internal class FollowListViewModel(
     fun toggleFollow(userId: String, isCurrentlyFollowing: Boolean) {
         viewModelScope.launch {
             runCatching {
-                if (isCurrentlyFollowing) unfollowUser(userId)
-                else followUser(userId)
+                if (isCurrentlyFollowing) unfollowUserUseCase(userId)
+                else followUserUseCase(userId)
             }
         }
     }

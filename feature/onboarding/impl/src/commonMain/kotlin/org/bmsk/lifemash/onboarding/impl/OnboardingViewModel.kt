@@ -16,8 +16,8 @@ import org.bmsk.lifemash.domain.usecase.onboarding.SaveOnboardingProfileUseCase
 private val HANDLE_REGEX = "^[a-z0-9_]{3,15}$".toRegex()
 
 internal class OnboardingViewModel(
-    private val checkHandle: CheckHandleUseCase,
-    private val saveOnboardingProfile: SaveOnboardingProfileUseCase,
+    private val checkHandleUseCase: CheckHandleUseCase,
+    private val saveOnboardingProfileUseCase: SaveOnboardingProfileUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OnboardingUiState.Default)
@@ -43,7 +43,7 @@ internal class OnboardingViewModel(
                     return@launch
                 }
                 _uiState.update { it.copy(handleStatus = HandleValidationStatus.CHECKING) }
-                runCatching { checkHandle(sanitized) }
+                runCatching { checkHandleUseCase(sanitized) }
                     .onSuccess { isAvailable ->
                         _uiState.update {
                             it.copy(
@@ -71,7 +71,7 @@ internal class OnboardingViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
             runCatching {
-                saveOnboardingProfile(
+                saveOnboardingProfileUseCase(
                     nickname = state.name,
                     username = state.handle,
                     birthDate = state.birthDate.ifBlank { null },

@@ -13,10 +13,10 @@ import org.bmsk.lifemash.domain.usecase.auth.SignInWithGoogleUseCase
 import org.bmsk.lifemash.domain.usecase.auth.SignInWithKakaoUseCase
 
 internal class AuthViewModel(
-    private val signInWithKakao: SignInWithKakaoUseCase,
-    private val signInWithGoogle: SignInWithGoogleUseCase,
-    private val signInWithEmail: SignInWithEmailUseCase,
-    private val getCurrentUser: GetCurrentUserUseCase,
+    private val signInWithKakaoUseCase: SignInWithKakaoUseCase,
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
+    private val signInWithEmailUseCase: SignInWithEmailUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -25,7 +25,7 @@ internal class AuthViewModel(
     fun signInWithKakao(accessToken: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            runCatching { signInWithKakao(accessToken) }
+            runCatching { signInWithKakaoUseCase(accessToken) }
                 .onSuccess { emitSuccess() }
                 .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "로그인 실패") }
         }
@@ -34,7 +34,7 @@ internal class AuthViewModel(
     fun signInWithGoogle(idToken: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            runCatching { signInWithGoogle(idToken) }
+            runCatching { signInWithGoogleUseCase(idToken) }
                 .onSuccess { emitSuccess() }
                 .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "로그인 실패") }
         }
@@ -43,14 +43,14 @@ internal class AuthViewModel(
     fun signInWithEmail(email: String, password: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            runCatching { signInWithEmail(email, password) }
+            runCatching { signInWithEmailUseCase(email, password) }
                 .onSuccess { emitSuccess() }
                 .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "로그인 실패") }
         }
     }
 
     private suspend fun emitSuccess() {
-        val user = getCurrentUser().first()
+        val user = getCurrentUserUseCase().first()
         _uiState.value = AuthUiState.Success(isNewUser = user?.username == null)
     }
 }
