@@ -1,5 +1,7 @@
 package org.bmsk.lifemash.main
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -77,7 +79,14 @@ internal fun MainTabScreen(
         },
         modifier = Modifier.fillMaxSize(),
     ) {
-        NavHost(navController = tabNavController, startDestination = FeedRoute) {
+        NavHost(
+            navController = tabNavController,
+            startDestination = FeedRoute,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None },
+        ) {
             feedNavGraph(
                 FeedNavGraphInfo(
                     onShowErrorSnackbar = onShowErrorSnackbar,

@@ -13,14 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -100,28 +95,12 @@ fun ProfileEditScreen(
                     .padding(top = LifeMashSpacing.xxxl, bottom = LifeMashSpacing.xl),
                 contentAlignment = Alignment.Center,
             ) {
-                Box {
-                    LifeMashAvatar(
-                        name = uiState.name,
-                        imageUrl = uiState.profileImageUrl,
-                        size = AvatarSize.XXLarge,
-                    )
-                    IconButton(
-                        onClick = onPickImage,
-                        modifier = Modifier
-                            .size(LifeMashSpacing.xxl)
-                            .align(Alignment.BottomEnd)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.onSurface),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CameraAlt,
-                            contentDescription = "프로필 사진 변경",
-                            modifier = Modifier.size(LifeMashSpacing.md),
-                            tint = MaterialTheme.colorScheme.surface,
-                        )
-                    }
-                }
+                LifeMashAvatar(
+                    name = uiState.name,
+                    imageUrl = uiState.profileImageUrl,
+                    size = AvatarSize.XXLarge,
+                    onEditClick = onPickImage,
+                )
             }
 
             // 폼 섹션
