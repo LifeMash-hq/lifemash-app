@@ -25,63 +25,40 @@ rootProject.name = "LifeMash"
 include(":app")
 include(":lint")
 
+// Feature
 include(
     ":feature:main",
-)
-
-include(
     ":feature:auth:api",
     ":feature:auth:impl",
-)
-
-include(
     ":feature:calendar:api",
     ":feature:calendar:impl",
-)
-
-include(
+    ":feature:event-detail:api",
+    ":feature:event-detail:impl",
+    ":feature:feed:api",
+    ":feature:feed:impl",
+    ":feature:memo:api",
+    ":feature:memo:impl",
+    ":feature:moment:api",
+    ":feature:moment:impl",
+    ":feature:notification:api",
+    ":feature:notification:impl",
+    ":feature:onboarding:api",
+    ":feature:onboarding:impl",
     ":feature:profile:api",
     ":feature:profile:impl",
 )
 
-include(
-    ":feature:event-detail:api",
-    ":feature:event-detail:impl",
-)
-
-include(
-    ":feature:feed:api",
-    ":feature:feed:impl",
-)
-
-include(
-    ":feature:memo:api",
-    ":feature:memo:impl",
-)
-
-include(
-    ":feature:moment:api",
-    ":feature:moment:impl",
-)
-
-include(
-    ":feature:onboarding:api",
-    ":feature:onboarding:impl",
-)
-
-include(
-    ":feature:notification:api",
-    ":feature:notification:impl",
-)
-
+// Domain
 include(":domain")
 
+// Data
 include(
     ":data:core",
     ":data:remote",
     ":data:local",
 )
 
+// Shared
 include(
     ":shared:designsystem",
     ":shared:platform",
