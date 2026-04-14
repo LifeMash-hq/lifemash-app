@@ -32,6 +32,8 @@ internal fun ProfileEditRouteScreen(
         }
     }
 
+    if (!uiState.isLoaded) return
+
     ProfileEditScreen(
         uiState = uiState,
         onPickImage = { pickImage() },

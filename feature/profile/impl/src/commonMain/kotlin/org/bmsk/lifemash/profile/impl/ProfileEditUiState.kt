@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.profile.impl
 
 data class ProfileEditUiState(
+    val isLoaded: Boolean,
     val name: String,
     val username: String,
     val bio: String,
@@ -15,6 +16,7 @@ data class ProfileEditUiState(
 ) {
     companion object {
         val Default = ProfileEditUiState(
+            isLoaded = false,
             name = "",
             username = "",
             bio = "",

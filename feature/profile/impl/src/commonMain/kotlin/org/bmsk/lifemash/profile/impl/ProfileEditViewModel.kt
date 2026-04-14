@@ -33,6 +33,7 @@ internal class ProfileEditViewModel(
                 getUserProfileUseCase("me").collect { p ->
                     _uiState.update {
                         it.copy(
+                            isLoaded = true,
                             name = p.nickname,
                             username = p.username.orEmpty(),
                             bio = p.bio.orEmpty(),
