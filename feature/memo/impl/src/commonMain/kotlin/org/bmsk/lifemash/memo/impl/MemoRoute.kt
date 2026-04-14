@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun MemoRouteScreen(
+internal fun MemoRoute(
     onShowErrorSnackbar: (Throwable?) -> Unit,
     onBack: () -> Unit = {},
     viewModel: MemoViewModel = koinViewModel(),

@@ -19,7 +19,7 @@ val FeedTab = BottomNavItem(
 
 fun NavGraphBuilder.feedNavGraph(navInfo: FeedNavGraphInfo) {
     composable<FeedRoute> {
-        FeedRouteScreen(
+        FeedRoute(
             onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
             onNavigateToEventDetail = navInfo.onNavigateToEventDetail,
         )

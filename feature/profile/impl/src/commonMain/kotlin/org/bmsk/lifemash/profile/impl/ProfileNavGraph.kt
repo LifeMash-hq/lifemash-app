@@ -22,7 +22,7 @@ val ProfileTab = BottomNavItem(
 
 fun NavGraphBuilder.profileNavGraph(navInfo: ProfileNavGraphInfo) {
     composable<ProfileRoute> {
-        ProfileRouteScreen(
+        ProfileRoute(
             onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
             onNavigateToProfileEdit = navInfo.onNavigateToProfileEdit,
             onNavigateToEventCreate = navInfo.onNavigateToEventCreate,
@@ -35,7 +35,7 @@ fun NavGraphBuilder.profileNavGraph(navInfo: ProfileNavGraphInfo) {
 // ProfileEditRoute는 Root NavHost에 등록되어야 하므로 별도 함수로 노출
 fun NavGraphBuilder.profileEditNavGraph(onBack: () -> Unit) {
     composable<ProfileEditRoute> {
-        ProfileEditRouteScreen(onBack = onBack)
+        ProfileEditRoute(onBack = onBack)
     }
 }
 
@@ -46,7 +46,7 @@ fun NavGraphBuilder.userProfileNavGraph(
 ) {
     composable<UserProfileRoute> { backStackEntry ->
         val route = backStackEntry.toRoute<UserProfileRoute>()
-        UserProfileRouteScreen(
+        UserProfileRoute(
             userId = route.userId,
             onBack = onBack,
             onNavigateToEventDetail = onNavigateToEventDetail,

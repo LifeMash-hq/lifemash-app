@@ -10,7 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun FeedRouteScreen(
+internal fun FeedRoute(
     onShowErrorSnackbar: (Throwable?) -> Unit,
     onNavigateToEventDetail: (String) -> Unit = {},
     viewModel: FeedViewModel = koinViewModel(),

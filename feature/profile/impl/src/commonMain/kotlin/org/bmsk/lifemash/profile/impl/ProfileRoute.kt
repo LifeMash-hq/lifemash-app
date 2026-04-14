@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun ProfileRouteScreen(
+internal fun ProfileRoute(
     onShowErrorSnackbar: (Throwable?) -> Unit,
     onNavigateToProfileEdit: () -> Unit = {},
     onNavigateToEventCreate: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },

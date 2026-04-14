@@ -8,7 +8,7 @@ import org.bmsk.lifemash.eventdetail.api.EventDetailRoute
 fun NavGraphBuilder.eventDetailNavGraph(onBack: () -> Unit) {
     composable<EventDetailRoute> { backStackEntry ->
         val route = backStackEntry.toRoute<EventDetailRoute>()
-        EventDetailRouteScreen(
+        EventDetailRoute(
             eventId = route.eventId,
             onBack = onBack,
         )

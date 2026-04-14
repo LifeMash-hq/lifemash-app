@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun UserProfileRouteScreen(
+internal fun UserProfileRoute(
     userId: String,
     onBack: () -> Unit,
     onNavigateToEventDetail: (String) -> Unit = {},

@@ -15,7 +15,7 @@ import kotlin.time.Instant
 
 fun NavGraphBuilder.calendarNavGraph(navInfo: CalendarNavGraphInfo, navController: NavController) {
     composable<CalendarRoute> {
-        CalendarRouteScreen(
+        CalendarRoute(
             onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
             onBack = navInfo.onBack,
             onNavigateToEventCreate = { year, month, day, groupId ->
@@ -48,7 +48,7 @@ fun NavGraphBuilder.calendarNavGraph(navInfo: CalendarNavGraphInfo, navControlle
 
     composable<EventCreateRoute> { entry ->
         val route = entry.toRoute<EventCreateRoute>()
-        EventCreateRouteScreen(
+        EventCreateRoute(
             year = route.year,
             month = route.month,
             day = route.day,
@@ -86,7 +86,7 @@ fun NavGraphBuilder.calendarNavGraph(navInfo: CalendarNavGraphInfo, navControlle
             updatedAt = Instant.fromEpochMilliseconds(route.eventUpdatedAt),
         )
 
-        EventEditRouteScreen(
+        EventEditRoute(
             groupId = route.groupId,
             existingEvent = existingEvent,
             onBack = { navController.popBackStack() },

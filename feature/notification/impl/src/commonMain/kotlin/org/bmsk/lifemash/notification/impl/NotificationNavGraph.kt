@@ -19,7 +19,7 @@ val NotificationTab = BottomNavItem(
 
 fun NavGraphBuilder.notificationNavGraph(navInfo: NotificationNavGraphInfo) {
     composable<NotificationRoute> {
-        NotificationRouteScreen(
+        NotificationRoute(
             onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
             onBack = navInfo.onBack,
             onNavigateToEventDetail = navInfo.onNavigateToEventDetail,

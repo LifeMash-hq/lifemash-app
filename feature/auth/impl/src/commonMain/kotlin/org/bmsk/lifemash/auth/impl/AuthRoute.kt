@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun AuthRouteScreen(
+internal fun AuthRoute(
     onSignInComplete: (isNewUser: Boolean) -> Unit,
     onShowErrorSnackbar: (Throwable?) -> Unit,
     viewModel: AuthViewModel = koinViewModel(),

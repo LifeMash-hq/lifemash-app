@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun NotificationRouteScreen(
+internal fun NotificationRoute(
     onShowErrorSnackbar: (Throwable?) -> Unit,
     onBack: () -> Unit,
     onNavigateToEventDetail: (String) -> Unit = {},

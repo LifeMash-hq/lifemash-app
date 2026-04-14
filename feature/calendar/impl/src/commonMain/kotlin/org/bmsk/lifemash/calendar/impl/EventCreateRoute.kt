@@ -8,7 +8,7 @@ import org.bmsk.lifemash.domain.calendar.Event
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun EventCreateRouteScreen(
+internal fun EventCreateRoute(
     year: Int,
     month: Int,
     day: Int,
@@ -51,7 +51,7 @@ internal fun EventCreateRouteScreen(
 }
 
 @Composable
-internal fun EventEditRouteScreen(
+internal fun EventEditRoute(
     groupId: String,
     existingEvent: Event,
     onBack: () -> Unit,

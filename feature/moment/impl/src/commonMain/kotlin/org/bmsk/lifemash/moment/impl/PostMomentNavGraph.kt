@@ -9,7 +9,7 @@ fun NavGraphBuilder.postMomentNavGraph(
     onClose: () -> Unit,
 ) {
     composable<PostMomentRoute> {
-        PostMomentRouteScreen(
+        PostMomentRoute(
             onSuccess = onSuccess,
             onClose = onClose,
         )

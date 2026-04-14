@@ -7,7 +7,7 @@ import org.bmsk.lifemash.memo.api.MemoRoute
 
 fun NavGraphBuilder.memoNavGraph(navInfo: MemoNavGraphInfo) {
     composable<MemoRoute> {
-        MemoRouteScreen(
+        MemoRoute(
             onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
             onBack = navInfo.onBack,
         )

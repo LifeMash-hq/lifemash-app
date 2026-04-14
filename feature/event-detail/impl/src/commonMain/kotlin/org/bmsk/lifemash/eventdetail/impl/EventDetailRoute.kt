@@ -9,7 +9,7 @@ import org.bmsk.lifemash.feature.shared.common.rememberShareLauncher
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun EventDetailRouteScreen(
+internal fun EventDetailRoute(
     eventId: String,
     onBack: () -> Unit,
     viewModel: EventDetailViewModel = koinViewModel(),

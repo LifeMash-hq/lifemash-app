@@ -8,7 +8,7 @@ import org.bmsk.lifemash.feature.shared.common.rememberSingleImagePickerLauncher
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun ProfileEditRouteScreen(
+internal fun ProfileEditRoute(
     onBack: () -> Unit,
     viewModel: ProfileEditViewModel = koinViewModel(),
 ) {

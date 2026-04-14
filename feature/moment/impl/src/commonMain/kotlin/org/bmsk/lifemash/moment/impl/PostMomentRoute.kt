@@ -16,7 +16,7 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun PostMomentRouteScreen(
+fun PostMomentRoute(
     onSuccess: () -> Unit,
     onClose: () -> Unit,
 ) {

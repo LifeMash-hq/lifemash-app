@@ -7,7 +7,7 @@ import org.bmsk.lifemash.auth.api.AuthRoute
 
 fun NavGraphBuilder.authNavGraph(navInfo: AuthNavGraphInfo) {
     composable<AuthRoute> {
-        AuthRouteScreen(
+        AuthRoute(
             onSignInComplete = navInfo.onSignInComplete,
             onShowErrorSnackbar = navInfo.onShowErrorSnackbar,
         )

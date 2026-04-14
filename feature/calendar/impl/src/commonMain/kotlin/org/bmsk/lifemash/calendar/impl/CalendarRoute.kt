@@ -10,7 +10,7 @@ import org.bmsk.lifemash.domain.calendar.Event
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun CalendarRouteScreen(
+internal fun CalendarRoute(
     onShowErrorSnackbar: (Throwable?) -> Unit,
     onBack: () -> Unit = {},
     onNavigateToEventCreate: (year: Int, month: Int, day: Int, groupId: String?) -> Unit = { _, _, _, _ -> },
