@@ -7,7 +7,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Instant
+import org.bmsk.lifemash.domain.calendar.EventTiming
 
 data class TimeOfDay(val hour: Int, val minute: Int) {
     fun formatted(): String =
@@ -35,21 +35,25 @@ data class EventDateTime(
         return "${date.month.number}월 ${date.day}일 ($dow)"
     }
 
-    fun timeLabel(): String = when {
-        startTime != null && endTime != null -> "${startTime.formatted()} - ${endTime.formatted()}"
-        startTime != null -> startTime.formatted()
-        else -> "시간 추가"
+    fun timeLabel(): String =
+        if (startTime != null && endTime != null) "${startTime.formatted()} - ${endTime.formatted()}"
+        else "시간 추가"
+
+    fun withStartTime(value: TimeOfDay?): EventDateTime {
+        if (value == null) return copy(startTime = null, endTime = null)
+        val nextEnd = endTime ?: TimeOfDay((value.hour + 1) % 24, value.minute)
+        return copy(startTime = value, endTime = nextEnd)
     }
 
-    fun toStartInstant(tz: TimeZone): Instant {
-        val hour = startTime?.hour ?: 0
-        val minute = startTime?.minute ?: 0
-        return LocalDateTime(date, LocalTime(hour, minute)).toInstant(tz)
-    }
+    fun withEndTime(value: TimeOfDay?): EventDateTime = copy(endTime = value ?: endTime)
 
-    fun toEndInstant(tz: TimeZone): Instant? {
-        val end = endTime ?: return null
-        return LocalDateTime(date, LocalTime(end.hour, end.minute)).toInstant(tz)
+    fun toTiming(tz: TimeZone): EventTiming {
+        val start = startTime ?: return EventTiming.AllDay(date)
+        val end = endTime ?: TimeOfDay((start.hour + 1) % 24, start.minute)
+        return EventTiming.Timed(
+            start = LocalDateTime(date, LocalTime(start.hour, start.minute)).toInstant(tz),
+            end = LocalDateTime(date, LocalTime(end.hour, end.minute)).toInstant(tz),
+        )
     }
 
     companion object {

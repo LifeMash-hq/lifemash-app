@@ -42,25 +42,26 @@ internal class MemoRepositoryImpl(private val api: MemoApi) : MemoRepository {
         content: String?,
         isPinned: Boolean?,
     ): Memo = api.updateMemo(
-        groupId,
-        memoId,
-        UpdateMemoRequest(title = title, content = content, isPinned = isPinned),
+        groupId = groupId,
+        memoId = memoId,
+        body = UpdateMemoRequest(title = title, content = content, isPinned = isPinned),
     ).toDomain()
 
-    override suspend fun deleteMemo(groupId: String, memoId: String) =
-        api.deleteMemo(groupId, memoId)
+    override suspend fun deleteMemo(groupId: String, memoId: String) {
+        api.deleteMemo(groupId = groupId, memoId = memoId)
+    }
 
     override suspend fun searchMemos(groupId: String, query: String): List<Memo> =
-        api.searchMemos(groupId, query).map { it.toDomain() }
+        api.searchMemos(groupId = groupId, query = query).map { it.toDomain() }
 
     override suspend fun syncChecklist(
         groupId: String,
         memoId: String,
         items: List<ChecklistItem>,
     ): List<ChecklistItem> = api.syncChecklist(
-        groupId,
-        memoId,
-        SyncChecklistRequest(items = items.map { it.toEntry() }),
+        groupId = groupId,
+        memoId = memoId,
+        body = SyncChecklistRequest(items = items.map { it.toEntry() }),
     ).map { it.toDomain() }
 
     private fun ChecklistItem.toEntry() = SyncChecklistItemEntry(

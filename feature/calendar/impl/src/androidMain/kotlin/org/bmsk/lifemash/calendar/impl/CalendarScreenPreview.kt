@@ -7,6 +7,7 @@ import kotlin.time.Instant
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.LocalDate
 import org.bmsk.lifemash.domain.calendar.Event
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.calendar.Group
 import org.bmsk.lifemash.domain.calendar.GroupType
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
@@ -21,9 +22,10 @@ internal val sampleEvents = persistentListOf(
         title = "팀 스프린트 회의",
         description = "2주 스프린트 계획 수립",
         location = null,
-        startAt = Instant.parse("2024-03-15T09:00:00Z"),
-        endAt = Instant.parse("2024-03-15T10:00:00Z"),
-        isAllDay = false,
+        timing = EventTiming.Timed(
+            start = Instant.parse("2024-03-15T09:00:00Z"),
+            end = Instant.parse("2024-03-15T10:00:00Z"),
+        ),
         color = "#4F6AF5",
         createdAt = sampleInstant,
         updatedAt = sampleInstant,
@@ -35,9 +37,10 @@ internal val sampleEvents = persistentListOf(
         title = "가족 저녁 식사",
         description = null,
         location = null,
-        startAt = Instant.parse("2024-03-15T18:00:00Z"),
-        endAt = Instant.parse("2024-03-15T20:00:00Z"),
-        isAllDay = false,
+        timing = EventTiming.Timed(
+            start = Instant.parse("2024-03-15T18:00:00Z"),
+            end = Instant.parse("2024-03-15T20:00:00Z"),
+        ),
         color = "#F5A623",
         createdAt = sampleInstant,
         updatedAt = sampleInstant,

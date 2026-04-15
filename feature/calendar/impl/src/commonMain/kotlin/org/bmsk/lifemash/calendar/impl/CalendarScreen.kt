@@ -60,13 +60,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.domain.calendar.Event
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.calendar.Group
 import org.bmsk.lifemash.domain.calendar.GroupType
 import org.bmsk.lifemash.designsystem.component.LifeMashButton
 import org.bmsk.lifemash.designsystem.component.LifeMashInput
 import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
+
+private fun Event.startsOn(date: LocalDate, tz: TimeZone): Boolean = when (val t = timing) {
+    is EventTiming.AllDay -> t.date == date
+    is EventTiming.Timed -> t.start.toLocalDateTime(tz).date == date
+}
+
+private val Event.isAllDay: Boolean get() = timing is EventTiming.AllDay
 
 @Composable
 internal fun CalendarScreen(
@@ -177,11 +187,10 @@ private fun CalendarContent(
 
             HorizontalDivider(Modifier.padding(vertical = LifeMashSpacing.sm))
 
+            val tz = TimeZone.currentSystemDefault()
             val selectedEvents = uiState.events
                 .filter { event ->
-                    uiState.selectedDate?.let { date ->
-                        event.startAt.toString().startsWith(date.toString())
-                    } == true
+                    uiState.selectedDate?.let { date -> event.startsOn(date, tz) } == true
                 }
 
             when {
@@ -538,7 +547,8 @@ private fun MonthGrid(
                 Box(Modifier.aspectRatio(1f))
             } else {
                 val isSelected = date == selectedDate
-                val hasEvent = events.any { it.startAt.toString().startsWith(date.toString()) }
+                val gridTz = TimeZone.currentSystemDefault()
+                val hasEvent = events.any { it.startsOn(date, gridTz) }
 
                 Box(
                     modifier = Modifier

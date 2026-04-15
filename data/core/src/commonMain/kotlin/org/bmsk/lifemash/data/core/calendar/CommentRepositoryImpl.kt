@@ -25,10 +25,11 @@ internal class CommentRepositoryImpl(private val api: CalendarApi) : CommentRepo
         groupId: String,
         eventId: String,
         commentId: String,
-    ) =
+    ) {
         api.deleteComment(
             groupId,
             eventId,
             commentId,
         )
+    }
 }

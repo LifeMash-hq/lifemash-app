@@ -1,7 +1,5 @@
 package org.bmsk.lifemash.domain.calendar
 
-import kotlin.time.Instant
-
 interface EventRepository {
     suspend fun getMonthEvents(
         groupId: String,
@@ -13,9 +11,7 @@ interface EventRepository {
         title: String,
         description: String?,
         location: String?,
-        startAt: Instant,
-        endAt: Instant?,
-        isAllDay: Boolean,
+        timing: EventTiming,
         color: String?,
         visibility: EventVisibility = EventVisibility.Followers,
     ): Event
@@ -25,9 +21,7 @@ interface EventRepository {
         title: String?,
         description: String?,
         location: String?,
-        startAt: Instant?,
-        endAt: Instant?,
-        isAllDay: Boolean?,
+        timing: EventTiming?,
         color: String?,
         visibility: EventVisibility? = null,
     ): Event

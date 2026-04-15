@@ -12,6 +12,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.domain.calendar.Event
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.profile.CalendarDayEvent
 import org.bmsk.lifemash.domain.profile.ProfileEvent
 import org.bmsk.lifemash.domain.profile.ProfileSettings
@@ -132,9 +133,7 @@ internal class ProfileViewModel(
                     title = title,
                     description = null,
                     location = null,
-                    startAt = null,
-                    endAt = null,
-                    isAllDay = null,
+                    timing = null,
                     color = color,
                 )
             }.onSuccess {
@@ -208,7 +207,12 @@ internal class ProfileViewModel(
     ): EventsData {
         val events = getMonthEventsUseCase(gId, year, month)
         val tz = TimeZone.currentSystemDefault()
-        val grouped = events.groupBy { it.startAt.toLocalDateTime(tz).date.day }
+        val grouped = events.groupBy { event ->
+            when (val t = event.timing) {
+                is EventTiming.AllDay -> t.date.day
+                is EventTiming.Timed -> t.start.toLocalDateTime(tz).date.day
+            }
+        }
         return EventsData(
             calendarEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toCalendarDayEvent() } },
             dayEvents = grouped.mapValues { (_, v) -> v.map { e -> e.toProfileEvent() } },

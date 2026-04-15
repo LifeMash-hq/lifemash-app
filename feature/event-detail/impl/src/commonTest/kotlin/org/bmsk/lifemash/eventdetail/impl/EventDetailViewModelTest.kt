@@ -7,10 +7,14 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.eventdetail.EventAttendee
 import org.bmsk.lifemash.domain.eventdetail.EventComment
 import org.bmsk.lifemash.domain.eventdetail.EventDetail
 import org.bmsk.lifemash.domain.eventdetail.EventDetailRepository
+import org.bmsk.lifemash.domain.usecase.eventdetail.AddEventCommentUseCase
+import org.bmsk.lifemash.domain.usecase.eventdetail.GetEventDetailUseCase
+import org.bmsk.lifemash.domain.usecase.eventdetail.ToggleEventJoinUseCase
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -32,8 +36,7 @@ class EventDetailViewModelTest {
         groupId = "group-1",
         title = "테스트 일정",
         description = "설명",
-        startAt = now,
-        endAt = null,
+        timing = EventTiming.Timed(start = now, end = now),
         location = "서울",
         imageEmoji = "🎉",
         sharedByNickname = "홍길동",
@@ -68,7 +71,12 @@ class EventDetailViewModelTest {
         }
     }
 
-    private fun createViewModel() = EventDetailViewModel(repository = fakeRepository)
+    private fun createViewModel(repository: EventDetailRepository = fakeRepository) =
+        EventDetailViewModel(
+            getEventDetailUseCase = GetEventDetailUseCase(repository),
+            toggleEventJoinUseCase = ToggleEventJoinUseCase(repository),
+            addEventCommentUseCase = AddEventCommentUseCase(repository),
+        )
 
     @BeforeTest
     fun setUp() {
@@ -103,7 +111,7 @@ class EventDetailViewModelTest {
             override suspend fun getEventDetail(eventId: String): EventDetail =
                 throw RuntimeException("서버 오류")
         }
-        val viewModel = EventDetailViewModel(repository = failingRepo)
+        val viewModel = createViewModel(repository = failingRepo)
 
         viewModel.loadEvent("event-1")
 

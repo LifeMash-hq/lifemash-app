@@ -1,5 +1,6 @@
 package org.bmsk.lifemash.data.core.eventdetail
 
+import org.bmsk.lifemash.data.core.calendar.toTiming
 import org.bmsk.lifemash.domain.eventdetail.EventAttendee
 import org.bmsk.lifemash.domain.eventdetail.EventComment
 import org.bmsk.lifemash.domain.eventdetail.EventDetail
@@ -18,8 +19,7 @@ internal class EventDetailRepositoryImpl(
             groupId = dto.groupId,
             title = dto.title,
             description = dto.description,
-            startAt = dto.startAt,
-            endAt = dto.endAt,
+            timing = toTiming(dto.startAt, dto.endAt, dto.isAllDay, dto.id),
             location = dto.location,
             imageEmoji = dto.imageEmoji ?: "",
             sharedByNickname = dto.authorNickname,
@@ -47,7 +47,7 @@ internal class EventDetailRepositoryImpl(
     }
 
     override suspend fun addComment(eventId: String, content: String): EventComment {
-        val dto = api.createComment(eventId, CreateCommentRequest(content))
+        val dto = api.createComment(eventId = eventId, request = CreateCommentRequest(content))
         return EventComment(
             id = dto.id,
             authorNickname = dto.authorNickname,

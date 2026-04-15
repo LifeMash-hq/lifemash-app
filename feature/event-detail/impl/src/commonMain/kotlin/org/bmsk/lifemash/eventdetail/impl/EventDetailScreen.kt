@@ -51,9 +51,11 @@ import androidx.compose.ui.unit.sp
 import kotlin.time.Clock
 import kotlin.time.Instant
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.designsystem.component.AvatarSize
 import org.bmsk.lifemash.designsystem.component.LifeMashAvatar
 import org.bmsk.lifemash.designsystem.component.LifeMashButton
@@ -197,8 +199,8 @@ private fun LoadedContent(
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
-                    title = formatDateLine(state.startAt),
-                    subtitle = formatTimeRange(state.startAt, state.endAt),
+                    title = formatDateLine(state.timing),
+                    subtitle = formatTimeRange(state.timing),
                 )
                 state.location?.let { location ->
                     Spacer(Modifier.height(LifeMashSpacing.lg))
@@ -412,21 +414,25 @@ private fun CommentItem(comment: Comment) {
     }
 }
 
-private fun formatDateLine(startAt: Instant): String {
-    val tz = TimeZone.currentSystemDefault()
-    val local = startAt.toLocalDateTime(tz)
-    val dow = local.dayOfWeek.toKorean()
-    return "${local.year}년 ${local.month.number}월 ${local.day}일 ($dow)"
+private fun formatDateLine(timing: EventTiming): String {
+    val date: LocalDate = when (timing) {
+        is EventTiming.AllDay -> timing.date
+        is EventTiming.Timed -> timing.start.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    }
+    val dow = date.dayOfWeek.toKorean()
+    return "${date.year}년 ${date.month.number}월 ${date.day}일 ($dow)"
 }
 
-private fun formatTimeRange(startAt: Instant, endAt: Instant?): String {
-    val tz = TimeZone.currentSystemDefault()
-    val s = startAt.toLocalDateTime(tz)
-    val startTime = "${s.hour.toString().padStart(2, '0')}:${s.minute.toString().padStart(2, '0')}"
-    if (endAt == null) return startTime
-    val e = endAt.toLocalDateTime(tz)
-    val endTime = "${e.hour.toString().padStart(2, '0')}:${e.minute.toString().padStart(2, '0')}"
-    return "$startTime — $endTime"
+private fun formatTimeRange(timing: EventTiming): String = when (timing) {
+    is EventTiming.AllDay -> "종일"
+    is EventTiming.Timed -> {
+        val tz = TimeZone.currentSystemDefault()
+        val s = timing.start.toLocalDateTime(tz)
+        val e = timing.end.toLocalDateTime(tz)
+        val startTime = "${s.hour.toString().padStart(2, '0')}:${s.minute.toString().padStart(2, '0')}"
+        val endTime = "${e.hour.toString().padStart(2, '0')}:${e.minute.toString().padStart(2, '0')}"
+        "$startTime — $endTime"
+    }
 }
 
 private fun DayOfWeek.toKorean(): String = when (this) {

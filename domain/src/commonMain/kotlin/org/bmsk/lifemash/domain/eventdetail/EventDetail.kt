@@ -3,14 +3,14 @@
 package org.bmsk.lifemash.domain.eventdetail
 
 import kotlin.time.Instant
+import org.bmsk.lifemash.domain.calendar.EventTiming
 
 data class EventDetail(
     val id: String,
     val groupId: String,
     val title: String,
     val description: String?,
-    val startAt: Instant,
-    val endAt: Instant?,
+    val timing: EventTiming,
     val location: String? = null,
     val imageEmoji: String = "",
     val sharedByNickname: String? = null,

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.domain.calendar.Event
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.calendar.EventVisibility
 import org.bmsk.lifemash.domain.usecase.calendar.CreateEventUseCase
 import org.bmsk.lifemash.domain.usecase.calendar.GetMyGroupsUseCase
@@ -38,8 +39,18 @@ internal class EventCreateViewModel(
 
         if (existingEvent != null) {
             val tz = TimeZone.currentSystemDefault()
-            val startLocal = existingEvent.startAt.toLocalDateTime(tz)
-            val endLocal = existingEvent.endAt?.toLocalDateTime(tz)
+            val eventDateTime = when (val timing = existingEvent.timing) {
+                is EventTiming.AllDay -> EventDateTime(date = timing.date)
+                is EventTiming.Timed -> {
+                    val startLocal = timing.start.toLocalDateTime(tz)
+                    val endLocal = timing.end.toLocalDateTime(tz)
+                    EventDateTime(
+                        date = startLocal.date,
+                        startTime = TimeOfDay(startLocal.hour, startLocal.minute),
+                        endTime = TimeOfDay(endLocal.hour, endLocal.minute),
+                    )
+                }
+            }
             _uiState.update {
                 it.copy(
                     title = existingEvent.title,
@@ -47,11 +58,7 @@ internal class EventCreateViewModel(
                     selectedColor = existingEvent.color,
                     visibility = existingEvent.visibility,
                     memo = existingEvent.description ?: "",
-                    eventDateTime = EventDateTime(
-                        date = startLocal.date,
-                        startTime = if (!existingEvent.isAllDay) TimeOfDay(startLocal.hour, startLocal.minute) else null,
-                        endTime = if (!existingEvent.isAllDay && endLocal != null) TimeOfDay(endLocal.hour, endLocal.minute) else null,
-                    ),
+                    eventDateTime = eventDateTime,
                 )
             }
         } else if (day > 0) {
@@ -113,8 +120,7 @@ internal class EventCreateViewModel(
         _uiState.update { it.copy(isSaving = true) }
 
         val tz = TimeZone.currentSystemDefault()
-        val startAt = state.eventDateTime.toStartInstant(tz)
-        val endAt = state.eventDateTime.toEndInstant(tz)
+        val timing = state.eventDateTime.toTiming(tz)
 
         viewModelScope.launch {
             runCatching {
@@ -123,9 +129,7 @@ internal class EventCreateViewModel(
                     title = state.title,
                     description = state.memo.ifBlank { null },
                     location = state.location.ifBlank { null },
-                    startAt = startAt,
-                    endAt = endAt,
-                    isAllDay = state.eventDateTime.isAllDay,
+                    timing = timing,
                     color = state.selectedColor,
                     visibility = state.visibility,
                 )
@@ -142,8 +146,7 @@ internal class EventCreateViewModel(
         _uiState.update { it.copy(isSaving = true) }
 
         val tz = TimeZone.currentSystemDefault()
-        val startAt = state.eventDateTime.toStartInstant(tz)
-        val endAt = state.eventDateTime.toEndInstant(tz)
+        val timing = state.eventDateTime.toTiming(tz)
 
         viewModelScope.launch {
             runCatching {
@@ -153,9 +156,7 @@ internal class EventCreateViewModel(
                     title = state.title,
                     description = state.memo.ifBlank { null },
                     location = state.location.ifBlank { null },
-                    startAt = startAt,
-                    endAt = endAt,
-                    isAllDay = state.eventDateTime.isAllDay,
+                    timing = timing,
                     color = state.selectedColor,
                     visibility = state.visibility,
                 )

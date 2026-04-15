@@ -1,20 +1,12 @@
 package org.bmsk.lifemash.data.core.calendar
 
-import kotlin.time.Instant
 import org.bmsk.lifemash.domain.calendar.Event
 import org.bmsk.lifemash.domain.calendar.EventRepository
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.calendar.EventVisibility
 import org.bmsk.lifemash.data.remote.calendar.CalendarApi
 import org.bmsk.lifemash.data.remote.calendar.dto.CreateEventRequest
 import org.bmsk.lifemash.data.remote.calendar.dto.UpdateEventRequest
-
-private fun EventVisibility.toApiType(): String = when (this) {
-    is EventVisibility.Public -> "public"
-    is EventVisibility.Followers -> "followers"
-    is EventVisibility.Group -> "group"
-    is EventVisibility.Specific -> "specific"
-    is EventVisibility.Private -> "private"
-}
 
 internal class EventRepositoryImpl(private val api: CalendarApi) : EventRepository {
 
@@ -24,9 +16,9 @@ internal class EventRepositoryImpl(private val api: CalendarApi) : EventReposito
         month: Int,
     ): List<Event> =
         api.getMonthEvents(
-            groupId,
-            year,
-            month,
+            groupId = groupId,
+            year = year,
+            month = month,
         ).map { it.toDomain() }
 
     override suspend fun createEvent(
@@ -34,26 +26,28 @@ internal class EventRepositoryImpl(private val api: CalendarApi) : EventReposito
         title: String,
         description: String?,
         location: String?,
-        startAt: Instant,
-        endAt: Instant?,
-        isAllDay: Boolean,
+        timing: EventTiming,
         color: String?,
         visibility: EventVisibility,
-    ): Event = api.createEvent(
-        groupId,
-        CreateEventRequest(
-            title = title,
-            description = description,
-            location = location,
-            startAt = startAt,
-            endAt = endAt,
-            isAllDay = isAllDay,
-            color = color,
-            visibility = visibility.toApiType(),
-            visibilityGroupId = (visibility as? EventVisibility.Group)?.groupId,
-            visibilityUserIds = (visibility as? EventVisibility.Specific)?.userIds,
-        ),
-    ).toDomain()
+    ): Event {
+        val vis = visibility.toRequestFields()
+        val time = timing.toRequestFields()
+        return api.createEvent(
+            groupId = groupId,
+            body = CreateEventRequest(
+                title = title,
+                description = description,
+                location = location,
+                startAt = time.startAt,
+                endAt = time.endAt,
+                isAllDay = time.isAllDay,
+                color = color,
+                visibility = vis.type,
+                visibilityGroupId = vis.groupId,
+                visibilityUserIds = vis.userIds,
+            ),
+        ).toDomain()
+    }
 
     override suspend fun updateEvent(
         groupId: String,
@@ -61,28 +55,31 @@ internal class EventRepositoryImpl(private val api: CalendarApi) : EventReposito
         title: String?,
         description: String?,
         location: String?,
-        startAt: Instant?,
-        endAt: Instant?,
-        isAllDay: Boolean?,
+        timing: EventTiming?,
         color: String?,
         visibility: EventVisibility?,
-    ): Event = api.updateEvent(
-        groupId,
-        eventId,
-        UpdateEventRequest(
-            title = title,
-            description = description,
-            location = location,
-            startAt = startAt,
-            endAt = endAt,
-            isAllDay = isAllDay,
-            color = color,
-            visibility = visibility?.toApiType(),
-            visibilityGroupId = (visibility as? EventVisibility.Group)?.groupId,
-            visibilityUserIds = (visibility as? EventVisibility.Specific)?.userIds,
-        ),
-    ).toDomain()
+    ): Event {
+        val vis = visibility?.toRequestFields()
+        val time = timing?.toRequestFields()
+        return api.updateEvent(
+            groupId = groupId,
+            eventId = eventId,
+            body = UpdateEventRequest(
+                title = title,
+                description = description,
+                location = location,
+                startAt = time?.startAt,
+                endAt = time?.endAt,
+                isAllDay = time?.isAllDay,
+                color = color,
+                visibility = vis?.type,
+                visibilityGroupId = vis?.groupId,
+                visibilityUserIds = vis?.userIds,
+            ),
+        ).toDomain()
+    }
 
-    override suspend fun deleteEvent(groupId: String, eventId: String) =
+    override suspend fun deleteEvent(groupId: String, eventId: String) {
         api.deleteEvent(groupId, eventId)
+    }
 }

@@ -34,6 +34,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.domain.calendar.Event
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.designsystem.theme.LifeMashSpacing
 import androidx.compose.foundation.Canvas
 
@@ -108,8 +109,11 @@ private fun EventSelectItem(
     onClick: () -> Unit,
 ) {
     val tz = TimeZone.currentSystemDefault()
-    val startLocal = event.startAt.toLocalDateTime(tz)
-    val dateLabel = "${startLocal.month.number}월 ${startLocal.day}일"
+    val displayDate = when (val t = event.timing) {
+        is EventTiming.AllDay -> t.date
+        is EventTiming.Timed -> t.start.toLocalDateTime(tz).date
+    }
+    val dateLabel = "${displayDate.month.number}월 ${displayDate.day}일"
 
     Row(
         modifier = Modifier

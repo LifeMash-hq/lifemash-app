@@ -1,8 +1,8 @@
 package org.bmsk.lifemash.domain.usecase.calendar
 
-import kotlin.time.Instant
 import org.bmsk.lifemash.domain.calendar.Event
 import org.bmsk.lifemash.domain.calendar.EventRepository
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.calendar.EventVisibility
 
 class CreateEventUseCase(private val repository: EventRepository) {
@@ -11,12 +11,10 @@ class CreateEventUseCase(private val repository: EventRepository) {
         title: String,
         description: String?,
         location: String?,
-        startAt: Instant,
-        endAt: Instant?,
-        isAllDay: Boolean,
+        timing: EventTiming,
         color: String?,
         visibility: EventVisibility = EventVisibility.Followers,
     ): Event = repository.createEvent(
-        groupId, title, description, location, startAt, endAt, isAllDay, color, visibility,
+        groupId, title, description, location, timing, color, visibility,
     )
 }

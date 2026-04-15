@@ -9,10 +9,11 @@ internal class NotificationRepositoryImpl(
     private val api: NotificationApi,
 ) : NotificationRepository {
 
-    override suspend fun getNotifications(): List<Notification> =
-        api.getNotifications().map { it.toDomainModel() }
+    override suspend fun getNotifications(): List<Notification> = api.getNotifications().map { it.toDomainModel() }
 
     override suspend fun getUnreadCount(): Int = api.getUnreadCount()
 
-    override suspend fun markAsRead(notificationId: String) = api.markAsRead(notificationId)
+    override suspend fun markAsRead(notificationId: String) {
+        api.markAsRead(notificationId)
+    }
 }

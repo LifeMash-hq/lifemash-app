@@ -1,6 +1,7 @@
 package org.bmsk.lifemash.eventdetail.impl
 
 import kotlin.time.Instant
+import org.bmsk.lifemash.domain.calendar.EventTiming
 
 data class Comment(
     val id: String,
@@ -21,8 +22,7 @@ sealed interface EventDetailUiState {
         val eventId: String,
         val title: String,
         val date: String,
-        val startAt: Instant,
-        val endAt: Instant? = null,
+        val timing: EventTiming,
         val location: String? = null,
         val description: String? = null,
         val imageEmoji: String = "",

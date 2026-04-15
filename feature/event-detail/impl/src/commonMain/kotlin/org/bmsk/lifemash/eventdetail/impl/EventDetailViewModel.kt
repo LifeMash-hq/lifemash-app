@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.eventdetail.EventAttendee
 import org.bmsk.lifemash.domain.eventdetail.EventComment
 import org.bmsk.lifemash.domain.usecase.eventdetail.AddEventCommentUseCase
@@ -32,9 +34,8 @@ internal class EventDetailViewModel(
                     _uiState.value = EventDetailUiState.Loaded(
                         eventId = detail.id,
                         title = detail.title,
-                        date = detail.startAt.formatDate(),
-                        startAt = detail.startAt,
-                        endAt = detail.endAt,
+                        date = detail.timing.formatDate(),
+                        timing = detail.timing,
                         location = detail.location,
                         description = detail.description,
                         imageEmoji = detail.imageEmoji,
@@ -87,7 +88,16 @@ private fun EventComment.toUi() = Comment(
 )
 
 @OptIn(kotlin.time.ExperimentalTime::class)
-private fun Instant.formatDate(): String {
+private fun EventTiming.formatDate(): String = when (this) {
+    is EventTiming.AllDay -> date.formatAllDay()
+    is EventTiming.Timed -> start.formatWithTime()
+}
+
+private fun LocalDate.formatAllDay(): String =
+    "${year}년 ${month.number}월 ${day}일 종일"
+
+@OptIn(kotlin.time.ExperimentalTime::class)
+private fun Instant.formatWithTime(): String {
     val local = toLocalDateTime(TimeZone.currentSystemDefault())
     val hour = if (local.hour < 12) "오전 ${local.hour}" else "오후 ${local.hour - 12}"
     val min = local.minute.toString().padStart(2, '0')

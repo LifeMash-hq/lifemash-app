@@ -3,10 +3,12 @@ package org.bmsk.lifemash.domain.usecase.moment
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.bmsk.lifemash.domain.calendar.Event
 import org.bmsk.lifemash.domain.calendar.EventRepository
+import org.bmsk.lifemash.domain.calendar.EventTiming
 import org.bmsk.lifemash.domain.calendar.GroupRepository
 
 class GetCurrentMonthGroupEventsUseCase(
@@ -19,6 +21,11 @@ class GetCurrentMonthGroupEventsUseCase(
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         return groups.flatMap { group ->
             eventRepository.getMonthEvents(group.id, now.year, now.month.number)
-        }.sortedBy { it.startAt }
+        }.sortedBy {
+            when (val t = it.timing) {
+                is EventTiming.Timed -> t.start
+                is EventTiming.AllDay -> t.date.atStartOfDayIn(TimeZone.UTC)
+            }
+        }
     }
 }

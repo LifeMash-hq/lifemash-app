@@ -30,8 +30,9 @@ internal class MomentRepositoryImpl(private val api: MomentApi) : MomentReposito
     override suspend fun getUserMoments(userId: String): List<Moment> =
         api.getUserMoments(userId).map { it.toDomainModel() }
 
-    override suspend fun delete(momentId: String) =
+    override suspend fun delete(momentId: String) {
         api.delete(momentId)
+    }
 
     private fun MomentMedia.toDto() = MediaItemResponse(
         mediaUrl = mediaUrl,
