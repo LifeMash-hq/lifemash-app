@@ -23,7 +23,18 @@ alias(libs.plugins.verify.detekt) apply false
 }
 
 subprojects {
-    apply(plugin = "org.jetbrains.dokka")
+    // Kotlin 플러그인이 적용된 모듈에만 Dokka 적용.
+    // include(":feature:moment:api") 등으로 암묵 생성되는 컨테이너 프로젝트
+    // (:feature:moment, :data 등)는 소스가 없으므로 제외.
+    listOf(
+        "org.jetbrains.kotlin.multiplatform",
+        "org.jetbrains.kotlin.android",
+        "org.jetbrains.kotlin.jvm",
+    ).forEach { kotlinPluginId ->
+        pluginManager.withPlugin(kotlinPluginId) {
+            apply(plugin = "org.jetbrains.dokka")
+        }
+    }
     configurations.all {
         exclude(group = "com.google.firebase", module = "firebase-common-ktx")
     }
