@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
+
 package org.bmsk.lifemash.notification.impl
 
 import androidx.compose.ui.test.assertIsDisplayed
@@ -5,8 +7,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import kotlinx.collections.immutable.persistentListOf
 import kotlin.time.Clock
-import org.bmsk.lifemash.domain.notification.Notification
-import org.bmsk.lifemash.domain.notification.NotificationType
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,6 +21,7 @@ class NotificationScreenTest {
             NotificationScreen(
                 uiState = NotificationUiState.Empty,
                 onRetry = {},
+                onNotificationClick = {},
             )
         }
 
@@ -30,31 +31,27 @@ class NotificationScreenTest {
     @Test
     fun loaded_상태에서_알림_목록이_표시된다() {
         val notifications = persistentListOf(
-            Notification(
+            NotificationUi.Comment(
                 id = "1",
-                type = NotificationType.COMMENT,
-                actorNickname = "이수아",
-                actorProfileImage = null,
-                targetId = null,
-                content = "축하해!",
-                isRead = false,
+                isUnread = true,
                 createdAt = Clock.System.now(),
+                targetId = null,
+                actorName = "이수아",
+                quote = "축하해!",
             ),
-            Notification(
+            NotificationUi.Follow(
                 id = "2",
-                type = NotificationType.FOLLOW,
-                actorNickname = "정재원",
-                actorProfileImage = null,
-                targetId = null,
-                content = null,
-                isRead = true,
+                isUnread = false,
                 createdAt = Clock.System.now(),
+                targetId = null,
+                actorName = "정재원",
             ),
         )
         composeTestRule.setContent {
             NotificationScreen(
                 uiState = NotificationUiState.Loaded(notifications),
                 onRetry = {},
+                onNotificationClick = {},
             )
         }
 
@@ -68,6 +65,7 @@ class NotificationScreenTest {
             NotificationScreen(
                 uiState = NotificationUiState.Error("오류 발생"),
                 onRetry = {},
+                onNotificationClick = {},
             )
         }
 

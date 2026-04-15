@@ -1,0 +1,24 @@
+<resources>
+    <!-- Notification screen -->
+    <string name="notification_title">Notifications</string>
+    <string name="notification_empty_title">No new notifications</string>
+    <string name="notification_empty_description">When friends share events or\nleave comments, you\'ll see them here</string>
+    <string name="notification_retry">Try again</string>
+    <string name="notification_load_error_default">Couldn\'t load notifications</string>
+
+    <!-- Notification body per type -->
+    <string name="notification_action_comment">commented on your post</string>
+    <string name="notification_action_follow">started following you</string>
+    <string name="notification_action_like">liked your post</string>
+    <string name="notification_action_photo">added a new photo</string>
+    <string name="notification_event_reminder">Today\'s event: %1$s</string>
+    <string name="notification_generic_default">New notification</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">Just now</string>
+    <string name="time_minutes_ago">%1$d min ago</string>
+    <string name="time_hours_ago">%1$d hr ago</string>
+    <string name="time_days_ago">%1$d d ago</string>
+    <string name="time_months_ago">%1$d mo ago</string>
+    <string name="time_years_ago">%1$d yr ago</string>
+</resources>

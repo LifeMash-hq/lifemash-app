@@ -30,7 +30,9 @@ internal class NotificationViewModel(
                     _uiState.value = if (notifications.isEmpty()) {
                         NotificationUiState.Empty
                     } else {
-                        NotificationUiState.Loaded(notifications.toPersistentList())
+                        NotificationUiState.Loaded(
+                            notifications.map { it.toUi() }.toPersistentList(),
+                        )
                     }
                 }
                 .onFailure { e ->
@@ -41,7 +43,7 @@ internal class NotificationViewModel(
 
     fun markAllAsRead() {
         val state = _uiState.value as? NotificationUiState.Loaded ?: return
-        val unread = state.notifications.filter { !it.isRead }
+        val unread = state.notifications.filter { it.isUnread }
         if (unread.isEmpty()) return
 
         viewModelScope.launch {

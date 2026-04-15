@@ -8,8 +8,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.bmsk.lifemash.domain.notification.Notification
-import org.bmsk.lifemash.domain.notification.NotificationType
 import org.bmsk.lifemash.domain.notification.NotificationRepository
+import org.bmsk.lifemash.domain.notification.NotificationType
+import org.bmsk.lifemash.domain.usecase.notification.GetNotificationsUseCase
+import org.bmsk.lifemash.domain.usecase.notification.MarkNotificationReadUseCase
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -63,7 +65,10 @@ class NotificationViewModelTest {
         }
     }
 
-    private fun createViewModel() = NotificationViewModel(fakeRepository)
+    private fun createViewModel() = NotificationViewModel(
+        GetNotificationsUseCase(fakeRepository),
+        MarkNotificationReadUseCase(fakeRepository),
+    )
 
     @BeforeTest
     fun setUp() {

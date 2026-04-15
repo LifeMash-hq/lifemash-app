@@ -2,23 +2,15 @@ plugins {
     id("lifemash.kmp.compose")
 }
 
-// CMP 1.10.2 + 통합 KMP 플러그인: androidDeviceTest용 Compose 리소스 복사 태스크 outputDirectory 미설정 workaround
-afterEvaluate {
-    tasks.findByName("copyAndroidDeviceTestComposeResourcesToAndroidAssets")?.let { task ->
-        val prop = task.javaClass.methods.find { it.name == "getOutputDirectory" }
-            ?.invoke(task) as? org.gradle.api.file.DirectoryProperty
-        if (prop != null && !prop.isPresent) {
-            prop.set(layout.buildDirectory.dir("intermediates/compose_resources_assets/androidDeviceTest"))
-        }
-    }
-}
-
 kotlin {
     android {
         namespace = "org.bmsk.lifemash.notification.impl"
         withDeviceTestBuilder {}.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
+        // CMP 1.10 + 통합 KMP 플러그인은 Android resources 처리가 기본 꺼져 있음.
+        // compose resources(strings.xml 등)를 APK assets로 패키징하려면 명시 활성화 필요.
+        androidResources.enable = true
     }
 
     sourceSets {
@@ -32,6 +24,7 @@ kotlin {
             implementation(project(":shared:designsystem"))
             implementation(libs.kotlinx.immutable)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.compose.components.resources)
         }
         val androidDeviceTest by getting {
             dependencies {
@@ -42,4 +35,8 @@ kotlin {
             }
         }
     }
+}
+
+compose.resources {
+    publicResClass = false
 }
