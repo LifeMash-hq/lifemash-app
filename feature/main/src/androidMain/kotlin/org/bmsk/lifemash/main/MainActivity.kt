@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
+import org.bmsk.lifemash.designsystem.component.LifeMashBackground
 import org.bmsk.lifemash.designsystem.theme.LifeMashTheme
 import java.net.UnknownHostException
 import kotlin.system.exitProcess
@@ -38,21 +39,23 @@ internal class MainActivity : AppCompatActivity() {
 
         setContent {
             LifeMashTheme {
-                val snackbarHostState = remember { SnackbarHostState() }
-                val coroutineScope = rememberCoroutineScope()
-                val localContextResource = LocalResources.current
-                val onShowErrorSnackbar: (Throwable?) -> Unit = { throwable ->
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            when (throwable) {
-                                is UnknownHostException -> localContextResource.getString(R.string.the_network_connection_is_not_smooth)
-                                else -> localContextResource.getString(R.string.unknown_error_occurred)
-                            },
-                        )
+                LifeMashBackground {
+                    val snackbarHostState = remember { SnackbarHostState() }
+                    val coroutineScope = rememberCoroutineScope()
+                    val localContextResource = LocalResources.current
+                    val onShowErrorSnackbar: (Throwable?) -> Unit = { throwable ->
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                when (throwable) {
+                                    is UnknownHostException -> localContextResource.getString(R.string.the_network_connection_is_not_smooth)
+                                    else -> localContextResource.getString(R.string.unknown_error_occurred)
+                                },
+                            )
+                        }
                     }
-                }
 
-                MainScreen(onShowErrorSnackbar = onShowErrorSnackbar)
+                    MainScreen(onShowErrorSnackbar = onShowErrorSnackbar)
+                }
             }
         }
     }
